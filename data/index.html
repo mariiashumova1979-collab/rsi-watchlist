@@ -1,0 +1,778 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>RSI Watchlist — Daily Scanner</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --card:#0f172a;
+      --muted:#94a3b8;
+      --text:#e2e8f0;
+      --line:rgba(148,163,184,.20);
+      --ok:#16a34a;
+      --warn:#f59e0b;
+      --bad:#ef4444;
+      --btn:#2563eb;
+      --btn2:#334155;
+      --radius:14px;
+      --shadow:0 10px 30px rgba(0,0,0,.35);
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0; background:var(--bg); color:var(--text);
+      font-family:var(--sans); line-height:1.35;
+    }
+    .wrap{ max-width:1240px; margin:24px auto; padding:0 16px; }
+    h1{ font-size:18px; margin:0 0 10px; font-weight:700; }
+    .card{
+      background:var(--card); border:1px solid var(--line);
+      border-radius:var(--radius); box-shadow:var(--shadow);
+      padding:14px;
+      margin-bottom:14px;
+    }
+    .row{ display:flex; gap:12px; flex-wrap:wrap; align-items:end; }
+    .field{ display:flex; flex-direction:column; gap:6px; min-width:160px; }
+    label{ color:var(--muted); font-size:12px; }
+    input, select{
+      width:100%;
+      padding:10px 10px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:rgba(2,6,23,.35);
+      color:var(--text);
+      outline:none;
+    }
+    input[type="number"]{ font-family:var(--mono); }
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 10px; border:1px solid var(--line);
+      border-radius:999px; background:rgba(2,6,23,.25);
+      color:var(--muted); font-size:12px;
+      white-space:nowrap;
+    }
+    .pill b{ color:var(--text); font-weight:700; }
+    .pill.ok{ border-color:rgba(22,163,74,.35); color:rgba(134,239,172,.9); }
+    .pill.bad{ border-color:rgba(239,68,68,.35); color:rgba(252,165,165,.95); }
+    .pill.warn{ border-color:rgba(245,158,11,.35); color:rgba(253,230,138,.95); }
+
+    .btns{ display:flex; gap:10px; flex-wrap:wrap; }
+    button{
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:10px 12px;
+      background:var(--btn2);
+      color:var(--text);
+      cursor:pointer;
+    }
+    button.primary{ background:var(--btn); border-color:rgba(37,99,235,.35); }
+    button.danger{ background:rgba(239,68,68,.18); border-color:rgba(239,68,68,.35); }
+    button:active{ transform:translateY(1px); }
+    button:disabled{ opacity:.55; cursor:not-allowed; transform:none; }
+
+    .split{
+      display:grid; gap:14px;
+      grid-template-columns: 1.25fr .75fr;
+    }
+    @media (max-width: 980px){
+      .split{ grid-template-columns:1fr; }
+    }
+
+    .tableWrap{ overflow:auto; border-radius:12px; border:1px solid var(--line); }
+    table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      min-width:1060px;
+      font-size:13px;
+    }
+    thead th{
+      position:sticky; top:0;
+      background:rgba(15,23,42,.98);
+      border-bottom:1px solid var(--line);
+      color:var(--muted);
+      text-align:left;
+      padding:10px;
+      font-weight:600;
+      white-space:nowrap;
+    }
+    tbody td{
+      border-bottom:1px solid rgba(148,163,184,.10);
+      padding:8px 10px;
+      vertical-align:middle;
+      white-space:nowrap;
+    }
+    tbody tr:hover{ background:rgba(148,163,184,.06); }
+    .num{ font-family:var(--mono); text-align:right; }
+    .center{ text-align:center; }
+    .tiny{ font-size:12px; color:var(--muted); }
+    .tag{
+      display:inline-flex; align-items:center; justify-content:center;
+      height:22px; padding:0 10px;
+      border-radius:999px; border:1px solid var(--line);
+      font-size:12px; color:var(--muted);
+      background:rgba(2,6,23,.20);
+    }
+    .tag.ok{ border-color:rgba(22,163,74,.35); color:rgba(134,239,172,.95); }
+    .tag.bad{ border-color:rgba(239,68,68,.35); color:rgba(252,165,165,.95); }
+    .tag.warn{ border-color:rgba(245,158,11,.35); color:rgba(253,230,138,.95); }
+
+    .checkbox{ width:18px; height:18px; accent-color:#60a5fa; }
+
+    .summaryBox{ display:flex; flex-direction:column; gap:10px; }
+    .list{
+      display:flex; flex-direction:column; gap:8px;
+      padding:10px; border:1px solid var(--line);
+      border-radius:12px; background:rgba(2,6,23,.22);
+      min-height:120px;
+    }
+    .item{
+      display:flex; justify-content:space-between; gap:10px;
+      border-bottom:1px dashed rgba(148,163,184,.18);
+      padding-bottom:8px;
+    }
+    .item:last-child{ border-bottom:none; padding-bottom:0; }
+    .reason{ color:var(--muted); font-size:12px; }
+    .muted{ color:var(--muted); }
+    .toast{
+      position:fixed; left:16px; bottom:16px;
+      background:rgba(15,23,42,.98);
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:10px 12px;
+      box-shadow:var(--shadow);
+      font-size:13px;
+      opacity:0; transform:translateY(6px);
+      transition:all .18s ease;
+      pointer-events:none;
+      max-width: min(560px, calc(100vw - 32px));
+    }
+    .toast.show{ opacity:1; transform:translateY(0); }
+    .toast.ok{ border-color:rgba(22,163,74,.35); }
+    .toast.bad{ border-color:rgba(239,68,68,.35); }
+    .notesInput{ min-width:300px; max-width:420px; }
+    .tickerInput{ width:92px; }
+    .sectorInput{ width:160px; }
+    .w80{ width:84px; }
+    .w90{ width:92px; }
+    .w110{ width:110px; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>RSI Watchlist — Daily Scanner (RSI-only)</h1>
+
+  <!-- MARKET + DATE CONTROLS -->
+  <div class="card">
+    <div class="row" style="justify-content:space-between; align-items:end;">
+      <div class="row">
+        <div class="field" style="min-width:190px">
+          <label>Дата</label>
+          <div class="row" style="gap:8px; align-items:center;">
+            <button id="prevDay" title="Предыдущий день">←</button>
+            <input id="date" type="date" />
+            <button id="nextDay" title="Следующий день">→</button>
+          </div>
+        </div>
+
+        <div class="field" style="min-width:180px">
+          <label>SPY RSI(14)</label>
+          <input id="spyRsi" type="number" step="0.1" min="0" max="100" />
+        </div>
+
+        <div class="field" style="min-width:260px">
+          <label>Ранжирование сигналов</label>
+          <select id="rankingMode">
+            <option value="abs50" selected>Score = |RSI14 − 50| (как в ТЗ)</option>
+            <option value="extreme">Score = экстремум (лонг: RSI14, шорт: 100−RSI14)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="btns">
+        <button class="primary" id="loadBtn">Загрузить</button>
+        <button class="primary" id="saveBtn">Сохранить</button>
+        <button id="cloneBtn" title="Создать текущий день копированием тикеров из вчера (без RSI)">Clone yesterday</button>
+        <button class="danger" id="resetPicks">Сбросить Pick</button>
+      </div>
+
+      <div class="row" style="margin-left:auto">
+        <span class="pill" id="regimePill">Режим: <b>—</b></span>
+        <span class="pill" id="sizePill">Размер: <b>—</b></span>
+        <span class="pill" id="tradePill">Торговля: <b>—</b></span>
+        <span class="pill" id="pickedPill">Pick: <b>0</b> / 3</span>
+      </div>
+    </div>
+
+    <div class="tiny" style="margin-top:10px">
+      Сохранение идёт в <code>/api/day</code> (Cloudflare Worker + D1). RSI(7) вчера подтягивается автоматически из предыдущей даты.
+    </div>
+  </div>
+
+  <div class="split">
+    <!-- TABLE -->
+    <div class="card">
+      <div class="row" style="justify-content:space-between; align-items:center;">
+        <div class="muted">Вводи только RSI(7) сегодня, RSI(14) сегодня, Earnings. RSI(7) вчера — авто из предыдущего дня.</div>
+        <div class="btns">
+          <button id="addRow">+ Добавить тикер</button>
+          <button id="recalc">Пересчитать</button>
+        </div>
+      </div>
+
+      <div class="tableWrap" style="margin-top:12px;">
+        <table>
+          <thead>
+            <tr>
+              <th class="center">Pick</th>
+              <th>Тикер</th>
+              <th>Сектор</th>
+              <th class="num">RSI7 (вчера)</th>
+              <th class="num">RSI7 (сегодня)</th>
+              <th class="num">RSI14 (сегодня)</th>
+              <th class="center">E ≤6d</th>
+              <th class="center">Cross</th>
+              <th class="center">Signal</th>
+              <th class="center">Allowed</th>
+              <th class="num">Score</th>
+              <th class="num">Rank</th>
+              <th>Notes</th>
+              <th class="center">—</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+
+      <div class="tiny" style="margin-top:10px">
+        LONG: RSI7(y) &lt; 20 и RSI7(t) &gt; 20 и RSI14 &lt; 40 и Earnings=N.  
+        SHORT: RSI7(y) &gt; 80 и RSI7(t) &lt; 80 и RSI14 &gt; 60 и Earnings=N.  
+        Rank — среди Allowed по Score (меньше = выше).
+      </div>
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="card summaryBox">
+      <div class="muted">Сигналы сегодня (Allowed)</div>
+
+      <div>
+        <div class="tiny" style="margin-bottom:6px;">LONG</div>
+        <div class="list" id="longList"></div>
+      </div>
+
+      <div>
+        <div class="tiny" style="margin-bottom:6px;">SHORT</div>
+        <div class="list" id="shortList"></div>
+      </div>
+
+      <div class="tiny">
+        Pick — это отметка «беру в работу сегодня» (лимит 3), не часть расчётов сигналов.
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+  // ---------------- utilities ----------------
+  const $ = (sel, root=document) => root.querySelector(sel);
+  const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+
+  function toNum(v){
+    if(v === "" || v === null || v === undefined) return null;
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
+  }
+  function fmt(n){
+    if(n === null || n === undefined) return "—";
+    const x = Math.round(n * 10) / 10;
+    return String(x).includes(".") ? x.toFixed(1) : String(x);
+  }
+  function toast(msg, kind="ok"){
+    const t = $("#toast");
+    t.textContent = msg;
+    t.className = "toast " + (kind || "");
+    t.classList.add("show");
+    clearTimeout(toast._tm);
+    toast._tm = setTimeout(()=>t.classList.remove("show"), 2200);
+  }
+  function isoDate(d){
+    return d.toISOString().slice(0,10);
+  }
+  function addDays(dateStr, delta){
+    const d = new Date(dateStr);
+    d.setDate(d.getDate() + delta);
+    return isoDate(d);
+  }
+
+  function setTag(el, text, kind){
+    el.textContent = text;
+    el.classList.remove("ok","bad","warn");
+    if(kind) el.classList.add(kind);
+  }
+
+  // ---------------- market regime (simplified) ----------------
+  function calcRegime(spy){
+    // Simplified: trade ON only when 30..70. Disabled if >80 or <20.
+    let regime="—", trade="OFF", size="—", pillKind=null;
+
+    if(spy === null) return {regime, trade, size, pillKind};
+
+    if(spy > 80){
+      regime = "PANIC (RSI>80)";
+      trade  = "OFF";
+      size   = "Cash only";
+      pillKind="bad";
+      return {regime, trade, size, pillKind};
+    }
+    if(spy < 20){
+      regime = "CAPITULATION (RSI<20)";
+      trade  = "OFF";
+      size   = "Cash only";
+      pillKind="bad";
+      return {regime, trade, size, pillKind};
+    }
+
+    if(spy >= 30 && spy <= 70){
+      trade="ON";
+      pillKind="ok";
+    }else{
+      trade="OFF";
+      pillKind="warn";
+    }
+
+    if(spy < 25){
+      regime="Extreme OS"; size="Long 100% / Short 0%";
+    }else if(spy < 45){
+      regime="Bearish"; size="Long 100% / Short 50%";
+    }else if(spy <= 55){
+      regime="Neutral"; size="Long 100% / Short 100%";
+    }else if(spy <= 75){
+      regime="Bullish"; size="Long 50% / Short 100%";
+    }else{
+      regime="Extreme OB"; size="Long 0% / Short 100%";
+    }
+
+    return {regime, trade, size, pillKind};
+  }
+
+  function updateMarketPills(){
+    const spy = toNum($("#spyRsi").value);
+    const {regime, trade, size, pillKind} = calcRegime(spy);
+
+    const regimePill = $("#regimePill");
+    const sizePill   = $("#sizePill");
+    const tradePill  = $("#tradePill");
+
+    regimePill.innerHTML = `Режим: <b>${regime}</b>`;
+    sizePill.innerHTML   = `Размер: <b>${size}</b>`;
+    tradePill.innerHTML  = `Торговля: <b>${trade}</b>`;
+
+    [regimePill, tradePill].forEach(p=>{
+      p.classList.remove("ok","bad","warn");
+      if(pillKind) p.classList.add(pillKind);
+    });
+    sizePill.classList.remove("ok","bad","warn");
+  }
+
+  // ---------------- table row rendering ----------------
+  function rowTemplate(data={}){
+    const {
+      ticker="", sector="",
+      rsi7_today=null, rsi14_today=null,
+      rsi7_yesterday=null,
+      earnings=0, notes=""
+    } = data;
+
+    const tr = document.createElement("tr");
+    tr.setAttribute("data-row","");
+
+    tr.innerHTML = `
+      <td class="center"><input class="checkbox pick" type="checkbox" /></td>
+
+      <td><input class="ticker tickerInput" value="${escapeHtml(ticker)}" placeholder="TICKER" /></td>
+      <td><input class="sector sectorInput" value="${escapeHtml(sector)}" placeholder="Sector" /></td>
+
+      <td class="num"><span class="rsi7y">${rsi7_yesterday === null ? "—" : fmt(rsi7_yesterday)}</span></td>
+
+      <td><input class="rsi7t num w80" type="number" step="0.1" min="0" max="100" value="${rsi7_today ?? ""}" /></td>
+      <td><input class="rsi14t num w90" type="number" step="0.1" min="0" max="100" value="${rsi14_today ?? ""}" /></td>
+
+      <td class="center">
+        <select class="earn w80">
+          <option value="0" ${earnings ? "" : "selected"}>N</option>
+          <option value="1" ${earnings ? "selected" : ""}>Y</option>
+        </select>
+      </td>
+
+      <td class="center"><span class="tag cross">—</span></td>
+      <td class="center"><span class="tag sig">—</span></td>
+      <td class="center"><span class="tag allow">—</span></td>
+      <td class="num"><span class="score">—</span></td>
+      <td class="num"><span class="rank">—</span></td>
+
+      <td><input class="notes notesInput" value="${escapeHtml(notes)}" placeholder="авто: причина блокировки или заметка" /></td>
+
+      <td class="center">
+        <button class="danger delBtn" title="Удалить строку">✕</button>
+      </td>
+    `;
+    return tr;
+  }
+
+  function escapeHtml(s){
+    return String(s ?? "")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+
+  function fillTable(rows){
+    const tbody = $("#tbody");
+    tbody.innerHTML = "";
+    (rows || []).forEach(r => tbody.appendChild(rowTemplate(r)));
+    if((rows || []).length === 0){
+      // start with a few empty rows
+      tbody.appendChild(rowTemplate({ ticker:"NVDA", sector:"Tech" }));
+      tbody.appendChild(rowTemplate({ ticker:"TSLA", sector:"ConsDisc" }));
+      tbody.appendChild(rowTemplate({ ticker:"PLTR", sector:"Tech" }));
+    }
+    recalcAll();
+  }
+
+  function collectRows(){
+    const rows = [];
+    $$("tr[data-row]", $("#tbody")).forEach(tr => {
+      const ticker = $(".ticker", tr).value.trim().toUpperCase();
+      if(!ticker) return;
+
+      rows.push({
+        ticker,
+        sector: $(".sector", tr).value.trim(),
+        rsi7_today: toNum($(".rsi7t", tr).value),
+        rsi14_today: toNum($(".rsi14t", tr).value),
+        earnings: Number($(".earn", tr).value) ? 1 : 0,
+        notes: $(".notes", tr).value.trim()
+      });
+    });
+    return rows;
+  }
+
+  // ---------------- row calc ----------------
+  function calcRow(tr, rankingMode){
+    const rsi7y = toNum($(".rsi7y", tr).textContent) ?? null; // rendered number or —
+    const rsi7t = toNum($(".rsi7t", tr).value);
+    const rsi14 = toNum($(".rsi14t", tr).value);
+    const earn  = Number($(".earn", tr).value); // 0/1
+
+    const crossTag = $(".cross", tr);
+    const sigTag   = $(".sig", tr);
+    const allowTag = $(".allow", tr);
+    const scoreEl  = $(".score", tr);
+    const rankEl   = $(".rank", tr);
+    const notes    = $(".notes", tr);
+
+    // reset
+    setTag(crossTag, "—", null);
+    setTag(sigTag, "—", null);
+    setTag(allowTag, "—", null);
+    scoreEl.textContent = "—";
+    rankEl.textContent = "—";
+
+    // if no "yesterday" (no prev day), no signal
+    if(rsi7y === null || rsi7t === null){
+      // keep notes as is
+      return { signal:null, allowed:false, score:null };
+    }
+
+    // cross detection
+    let cross = null;
+    if(rsi7y < 20 && rsi7t > 20) cross = "UP20";
+    if(rsi7y > 80 && rsi7t < 80) cross = "DN80";
+
+    if(cross === "UP20") setTag(crossTag, "↑20", "ok");
+    else if(cross === "DN80") setTag(crossTag, "↓80", "ok");
+
+    let signal=null, allowed=false, reason="";
+
+    if(cross === "UP20"){
+      signal="LONG"; setTag(sigTag, "LONG", "ok");
+      if(earn) { allowed=false; reason="blocked: earnings ≤6d"; }
+      else if(rsi14 === null) { allowed=false; reason="blocked: RSI14 empty"; }
+      else if(rsi14 >= 40) { allowed=false; reason="blocked: RSI14 ≥ 40"; }
+      else allowed=true;
+    }
+
+    if(cross === "DN80"){
+      signal="SHORT"; setTag(sigTag, "SHORT", "warn");
+      if(earn) { allowed=false; reason="blocked: earnings ≤6d"; }
+      else if(rsi14 === null) { allowed=false; reason="blocked: RSI14 empty"; }
+      else if(rsi14 <= 60) { allowed=false; reason="blocked: RSI14 ≤ 60"; }
+      else allowed=true;
+    }
+
+    if(signal === null){
+      if(notes.value.startsWith("blocked:")) notes.value = "";
+      return { signal:null, allowed:false, score:null };
+    }
+
+    if(allowed){
+      setTag(allowTag, "✅", "ok");
+      if(notes.value.startsWith("blocked:")) notes.value = "";
+    }else{
+      setTag(allowTag, "❌", "bad");
+      if(!notes.value.trim() || notes.value.startsWith("blocked:")) notes.value = reason;
+    }
+
+    let score=null;
+    if(allowed && rsi14 !== null){
+      if(rankingMode === "abs50"){
+        score = Math.abs(rsi14 - 50);
+      }else{
+        score = (signal === "LONG") ? rsi14 : (100 - rsi14);
+      }
+      scoreEl.textContent = fmt(score);
+    }
+
+    return { signal, allowed, score };
+  }
+
+  function updatePickCount(){
+    const picks = $$(".pick", document).filter(x => x.checked).length;
+    $("#pickedPill").innerHTML = `Pick: <b>${picks}</b> / 3`;
+    $("#pickedPill").classList.remove("ok","warn","bad");
+    $("#pickedPill").classList.add(picks > 3 ? "bad" : (picks === 3 ? "warn" : "ok"));
+  }
+
+  function renderSummary(allowedSorted){
+    const longs  = allowedSorted.filter(x => x.signal === "LONG");
+    const shorts = allowedSorted.filter(x => x.signal === "SHORT");
+
+    const longList  = $("#longList");
+    const shortList = $("#shortList");
+    longList.innerHTML = "";
+    shortList.innerHTML = "";
+
+    function render(list, root){
+      if(list.length === 0){
+        root.innerHTML = `<div class="muted">Нет</div>`;
+        return;
+      }
+      list.forEach(x => {
+        const tr = x.tr;
+        const t  = $(".ticker", tr).value.trim().toUpperCase() || "—";
+        const s  = $(".sector", tr).value.trim() || "—";
+        const r  = $(".rank", tr).textContent || "—";
+        const sc = $(".score", tr).textContent || "—";
+        const el = document.createElement("div");
+        el.className = "item";
+        el.innerHTML = `
+          <div>
+            <div><b>${t}</b> <span class="muted">(${s})</span></div>
+            <div class="reason">Rank ${r} · Score ${sc}</div>
+          </div>
+          <div class="tag ok">ALLOWED</div>
+        `;
+        root.appendChild(el);
+      });
+    }
+
+    render(longs, longList);
+    render(shorts, shortList);
+  }
+
+  function recalcAll(){
+    updateMarketPills();
+
+    const rankingMode = $("#rankingMode").value;
+
+    const rows = $$("tr[data-row]", $("#tbody"));
+    const computed = rows.map(tr => ({ tr, ...calcRow(tr, rankingMode) }));
+
+    // rank among allowed with score asc
+    const allowedSorted = computed
+      .filter(x => x.allowed && x.score !== null)
+      .sort((a,b) => a.score - b.score);
+
+    allowedSorted.forEach((x, idx) => {
+      $(".rank", x.tr).textContent = String(idx + 1);
+    });
+
+    renderSummary(allowedSorted);
+    updatePickCount();
+  }
+
+  // ---------------- API calls ----------------
+  async function apiGetDay(date){
+    const res = await fetch(`/api/day?date=${encodeURIComponent(date)}`);
+    if(!res.ok) throw new Error(`GET failed: ${res.status}`);
+    return await res.json();
+  }
+  async function apiSaveDay(date, spyRsi, rows){
+    const payload = {
+      date,
+      meta: { spy_rsi14: spyRsi },
+      rows
+    };
+    const res = await fetch("/api/day", {
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify(payload)
+    });
+    if(!res.ok) throw new Error(`POST failed: ${res.status}`);
+    return await res.json();
+  }
+
+  // ---------------- date actions ----------------
+  async function loadCurrentDate(){
+    const date = $("#date").value;
+    if(!date) return;
+
+    $("#loadBtn").disabled = true;
+    try{
+      const data = await apiGetDay(date);
+
+      // meta: restore spyRsi if present
+      if(data.meta && data.meta.spy_rsi14 !== undefined && data.meta.spy_rsi14 !== null){
+        $("#spyRsi").value = data.meta.spy_rsi14;
+      }else if($("#spyRsi").value === ""){
+        $("#spyRsi").value = "";
+      }
+
+      fillTable(data.rows || []);
+      toast(`Загружено: ${date}`, "ok");
+    }catch(e){
+      // if day not found, just start with empty table but keep yesterday auto via API only after save
+      fillTable([]);
+      toast(`Нет данных за ${date} (создай и сохрани)`, "warn");
+      console.error(e);
+    }finally{
+      $("#loadBtn").disabled = false;
+    }
+  }
+
+  async function saveCurrentDate(){
+    const date = $("#date").value;
+    const spy = toNum($("#spyRsi").value);
+
+    const rows = collectRows();
+    if(!date){ toast("Дата не выбрана", "bad"); return; }
+    if(rows.length === 0){ toast("Нет тикеров для сохранения", "bad"); return; }
+
+    $("#saveBtn").disabled = true;
+    try{
+      await apiSaveDay(date, spy, rows);
+      toast(`Сохранено: ${date} (${rows.length} тикеров)`, "ok");
+
+      // reload to refresh auto "RSI yesterday" from prev day
+      await loadCurrentDate();
+    }catch(e){
+      toast(`Ошибка сохранения (проверь Worker/D1)`, "bad");
+      console.error(e);
+    }finally{
+      $("#saveBtn").disabled = false;
+    }
+  }
+
+  async function cloneYesterdayTickers(){
+    const date = $("#date").value;
+    if(!date){ toast("Дата не выбрана", "bad"); return; }
+    const prev = addDays(date, -1);
+
+    $("#cloneBtn").disabled = true;
+    try{
+      const y = await apiGetDay(prev);
+      const tickers = (y.rows || []).map(r => ({
+        ticker: r.ticker,
+        sector: r.sector || "",
+        rsi7_today: null,
+        rsi14_today: null,
+        rsi7_yesterday: null,
+        earnings: 0,
+        notes: ""
+      }));
+      fillTable(tickers);
+      toast(`Скопированы тикеры из ${prev} (без RSI)`, "ok");
+    }catch(e){
+      toast(`Нет данных за ${prev}`, "warn");
+      console.error(e);
+    }finally{
+      $("#cloneBtn").disabled = false;
+    }
+  }
+
+  // ---------------- events ----------------
+  $("#recalc").addEventListener("click", recalcAll);
+  $("#rankingMode").addEventListener("change", recalcAll);
+  $("#spyRsi").addEventListener("input", recalcAll);
+
+  $("#prevDay").addEventListener("click", async () => {
+    $("#date").value = addDays($("#date").value, -1);
+    await loadCurrentDate();
+  });
+  $("#nextDay").addEventListener("click", async () => {
+    $("#date").value = addDays($("#date").value, +1);
+    await loadCurrentDate();
+  });
+
+  $("#loadBtn").addEventListener("click", loadCurrentDate);
+  $("#saveBtn").addEventListener("click", saveCurrentDate);
+  $("#cloneBtn").addEventListener("click", cloneYesterdayTickers);
+
+  $("#resetPicks").addEventListener("click", () => {
+    $$(".pick", document).forEach(x => x.checked = false);
+    updatePickCount();
+    toast("Pick сброшен", "ok");
+  });
+
+  $("#addRow").addEventListener("click", () => {
+    $("#tbody").appendChild(rowTemplate({}));
+    recalcAll();
+  });
+
+  document.addEventListener("click", (e) => {
+    if(e.target.classList.contains("delBtn")){
+      const tr = e.target.closest("tr[data-row]");
+      if(tr) tr.remove();
+      recalcAll();
+    }
+  });
+
+  document.addEventListener("input", (e) => {
+    if(e.target.closest("tr[data-row]")) recalcAll();
+  });
+
+  document.addEventListener("change", (e) => {
+    if(e.target.classList.contains("pick")){
+      const picks = $$(".pick", document).filter(x => x.checked);
+      if(picks.length > 3){
+        e.target.checked = false;
+        toast("Лимит Pick = 3", "warn");
+      }
+      updatePickCount();
+    }
+    if(e.target.closest("tr[data-row]")) recalcAll();
+  });
+
+  $("#date").addEventListener("change", loadCurrentDate);
+
+  // ---------------- init ----------------
+  (function init(){
+    // default date = today
+    const today = isoDate(new Date());
+    $("#date").value = today;
+    $("#spyRsi").value = 52;
+
+    // initial empty table, then try load
+    fillTable([]);
+    loadCurrentDate();
+  })();
+</script>
+</body>
+</html>
