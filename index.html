@@ -38,7 +38,6 @@
     tr:last-child td{border-bottom:0}
     .tag{display:inline-flex; align-items:center; gap:6px; padding:3px 8px; border-radius:999px; font-size:12px; border:1px solid var(--line)}
     .tag.ok{border-color:rgba(22,163,74,.45); color:#86efac}
-    .tag.warn{border-color:rgba(245,158,11,.45); color:#fde68a}
     .tag.bad{border-color:rgba(239,68,68,.45); color:#fecaca}
     .small{font-size:12px; color:var(--muted)}
     .right{display:flex; justify-content:flex-end}
@@ -46,6 +45,17 @@
     .notice{padding:10px 12px; border-radius:12px; border:1px solid var(--line); background:rgba(148,163,184,.06); color:var(--muted); font-size:12px}
     .error{color:#fecaca}
     .oktext{color:#86efac}
+
+    /* Tabs + Watchlist editor */
+    .tabs{display:flex; gap:10px; flex-wrap:wrap}
+    .tab{background:var(--btn2); padding:10px 12px; border-radius:12px; border:1px solid var(--line); cursor:pointer; user-select:none}
+    .tab.active{background:var(--btn); border-color:rgba(37,99,235,.35)}
+    .view{display:none}
+    .view.active{display:block}
+    .wl-grid{display:grid; grid-template-columns: 1fr 1fr 120px; gap:10px}
+    .wl-row{display:grid; grid-template-columns: 140px 1fr 120px; gap:10px; align-items:center}
+    .wl-row input{width:100%}
+    .smallbtn{padding:10px 12px; border-radius:12px}
   </style>
 </head>
 <body>
@@ -53,6 +63,7 @@
   <h1>RSI Watchlist</h1>
 
   <div class="grid">
+    <!-- LEFT CARD -->
     <div class="card">
       <div class="row">
         <div>
@@ -60,9 +71,9 @@
           <input id="date" type="date" />
         </div>
         <div>
-          <label>Кэш токен GitHub (не хранится в коде)</label>
-          <input id="token" type="password" placeholder="GitHub fine-grained token (Contents RW)" />
-          <div class="small">Хранится только в твоём браузере (localStorage). Можно очистить кнопкой.</div>
+          <label>GitHub token (Contents: Read &amp; Write)</label>
+          <input id="token" type="password" placeholder="fine-grained token" />
+          <div class="small">Токен не в коде. Можно сохранить в браузере.</div>
         </div>
       </div>
 
@@ -86,7 +97,7 @@
       <div style="height:10px"></div>
 
       <div class="btns">
-        <button class="secondary" id="load">Load from Git</button>
+        <button class="secondary" id="load">Load history from Git (sha)</button>
         <button class="secondary" id="saveToken">Save token (local)</button>
         <button class="danger" id="clearToken">Clear token</button>
       </div>
@@ -98,25 +109,37 @@
       <div class="notice">
         Правила сигнала:
         <div class="mono" style="margin-top:6px">
-          LONG: RSI7 crossed ↑20 (вчера <=20, сегодня >20) и RSI14 < 40<br/>
-          SHORT: RSI7 crossed ↓80 (вчера >=80, сегодня <80) и RSI14 > 60
+          LONG: RSI7 crossed ↑20 (вчера &lt;=20, сегодня &gt;20) и RSI14 &lt; 40<br/>
+          SHORT: RSI7 crossed ↓80 (вчера &gt;=80, сегодня &lt;80) и RSI14 &gt; 60
+        </div>
+        <div class="small" style="margin-top:8px">
+          RSI7 вчера берётся из предыдущей даты в history.json (date-1).
         </div>
       </div>
     </div>
 
+    <!-- RIGHT CARD WITH TABS -->
     <div class="card">
-      <div class="sticky-actions">
-        <div class="small" id="meta"></div>
-        <div class="btns">
-          <button class="secondary" id="exportDay">Export day JSON</button>
-          <button class="primary" id="saveGit">Save to GitHub</button>
-        </div>
+
+      <div class="tabs" style="margin-bottom:12px">
+        <div class="tab active" id="tabScanner">Scanner</div>
+        <div class="tab" id="tabWatchlist">Watchlist</div>
       </div>
 
-      <div style="height:10px"></div>
+      <!-- VIEW: SCANNER -->
+      <div class="view active" id="viewScanner">
+        <div class="sticky-actions">
+          <div class="small" id="meta"></div>
+          <div class="btns">
+            <button class="secondary" id="exportDay">Export day JSON</button>
+            <button class="primary" id="saveGit">Save day to GitHub</button>
+          </div>
+        </div>
 
-      <table>
-        <thead>
+        <div style="height:10px"></div>
+
+        <table>
+          <thead>
           <tr>
             <th style="width:120px">Ticker</th>
             <th style="width:110px">RSI7 today</th>
@@ -126,12 +149,51 @@
             <th style="width:110px">Pick</th>
             <th>Notes</th>
           </tr>
-        </thead>
-        <tbody id="tbody"></tbody>
-      </table>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
 
-      <div style="height:10px"></div>
-      <div class="right small">Изменения остаются в браузере до “Save to GitHub”.</div>
+        <div style="height:10px"></div>
+        <div class="right small">Изменения остаются в браузере до “Save day to GitHub”.</div>
+      </div>
+
+      <!-- VIEW: WATCHLIST -->
+      <div class="view" id="viewWatchlist">
+        <div class="notice">
+          Здесь редактируется <span class="mono">data/watchlist.json</span>.
+          История (<span class="mono">history.json</span>) не трогается.
+        </div>
+
+        <div style="height:12px"></div>
+
+        <div class="wl-grid">
+          <div>
+            <label>Ticker</label>
+            <input id="wlNewTicker" placeholder="например, META" />
+          </div>
+          <div>
+            <label>Sector</label>
+            <input id="wlNewSector" placeholder="например, Tech" />
+          </div>
+          <div style="display:flex; align-items:end">
+            <button class="secondary smallbtn" id="wlAdd">+ Add</button>
+          </div>
+        </div>
+
+        <div style="height:12px"></div>
+
+        <div class="sticky-actions">
+          <div class="small" id="wlMeta"></div>
+          <div class="btns">
+            <button class="secondary" id="wlReload">Reload watchlist (sha)</button>
+            <button class="primary" id="wlSave">Save watchlist to GitHub</button>
+          </div>
+        </div>
+
+        <div style="height:10px"></div>
+
+        <div id="wlList" style="display:flex; flex-direction:column; gap:10px"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -142,12 +204,15 @@
   const HISTORY_RAW   = "https://raw.githubusercontent.com/mariiashumova1979-collab/rsi-watchlist/refs/heads/main/data/history.json";
 
   const $ = (id)=>document.getElementById(id);
+
   const state = {
     watchlist: [],
     history: null,
     date: null,
     dayRows: [],
-    historySha: null
+    historySha: null,
+    watchlistObj: null,
+    watchlistSha: null
   };
 
   function setStatus(msg, type="") {
@@ -159,10 +224,17 @@
   }
 
   function fmtDate(d){ return d.toISOString().slice(0,10); }
+
   function prevDateStr(dateStr){
     const d = new Date(dateStr+"T00:00:00");
     d.setDate(d.getDate()-1);
     return fmtDate(d);
+  }
+
+  function safeNum(v){
+    if (v===null || v===undefined || v==="") return null;
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
   }
 
   function computeSignal(rsi7Today, rsi14Today, rsi7Prev){
@@ -180,22 +252,19 @@
     return `<span class="tag">—</span>`;
   }
 
-  function safeNum(v){
-    if (v===null || v===undefined || v==="") return null;
-    const n = Number(v);
-    return Number.isFinite(n) ? n : null;
-  }
-
-  async function loadWatchlist(){
+  async function loadWatchlistRaw(){
     const res = await fetch(WATCHLIST_URL, { cache:"no-store" });
-    if (!res.ok) throw new Error("watchlist fetch failed");
+    if (!res.ok) throw new Error("Watchlist not loaded");
     const data = await res.json();
-    return data.tickers || [];
+    return (data.tickers || []).map(x => ({
+      ticker: (x.ticker || "").toUpperCase().trim(),
+      sector: (x.sector || "").trim()
+    }));
   }
 
   async function loadHistoryRaw(){
     const res = await fetch(HISTORY_RAW, { cache:"no-store" });
-    if (!res.ok) throw new Error("history fetch failed");
+    if (!res.ok) throw new Error("History not loaded");
     return await res.json();
   }
 
@@ -209,7 +278,7 @@
   function buildDayRows(dateStr){
     const prev = prevDateStr(dateStr);
     const prevRows = (state.history.days[prev] || []);
-    const prevMap = new Map(prevRows.map(r => [r.ticker, r.rsi7 ?? r.rsi7_today ?? r.rsi7Today ?? null]));
+    const prevMap = new Map(prevRows.map(r => [r.ticker, r.rsi7_prev ?? r.rsi7 ?? null])); // tolerate old formats
 
     const todayExisting = (state.history.days[dateStr] || []);
     const todayMap = new Map(todayExisting.map(r => [r.ticker, r]));
@@ -264,8 +333,44 @@
         }
         const r = state.dayRows[idx];
         r.signal = computeSignal(r.rsi7, r.rsi14, r.rsi7_prev);
-        // rerender just signal cell
         tr.children[4].innerHTML = signalTag(r.signal);
+      });
+    });
+  }
+
+  function renderWatchlist(){
+    const root = $("wlList");
+    $("wlMeta").textContent = `Tickers: ${state.watchlist.length}`;
+    root.innerHTML = "";
+
+    state.watchlist.forEach((w, idx) => {
+      const row = document.createElement("div");
+      row.className = "wl-row";
+      row.dataset.idx = String(idx);
+      row.innerHTML = `
+        <input class="mono" data-k="ticker" value="${(w.ticker||"").replaceAll('"',"&quot;")}" />
+        <input data-k="sector" value="${(w.sector||"").replaceAll('"',"&quot;")}" />
+        <button class="danger smallbtn" data-act="del">Delete</button>
+      `;
+      root.appendChild(row);
+    });
+
+    root.querySelectorAll("input").forEach(el=>{
+      el.addEventListener("change", (e)=>{
+        const row = e.target.closest(".wl-row");
+        const idx = Number(row.dataset.idx);
+        const key = e.target.dataset.k;
+        state.watchlist[idx][key] = (e.target.value || "").trim();
+        if(key === "ticker") state.watchlist[idx].ticker = state.watchlist[idx].ticker.toUpperCase().trim();
+      });
+    });
+
+    root.querySelectorAll("button[data-act='del']").forEach(btn=>{
+      btn.addEventListener("click", (e)=>{
+        const row = e.target.closest(".wl-row");
+        const idx = Number(row.dataset.idx);
+        state.watchlist.splice(idx, 1);
+        renderWatchlist();
       });
     });
   }
@@ -289,10 +394,11 @@
 
   async function githubGetFile(owner, repo, path){
     const url = `https://api.github.com/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}`;
+    const token = getAuthToken();
     const res = await fetch(url, {
       headers: {
         "Accept": "application/vnd.github+json",
-        ...(getAuthToken() ? { "Authorization": "Bearer " + getAuthToken() } : {})
+        ...(token ? { "Authorization": "Bearer " + token } : {})
       }
     });
     if (!res.ok) {
@@ -302,13 +408,13 @@
     return await res.json(); // includes content + sha
   }
 
-  async function githubPutFile(owner, repo, path, contentObj, sha){
+  async function githubPutFile(owner, repo, path, contentObj, sha, message){
     const url = `https://api.github.com/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}`;
     const token = getAuthToken();
-    if (!token) throw new Error("No GitHub token (Contents RW) provided");
+    if (!token) throw new Error("No GitHub token provided");
 
     const body = {
-      message: `Update history ${state.date}`,
+      message: message || `Update ${path}`,
       content: btoa(unescape(encodeURIComponent(JSON.stringify(contentObj, null, 2)))),
       sha
     };
@@ -330,49 +436,107 @@
     return await res.json();
   }
 
-  async function init(){
-    // default date today
-    const today = new Date();
-    $("date").value = fmtDate(today);
+  async function loadWatchlistFromGit(){
+    const owner = $("owner").value.trim();
+    const repo  = $("repo").value.trim();
+    const path  = "data/watchlist.json";
 
-    // preload token if exists
-    const t = localStorage.getItem("gh_token");
-    if (t) $("token").value = t;
+    const file = await githubGetFile(owner, repo, path);
+    const decoded = decodeURIComponent(escape(atob(file.content.replaceAll("\n",""))));
+    const obj = JSON.parse(decoded);
 
-    setStatus("loading watchlist + history...");
-    state.watchlist = await loadWatchlist();
-    state.history = ensureBaseHistory(await loadHistoryRaw());
-    state.date = $("date").value;
-    buildDayRows(state.date);
-    setStatus("loaded from raw github (read-only). Use Load from Git for write mode.", "ok");
+    state.watchlistSha = file.sha;
+    state.watchlistObj = obj;
+
+    state.watchlist = (obj.tickers || []).map(x => ({
+      ticker: (x.ticker || "").toUpperCase().trim(),
+      sector: (x.sector || "").trim()
+    }));
   }
 
+  async function saveWatchlistToGit(){
+    const owner = $("owner").value.trim();
+    const repo  = $("repo").value.trim();
+    const path  = "data/watchlist.json";
+
+    if(!state.watchlistSha){
+      throw new Error("No watchlist sha. Click 'Reload watchlist (sha)' first.");
+    }
+
+    const obj = state.watchlistObj && typeof state.watchlistObj === "object"
+      ? state.watchlistObj
+      : { tickers: [] };
+
+    obj.tickers = state.watchlist.map(w => ({
+      ticker: (w.ticker || "").toUpperCase().trim(),
+      sector: (w.sector || "").trim()
+    }));
+
+    const resp = await githubPutFile(owner, repo, path, obj, state.watchlistSha, "Update watchlist");
+    state.watchlistSha = resp.content.sha;
+    state.watchlistObj = obj;
+
+    // update scanner
+    buildDayRows(state.date);
+  }
+
+  // Tabs
+  function setTab(name){
+    const scannerOn = name === "scanner";
+    $("tabScanner").classList.toggle("active", scannerOn);
+    $("tabWatchlist").classList.toggle("active", !scannerOn);
+    $("viewScanner").classList.toggle("active", scannerOn);
+    $("viewWatchlist").classList.toggle("active", !scannerOn);
+  }
+
+  // Actions
   $("saveToken").addEventListener("click", saveToken);
   $("clearToken").addEventListener("click", clearToken);
 
-  $("date").addEventListener("change", async ()=>{
-    state.date = $("date").value;
-    // reload raw history to keep consistent
-    state.history = ensureBaseHistory(await loadHistoryRaw());
-    buildDayRows(state.date);
-    setStatus("date changed; refreshed from raw history", "ok");
+  $("tabScanner").addEventListener("click", ()=>setTab("scanner"));
+  $("tabWatchlist").addEventListener("click", ()=>{
+    setTab("watchlist");
+    renderWatchlist();
+    setStatus("watchlist opened. To save, click Reload watchlist (sha) first (needs token).", "ok");
   });
 
-  $("load").addEventListener("click", async ()=>{
+  $("wlAdd").addEventListener("click", ()=>{
+    const t = $("wlNewTicker").value.trim();
+    const s = $("wlNewSector").value.trim();
+    if(!t) return;
+    state.watchlist.unshift({ ticker: t.toUpperCase().trim(), sector: s });
+    $("wlNewTicker").value = "";
+    $("wlNewSector").value = "";
+    renderWatchlist();
+  });
+
+  $("wlReload").addEventListener("click", async ()=>{
     try{
-      setStatus("loading history.json from GitHub API (to get sha)...");
-      const owner = $("owner").value.trim();
-      const repo  = $("repo").value.trim();
-      const path  = $("path").value.trim();
+      setStatus("loading watchlist from GitHub API (sha acquired)...", "");
+      await loadWatchlistFromGit();
+      renderWatchlist();
+      setStatus("watchlist loaded via GitHub API. You can save now.", "ok");
+    } catch(e){
+      setStatus(e.message, "error");
+    }
+  });
 
-      const file = await githubGetFile(owner, repo, path);
-      state.historySha = file.sha;
+  $("wlSave").addEventListener("click", async ()=>{
+    try{
+      setStatus("saving watchlist to GitHub...", "");
+      await saveWatchlistToGit();
+      setStatus("watchlist saved to GitHub", "ok");
+    } catch(e){
+      setStatus(e.message, "error");
+    }
+  });
 
-      const decoded = decodeURIComponent(escape(atob(file.content.replaceAll("\n",""))));
-      state.history = ensureBaseHistory(JSON.parse(decoded));
-
+  $("date").addEventListener("change", async ()=>{
+    try{
+      state.date = $("date").value;
+      state.history = ensureBaseHistory(await loadHistoryRaw());
       buildDayRows(state.date);
-      setStatus("loaded via GitHub API (sha acquired). You can Save to GitHub now.", "ok");
+      setStatus("date changed; refreshed history raw", "ok");
     } catch(e){
       setStatus(e.message, "error");
     }
@@ -385,6 +549,27 @@
     setStatus("day JSON copied to clipboard", "ok");
   });
 
+  // History (day) load/save via GitHub API
+  $("load").addEventListener("click", async ()=>{
+    try{
+      setStatus("loading history.json from GitHub API (sha acquired)...", "");
+      const owner = $("owner").value.trim();
+      const repo  = $("repo").value.trim();
+      const path  = $("path").value.trim();
+
+      const file = await githubGetFile(owner, repo, path);
+      state.historySha = file.sha;
+
+      const decoded = decodeURIComponent(escape(atob(file.content.replaceAll("\n",""))));
+      state.history = ensureBaseHistory(JSON.parse(decoded));
+
+      buildDayRows(state.date);
+      setStatus("history loaded via GitHub API. You can save day now.", "ok");
+    } catch(e){
+      setStatus(e.message, "error");
+    }
+  });
+
   $("saveGit").addEventListener("click", async ()=>{
     try{
       const owner = $("owner").value.trim();
@@ -392,10 +577,9 @@
       const path  = $("path").value.trim();
 
       if (!state.historySha) {
-        throw new Error("No sha. Click 'Load from Git' first (needs token).");
+        throw new Error("No history sha. Click 'Load history from Git (sha)' first.");
       }
 
-      // write today rows into history.days[date]
       const cleaned = state.dayRows
         .filter(r => r.rsi7!=null || r.rsi14!=null || r.pick || r.notes)
         .map(r => ({
@@ -410,14 +594,32 @@
 
       state.history.days[state.date] = cleaned;
 
-      setStatus("saving to GitHub...");
-      const resp = await githubPutFile(owner, repo, path, state.history, state.historySha);
-      state.historySha = resp.content.sha; // update sha after write
-      setStatus("saved to GitHub successfully", "ok");
+      setStatus("saving day to GitHub...", "");
+      const resp = await githubPutFile(owner, repo, path, state.history, state.historySha, `Update history ${state.date}`);
+      state.historySha = resp.content.sha;
+      setStatus("day saved to GitHub successfully", "ok");
     } catch(e){
       setStatus(e.message, "error");
     }
   });
+
+  async function init(){
+    // default date today
+    const today = new Date();
+    $("date").value = fmtDate(today);
+    state.date = $("date").value;
+
+    // preload token if exists
+    const t = localStorage.getItem("gh_token");
+    if (t) $("token").value = t;
+
+    setStatus("loading raw watchlist + raw history...");
+    state.watchlist = await loadWatchlistRaw();
+    state.history = ensureBaseHistory(await loadHistoryRaw());
+    buildDayRows(state.date);
+    $("wlMeta").textContent = `Tickers: ${state.watchlist.length}`;
+    setStatus("loaded from raw GitHub. For saving to GitHub, load sha via API buttons.", "ok");
+  }
 
   init().catch(e => setStatus(e.message, "error"));
 </script>
