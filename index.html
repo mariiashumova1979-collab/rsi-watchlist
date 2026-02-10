@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>RSI Watchlist</title>
+  <style>
+    :root{
+      --bg:#0b1220; --card:#0f172a; --muted:#94a3b8; --text:#e2e8f0;
+      --line:rgba(148,163,184,.25); --btn:#2563eb; --btn2:#334155;
+      --ok:#16a34a; --warn:#f59e0b; --bad:#ef4444;
+      --radius:14px; --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
+    }
+    *{box-sizing:border-box}
+    body{margin:0; font-family:var(--sans); background:var(--bg); color:var(--text)}
+    .wrap{max-width:1200px; margin:24px auto; padding:0 16px}
+    h1{margin:0 0 16px 0; font-size:22px}
+    .grid{display:grid; grid-template-columns: 1.2fr 2fr; gap:14px}
+    .card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:0 10px 30px rgba(0,0,0,.25)}
+    label{display:block; font-size:12px; color:var(--muted); margin:0 0 6px}
+    input, select, button, textarea{
+      width:100%; padding:10px 12px; border-radius:12px; border:1px solid var(--line);
+      background:rgba(2,6,23,.35); color:var(--text); outline:none;
+    }
+    input[type="date"]{padding:9px 12px}
+    .row{display:grid; grid-template-columns: 1fr 1fr; gap:10px}
+    .row3{display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px}
+    .btns{display:flex; gap:10px; flex-wrap:wrap}
+    button{cursor:pointer; border:0}
+    .primary{background:var(--btn)}
+    .secondary{background:var(--btn2)}
+    .danger{background:var(--bad)}
+    .mono{font-family:var(--mono); font-size:12px}
+    table{width:100%; border-collapse:collapse; overflow:hidden; border-radius:12px; border:1px solid var(--line)}
+    th, td{padding:10px 10px; border-bottom:1px solid var(--line); vertical-align:middle}
+    th{font-size:12px; color:var(--muted); text-align:left; background:rgba(148,163,184,.06)}
+    tr:last-child td{border-bottom:0}
+    .tag{display:inline-flex; align-items:center; gap:6px; padding:3px 8px; border-radius:999px; font-size:12px; border:1px solid var(--line)}
+    .tag.ok{border-color:rgba(22,163,74,.45); color:#86efac}
+    .tag.warn{border-color:rgba(245,158,11,.45); color:#fde68a}
+    .tag.bad{border-color:rgba(239,68,68,.45); color:#fecaca}
+    .small{font-size:12px; color:var(--muted)}
+    .right{display:flex; justify-content:flex-end}
+    .sticky-actions{display:flex; gap:10px; align-items:center; justify-content:space-between; margin-top:10px}
+    .notice{padding:10px 12px; border-radius:12px; border:1px solid var(--line); background:rgba(148,163,184,.06); color:var(--muted); font-size:12px}
+    .error{color:#fecaca}
+    .oktext{color:#86efac}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>RSI Watchlist</h1>
+
+  <div class="grid">
+    <div class="card">
+      <div class="row">
+        <div>
+          <label>Дата (торговый день)</label>
+          <input id="date" type="date" />
+        </div>
+        <div>
+          <label>Кэш токен GitHub (не хранится в коде)</label>
+          <input id="token" type="password" placeholder="GitHub fine-grained token (Contents RW)" />
+          <div class="small">Хранится только в твоём браузере (localStorage). Можно очистить кнопкой.</div>
+        </div>
+      </div>
+
+      <div style="height:10px"></div>
+
+      <div class="row3">
+        <div>
+          <label>Owner</label>
+          <input id="owner" value="mariiashumova1979-collab" />
+        </div>
+        <div>
+          <label>Repo</label>
+          <input id="repo" value="rsi-watchlist" />
+        </div>
+        <div>
+          <label>Файл истории</label>
+          <input id="path" value="data/history.json" />
+        </div>
+      </div>
+
+      <div style="height:10px"></div>
+
+      <div class="btns">
+        <button class="secondary" id="load">Load from Git</button>
+        <button class="secondary" id="saveToken">Save token (local)</button>
+        <button class="danger" id="clearToken">Clear token</button>
+      </div>
+
+      <div style="height:10px"></div>
+      <div id="status" class="notice mono">Status: idle</div>
+
+      <div style="height:14px"></div>
+      <div class="notice">
+        Правила сигнала:
+        <div class="mono" style="margin-top:6px">
+          LONG: RSI7 crossed ↑20 (вчера <=20, сегодня >20) и RSI14 < 40<br/>
+          SHORT: RSI7 crossed ↓80 (вчера >=80, сегодня <80) и RSI14 > 60
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="sticky-actions">
+        <div class="small" id="meta"></div>
+        <div class="btns">
+          <button class="secondary" id="exportDay">Export day JSON</button>
+          <button class="primary" id="saveGit">Save to GitHub</button>
+        </div>
+      </div>
+
+      <div style="height:10px"></div>
+
+      <table>
+        <thead>
+          <tr>
+            <th style="width:120px">Ticker</th>
+            <th style="width:110px">RSI7 today</th>
+            <th style="width:110px">RSI14 today</th>
+            <th style="width:110px">RSI7 вчера</th>
+            <th style="width:120px">Signal</th>
+            <th style="width:110px">Pick</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+
+      <div style="height:10px"></div>
+      <div class="right small">Изменения остаются в браузере до “Save to GitHub”.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Raw URLs (read-only)
+  const WATCHLIST_URL = "https://raw.githubusercontent.com/mariiashumova1979-collab/rsi-watchlist/refs/heads/main/data/watchlist.json";
+  const HISTORY_RAW   = "https://raw.githubusercontent.com/mariiashumova1979-collab/rsi-watchlist/refs/heads/main/data/history.json";
+
+  const $ = (id)=>document.getElementById(id);
+  const state = {
+    watchlist: [],
+    history: null,
+    date: null,
+    dayRows: [],
+    historySha: null
+  };
+
+  function setStatus(msg, type="") {
+    const el = $("status");
+    el.textContent = "Status: " + msg;
+    el.classList.remove("error","oktext");
+    if (type==="error") el.classList.add("error");
+    if (type==="ok") el.classList.add("oktext");
+  }
+
+  function fmtDate(d){ return d.toISOString().slice(0,10); }
+  function prevDateStr(dateStr){
+    const d = new Date(dateStr+"T00:00:00");
+    d.setDate(d.getDate()-1);
+    return fmtDate(d);
+  }
+
+  function computeSignal(rsi7Today, rsi14Today, rsi7Prev){
+    if (rsi7Today==null || rsi14Today==null || rsi7Prev==null) return "";
+    const long = (rsi7Prev <= 20 && rsi7Today > 20 && rsi14Today < 40);
+    const short = (rsi7Prev >= 80 && rsi7Today < 80 && rsi14Today > 60);
+    if (long) return "LONG";
+    if (short) return "SHORT";
+    return "";
+  }
+
+  function signalTag(signal){
+    if (signal==="LONG") return `<span class="tag ok">LONG</span>`;
+    if (signal==="SHORT") return `<span class="tag bad">SHORT</span>`;
+    return `<span class="tag">—</span>`;
+  }
+
+  function safeNum(v){
+    if (v===null || v===undefined || v==="") return null;
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  async function loadWatchlist(){
+    const res = await fetch(WATCHLIST_URL, { cache:"no-store" });
+    if (!res.ok) throw new Error("watchlist fetch failed");
+    const data = await res.json();
+    return data.tickers || [];
+  }
+
+  async function loadHistoryRaw(){
+    const res = await fetch(HISTORY_RAW, { cache:"no-store" });
+    if (!res.ok) throw new Error("history fetch failed");
+    return await res.json();
+  }
+
+  function ensureBaseHistory(h){
+    if (!h || typeof h !== "object") h = {};
+    if (!h.meta) h.meta = { timezone: "Europe/Nicosia" };
+    if (!h.days) h.days = {};
+    return h;
+  }
+
+  function buildDayRows(dateStr){
+    const prev = prevDateStr(dateStr);
+    const prevRows = (state.history.days[prev] || []);
+    const prevMap = new Map(prevRows.map(r => [r.ticker, r.rsi7 ?? r.rsi7_today ?? r.rsi7Today ?? null]));
+
+    const todayExisting = (state.history.days[dateStr] || []);
+    const todayMap = new Map(todayExisting.map(r => [r.ticker, r]));
+
+    const rows = state.watchlist.map(w => {
+      const t = (w.ticker || "").toUpperCase().trim();
+      const existing = todayMap.get(t) || {};
+      const rsi7prev = prevMap.has(t) ? prevMap.get(t) : (existing.rsi7_prev ?? null);
+      const rsi7 = existing.rsi7 ?? null;
+      const rsi14 = existing.rsi14 ?? null;
+      const pick = existing.pick ?? "";
+      const notes = existing.notes ?? "";
+      const signal = computeSignal(rsi7, rsi14, rsi7prev);
+      return { ticker:t, rsi7, rsi14, rsi7_prev:rsi7prev, signal, pick, notes };
+    });
+
+    state.dayRows = rows;
+    renderTable();
+    $("meta").textContent = `Loaded: ${state.watchlist.length} tickers | Date: ${dateStr} | Prev date: ${prev}`;
+  }
+
+  function renderTable(){
+    const tb = $("tbody");
+    tb.innerHTML = state.dayRows.map((r, idx)=>`
+      <tr data-idx="${idx}">
+        <td class="mono">${r.ticker}</td>
+        <td><input inputmode="decimal" value="${r.rsi7 ?? ""}" data-k="rsi7" /></td>
+        <td><input inputmode="decimal" value="${r.rsi14 ?? ""}" data-k="rsi14" /></td>
+        <td class="mono">${r.rsi7_prev ?? ""}</td>
+        <td>${signalTag(r.signal)}</td>
+        <td>
+          <select data-k="pick">
+            <option value="" ${r.pick===""?"selected":""}>—</option>
+            <option value="YES" ${r.pick==="YES"?"selected":""}>YES</option>
+            <option value="WAIT" ${r.pick==="WAIT"?"selected":""}>WAIT</option>
+            <option value="NO" ${r.pick==="NO"?"selected":""}>NO</option>
+          </select>
+        </td>
+        <td><input value="${(r.notes||"").replaceAll('"',"&quot;")}" data-k="notes" /></td>
+      </tr>
+    `).join("");
+
+    tb.querySelectorAll("input,select").forEach(el=>{
+      el.addEventListener("change", (e)=>{
+        const tr = e.target.closest("tr");
+        const idx = Number(tr.dataset.idx);
+        const key = e.target.dataset.k;
+        if (key === "rsi7" || key === "rsi14") {
+          state.dayRows[idx][key] = safeNum(e.target.value);
+        } else {
+          state.dayRows[idx][key] = e.target.value;
+        }
+        const r = state.dayRows[idx];
+        r.signal = computeSignal(r.rsi7, r.rsi14, r.rsi7_prev);
+        // rerender just signal cell
+        tr.children[4].innerHTML = signalTag(r.signal);
+      });
+    });
+  }
+
+  function getAuthToken(){
+    return $("token").value.trim() || localStorage.getItem("gh_token") || "";
+  }
+
+  function saveToken(){
+    const t = $("token").value.trim();
+    if (!t) { setStatus("token empty", "error"); return; }
+    localStorage.setItem("gh_token", t);
+    setStatus("token saved locally", "ok");
+  }
+
+  function clearToken(){
+    localStorage.removeItem("gh_token");
+    $("token").value = "";
+    setStatus("token cleared", "ok");
+  }
+
+  async function githubGetFile(owner, repo, path){
+    const url = `https://api.github.com/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}`;
+    const res = await fetch(url, {
+      headers: {
+        "Accept": "application/vnd.github+json",
+        ...(getAuthToken() ? { "Authorization": "Bearer " + getAuthToken() } : {})
+      }
+    });
+    if (!res.ok) {
+      const txt = await res.text();
+      throw new Error(`GitHub GET failed: ${res.status} ${txt}`);
+    }
+    return await res.json(); // includes content + sha
+  }
+
+  async function githubPutFile(owner, repo, path, contentObj, sha){
+    const url = `https://api.github.com/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}`;
+    const token = getAuthToken();
+    if (!token) throw new Error("No GitHub token (Contents RW) provided");
+
+    const body = {
+      message: `Update history ${state.date}`,
+      content: btoa(unescape(encodeURIComponent(JSON.stringify(contentObj, null, 2)))),
+      sha
+    };
+
+    const res = await fetch(url, {
+      method: "PUT",
+      headers: {
+        "Accept": "application/vnd.github+json",
+        "Authorization": "Bearer " + token,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(body)
+    });
+
+    if (!res.ok) {
+      const txt = await res.text();
+      throw new Error(`GitHub PUT failed: ${res.status} ${txt}`);
+    }
+    return await res.json();
+  }
+
+  async function init(){
+    // default date today
+    const today = new Date();
+    $("date").value = fmtDate(today);
+
+    // preload token if exists
+    const t = localStorage.getItem("gh_token");
+    if (t) $("token").value = t;
+
+    setStatus("loading watchlist + history...");
+    state.watchlist = await loadWatchlist();
+    state.history = ensureBaseHistory(await loadHistoryRaw());
+    state.date = $("date").value;
+    buildDayRows(state.date);
+    setStatus("loaded from raw github (read-only). Use Load from Git for write mode.", "ok");
+  }
+
+  $("saveToken").addEventListener("click", saveToken);
+  $("clearToken").addEventListener("click", clearToken);
+
+  $("date").addEventListener("change", async ()=>{
+    state.date = $("date").value;
+    // reload raw history to keep consistent
+    state.history = ensureBaseHistory(await loadHistoryRaw());
+    buildDayRows(state.date);
+    setStatus("date changed; refreshed from raw history", "ok");
+  });
+
+  $("load").addEventListener("click", async ()=>{
+    try{
+      setStatus("loading history.json from GitHub API (to get sha)...");
+      const owner = $("owner").value.trim();
+      const repo  = $("repo").value.trim();
+      const path  = $("path").value.trim();
+
+      const file = await githubGetFile(owner, repo, path);
+      state.historySha = file.sha;
+
+      const decoded = decodeURIComponent(escape(atob(file.content.replaceAll("\n",""))));
+      state.history = ensureBaseHistory(JSON.parse(decoded));
+
+      buildDayRows(state.date);
+      setStatus("loaded via GitHub API (sha acquired). You can Save to GitHub now.", "ok");
+    } catch(e){
+      setStatus(e.message, "error");
+    }
+  });
+
+  $("exportDay").addEventListener("click", ()=>{
+    const dateStr = state.date;
+    const payload = { [dateStr]: state.dayRows.filter(r => r.rsi7!=null || r.rsi14!=null || r.pick || r.notes) };
+    navigator.clipboard.writeText(JSON.stringify(payload, null, 2));
+    setStatus("day JSON copied to clipboard", "ok");
+  });
+
+  $("saveGit").addEventListener("click", async ()=>{
+    try{
+      const owner = $("owner").value.trim();
+      const repo  = $("repo").value.trim();
+      const path  = $("path").value.trim();
+
+      if (!state.historySha) {
+        throw new Error("No sha. Click 'Load from Git' first (needs token).");
+      }
+
+      // write today rows into history.days[date]
+      const cleaned = state.dayRows
+        .filter(r => r.rsi7!=null || r.rsi14!=null || r.pick || r.notes)
+        .map(r => ({
+          ticker: r.ticker,
+          rsi7: r.rsi7,
+          rsi14: r.rsi14,
+          rsi7_prev: r.rsi7_prev,
+          signal: r.signal || "",
+          pick: r.pick || "",
+          notes: r.notes || ""
+        }));
+
+      state.history.days[state.date] = cleaned;
+
+      setStatus("saving to GitHub...");
+      const resp = await githubPutFile(owner, repo, path, state.history, state.historySha);
+      state.historySha = resp.content.sha; // update sha after write
+      setStatus("saved to GitHub successfully", "ok");
+    } catch(e){
+      setStatus(e.message, "error");
+    }
+  });
+
+  init().catch(e => setStatus(e.message, "error"));
+</script>
+</body>
+</html>
