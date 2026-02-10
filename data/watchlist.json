@@ -1,0 +1,7 @@
+{
+  "tickers": [
+    { "ticker": "AAPL", "sector": "Tech" },
+    { "ticker": "MSFT", "sector": "Tech" },
+    { "ticker": "NVDA", "sector": "Tech" }
+  ]
+}
