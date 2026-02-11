@@ -1206,7 +1206,7 @@ async function saveRegime() {
   const val = parseFloat(document.getElementById('spyRsi').value);
   if (isNaN(val)) return;
   cache.regime = { spyRsi14: val, savedAt: new Date().toISOString() };
-  const ok = await saveCloud(KEYS.regime, cache.regime);
+  scheduleSave(); const ok = true;
   if (ok) toast('Режим сохранён ✓');
 }
 
@@ -1226,7 +1226,7 @@ async function saveSets() {
   const s = {};
   Object.entries(map).forEach(([id,key]) => { const el=document.getElementById('s_'+id); if(el) s[key]=parseFloat(el.value)||0; });
   cache.settings = s;
-  const ok = await saveCloud(KEYS.settings, s);
+  scheduleSave(); const ok = true;
   if(ok) toast('Настройки сохранены ✓');
 }
 
@@ -1565,7 +1565,7 @@ async function saveTrade() {
   }
   if(id) { const i=cache.trades.findIndex(x=>x.id===id); if(i>=0) cache.trades[i]=t; else cache.trades.unshift(t); }
   else cache.trades.unshift(t);
-  const ok = await saveCloud(KEYS.trades, cache.trades);
+  scheduleSave(); const ok = true;
   if(ok) { closeMo('moTrade'); renderTrades(); renderDash(); toast(id?'Сделка обновлена ✓':'Сделка добавлена ✓'); }
 }
 
@@ -1838,7 +1838,7 @@ async function toggleCl(sec, i, el) {
   if(!cache.checklist[td]) cache.checklist[td] = {};
   cache.checklist[td][sec+'_'+i] = el.classList.contains('chk');
   updClProg();
-  await saveCloud(KEYS.checklist, cache.checklist);
+  scheduleSave();
 }
 
 function updClProg() {
@@ -1933,7 +1933,7 @@ async function saveWL() {
     cache.watchlist.unshift(item);
   }
 
-  const ok = await saveCloud(KEYS.watchlist, cache.watchlist);
+  scheduleSave(); const ok = true;
   if (ok) {
     closeMo('moWL');
     renderWL();
@@ -2351,7 +2351,7 @@ async function toggleQCl(i,el) {
   if(!cache.quarterly[key]) cache.quarterly[key]={};
   if(!cache.quarterly[key].checks) cache.quarterly[key].checks={};
   cache.quarterly[key].checks[i]=el.classList.contains('chk');
-  await saveCloud(KEYS.quarterly, cache.quarterly);
+  scheduleSave();
 }
 
 async function saveQ() {
@@ -2360,7 +2360,7 @@ async function saveQ() {
   const d = cache.quarterly[key];
   ['t','wr','r','d','aw','al','rem','add','gd','im','vl','ch'].forEach(f=>{ const el=document.getElementById('q_'+f); if(el) d[f]=el.value; });
   d.ps = document.getElementById('q_ps').value;
-  const ok = await saveCloud(KEYS.quarterly, cache.quarterly);
+  scheduleSave(); const ok = true;
   if(ok) toast('Квартал сохранён ✓');
 }
 
