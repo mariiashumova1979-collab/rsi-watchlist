@@ -666,8 +666,15 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
       <div class="card">
         <div class="sh">🐙 GitHub — синхронизация</div>
         <div style="font-family:var(--mono);font-size:10px;color:var(--t2);margin-bottom:14px;line-height:1.8">
-          Данные хранятся в репозитории <b style="color:var(--acc)">rsi-watchlist</b>.<br>
-          Файл: <b style="color:var(--acc)">data.json</b> · автосохранение при каждом изменении.
+          Данные хранятся в репозитории <b style="color:var(--acc)">rsi-watchlist</b> · файл <b style="color:var(--acc)">data.json</b><br>
+          Токен вводится один раз и сохраняется только в браузере.
+        </div>
+        <div class="fg" style="margin-bottom:10px">
+          <label>GitHub Token (ghp_...)</label>
+          <div style="display:flex;gap:8px">
+            <input type="password" id="s_gh_token" placeholder="ghp_xxxxxxxxxxxx" style="flex:1;font-family:var(--mono);font-size:11px" autocomplete="off">
+            <button class="btn btn-p btn-s" onclick="saveGhToken()">СОХРАНИТЬ</button>
+          </div>
         </div>
         <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
           <button class="btn btn-g btn-s" onclick="testGithub()">✓ ПРОВЕРИТЬ</button>
@@ -679,7 +686,7 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
         </div>
         <div style="display:flex;align-items:center;gap:10px;margin-top:12px">
           <div class="sync-dot" id="syncDot2"></div>
-          <span style="font-family:var(--mono);font-size:11px;color:var(--t2)" id="syncStatus2">Проверка...</span>
+          <span style="font-family:var(--mono);font-size:11px;color:var(--t2)" id="syncStatus2">—</span>
         </div>
       </div>
     </div>
@@ -852,178 +859,195 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
 <script>
 // ═══════════════════════════════════════════════════════════
 // ═══════════════════════════════════════════════════════════
-// STORAGE ENGINE v5  —  GitHub Repository (primary) + localStorage (cache)
-// Repo: mariiashumova1979-collab/rsi-watchlist
-// Data file: data.json  |  Journal: index.html
+// STORAGE ENGINE v6
+// GitHub repo = primary sync | localStorage = instant cache
+// Token stored ONLY in localStorage — never in code
 // ═══════════════════════════════════════════════════════════
-const GH_TOKEN  = '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';
-const GH_OWNER  = 'mariiashumova1979-collab';
-const GH_REPO   = 'rsi-watchlist';
-const GH_FILE   = 'data.json';
-const GH_API    = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`;
-const GH_RAW    = `https://raw.githubusercontent.com/${GH_OWNER}/${GH_REPO}/main/${GH_FILE}`;
-const LS_KEY    = 'rsi_journal_v2';
-const SS_KEY    = 'rsi_journal_session';
+const GH_OWNER = 'mariiashumova1979-collab';
+const GH_REPO  = 'rsi-watchlist';
+const GH_FILE  = 'data.json';
+const LS_KEY   = 'rsi_journal_v2';
+const LS_TOKEN = 'gh_token_v1';
 
-// SHA of current data.json (needed for GitHub PATCH)
-let ghFileSha = null;
-let storageMode = 'detecting';
+let ghFileSha   = null;
+let storageMode = 'local';
 
 // In-memory cache
 const cache = { trades:[], watchlist:[], quarterly:{}, checklist:{}, settings:{}, regime:{}, rsiScans:{} };
 
 let saveTimer = null;
+function scheduleSave() { clearTimeout(saveTimer); saveTimer = setTimeout(doSave, 800); }
 
-function scheduleSave() {
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(doSave, 800);
+// Token: stored ONLY in localStorage, never in source code
+function getToken() {
+  try { return localStorage.getItem(LS_TOKEN) || ''; } catch { return ''; }
 }
+function saveToken(t) {
+  try { localStorage.setItem(LS_TOKEN, t); } catch {}
+}
+
+function ghAPI()  { return `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`; }
+function ghRAW()  { return `https://raw.githubusercontent.com/${GH_OWNER}/${GH_REPO}/main/${GH_FILE}`; }
 
 // ── WRITE ──────────────────────────────────────────────────
 async function doSave() {
+  const token = getToken();
   const payload = JSON.stringify(cache, null, 2);
-  // Always cache locally first (instant)
-  try { localStorage.setItem(LS_KEY, JSON.stringify(cache)); } catch {}
+
+  // Always write to localStorage immediately
+  try { localStorage.setItem(LS_KEY, payload); } catch {}
+
+  if (!token) {
+    storageMode = 'local';
+    setSyncState('synced', '💾 ЛОКАЛЬНО');
+    updateStorageInfo();
+    return;
+  }
 
   setSyncState('syncing', 'СОХРАНЕНИЕ...');
   try {
+    // Get SHA if we don't have it
+    if (!ghFileSha) await fetchGhSha(token);
+
     const body = {
-      message: `journal update ${new Date().toISOString().slice(0,16)}`,
+      message: 'journal ' + new Date().toISOString().slice(0,16),
       content: btoa(unescape(encodeURIComponent(payload))),
       branch: 'main'
     };
     if (ghFileSha) body.sha = ghFileSha;
 
-    const res = await fetch(GH_API, {
+    const res = await fetch(ghAPI(), {
       method: 'PUT',
-      headers: {
-        'Authorization': `Bearer ${GH_TOKEN}`,
-        'Content-Type': 'application/json',
-        'X-GitHub-Api-Version': '2022-11-28'
-      },
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json', 'X-GitHub-Api-Version': '2022-11-28' },
       body: JSON.stringify(body)
     });
 
     if (res.ok) {
-      const data = await res.json();
-      ghFileSha = data.content?.sha || ghFileSha;
+      const d = await res.json();
+      ghFileSha = d.content?.sha || ghFileSha;
       storageMode = 'github';
       setSyncState('synced', '🐙 GITHUB');
-      updateStorageInfo();
+    } else if (res.status === 409 || res.status === 422) {
+      await fetchGhSha(token);
+      setTimeout(doSave, 1000);
+      return;
     } else {
-      const err = await res.json().catch(() => ({}));
-      // If conflict (SHA mismatch), reload SHA and retry once
-      if (res.status === 409 || res.status === 422) {
-        await fetchGhSha();
-        setTimeout(doSave, 500);
-        return;
-      }
-      throw new Error(err.message || `HTTP ${res.status}`);
+      throw new Error('HTTP ' + res.status);
     }
   } catch(e) {
     storageMode = 'local';
-    setSyncState('synced', '⚠ ЛОКАЛЬНО');
-    console.warn('GitHub save error:', e.message);
-    updateStorageInfo();
+    setSyncState('synced', '💾 ЛОКАЛЬНО');
+    console.warn('GitHub save:', e.message);
   }
+  updateStorageInfo();
 }
 
-async function fetchGhSha() {
+async function fetchGhSha(token) {
   try {
-    const res = await fetch(GH_API, {
-      headers: { 'Authorization': `Bearer ${GH_TOKEN}`, 'X-GitHub-Api-Version': '2022-11-28' }
+    const res = await fetch(ghAPI(), {
+      headers: { 'Authorization': 'Bearer ' + (token || getToken()), 'X-GitHub-Api-Version': '2022-11-28' }
     });
-    if (res.ok) {
-      const d = await res.json();
-      ghFileSha = d.sha;
-    }
+    if (res.ok) { const d = await res.json(); ghFileSha = d.sha; }
   } catch {}
 }
 
 // ── READ ───────────────────────────────────────────────────
 async function loadFromStorage() {
-  // Try GitHub raw URL (fast, no auth needed for public repo)
+  const token = getToken();
+
+  // 1. localStorage FIRST — instant, no network needed
+  let localData = null;
   try {
-    const res = await fetch(GH_RAW + '?t=' + Date.now());
+    const raw = localStorage.getItem(LS_KEY);
+    if (raw) localData = JSON.parse(raw);
+  } catch {}
+
+  // If no token — use localStorage only
+  if (!token) {
+    storageMode = 'local';
+    return localData;
+  }
+
+  // 2. Try GitHub (with timeout so app never hangs)
+  try {
+    const controller = new AbortController();
+    const tid = setTimeout(() => controller.abort(), 8000);
+    const res = await fetch(ghRAW() + '?t=' + Date.now(), { signal: controller.signal });
+    clearTimeout(tid);
+
     if (res.ok) {
       const text = await res.text();
-      if (text && text.trim() !== '{}' && text.trim() !== '') {
-        const data = JSON.parse(text);
+      const trimmed = text.trim();
+      if (trimmed && trimmed !== '{}' && trimmed !== '') {
+        const data = JSON.parse(trimmed);
         storageMode = 'github';
-        // Cache locally
-        try { localStorage.setItem(LS_KEY, text); } catch {}
-        // Also get SHA for future writes
-        fetchGhSha();
+        try { localStorage.setItem(LS_KEY, trimmed); } catch {}
+        fetchGhSha(token); // get SHA for writes, non-blocking
         return data;
       }
     }
   } catch(e) {
-    console.warn('GitHub raw load failed:', e.message);
+    if (e.name !== 'AbortError') console.warn('GitHub load:', e.message);
   }
 
-  // Fallback: GitHub API (works even for private repos)
+  // 3. Fallback to local
+  storageMode = localData ? 'local' : 'local';
+  return localData;
+}
+
+async function probeStorage() { /* noop — done in loadFromStorage */ }
+
+function storageModeLabel() {
+  return { github: '🐙 GITHUB', local: '💾 ЛОКАЛЬНО' }[storageMode] || storageMode;
+}
+
+// ── GitHub settings ────────────────────────────────────────
+function saveGhToken() {
+  const t = (document.getElementById('s_gh_token')?.value || '').trim();
+  if (t) { saveToken(t); toast('Токен сохранён ✓'); scheduleSave(); }
+  else { toast('Введите токен', true); }
+}
+
+function loadGhUI() {
+  const el = document.getElementById('s_gh_token');
+  const t = getToken();
+  if (el) el.value = t ? '••••••••' + t.slice(-4) : '';
+}
+
+async function testGithub() {
+  const el = document.getElementById('ghStatus');
+  const token = getToken();
+  if (!token) { el.textContent = '✗ Введите токен'; el.style.color = 'var(--acc2)'; return; }
+  el.textContent = '⏳ Проверка...'; el.style.color = 'var(--t2)';
   try {
-    const res = await fetch(GH_API, {
-      headers: { 'Authorization': `Bearer ${GH_TOKEN}`, 'X-GitHub-Api-Version': '2022-11-28' }
+    const res = await fetch(ghAPI(), {
+      headers: { 'Authorization': 'Bearer ' + token, 'X-GitHub-Api-Version': '2022-11-28' }
     });
     if (res.ok) {
       const d = await res.json();
       ghFileSha = d.sha;
-      const content = decodeURIComponent(escape(atob(d.content.replace(/\n/g, ''))));
-      if (content && content.trim() !== '{}') {
-        storageMode = 'github';
-        try { localStorage.setItem(LS_KEY, content); } catch {}
-        return JSON.parse(content);
-      }
+      el.textContent = '✓ Подключено · ' + GH_OWNER + '/' + GH_REPO;
+      el.style.color = 'var(--acc)';
+      storageMode = 'github';
+      updateStorageInfo();
+    } else {
+      el.textContent = '✗ HTTP ' + res.status + ' — проверьте токен'; el.style.color = 'var(--acc2)';
     }
-  } catch(e) {
-    console.warn('GitHub API load failed:', e.message);
-  }
+  } catch(e) { el.textContent = '✗ ' + e.message; el.style.color = 'var(--acc2)'; }
+}
 
-  // Fallback: localStorage
+async function syncFromGithub() {
+  setSyncState('syncing', 'ЗАГРУЗКА...');
   try {
-    const raw = localStorage.getItem(LS_KEY);
-    if (raw) { storageMode = 'local'; return JSON.parse(raw); }
-  } catch {}
-
-  storageMode = 'local';
-  return null;
+    const data = await loadFromStorage();
+    if (data) { applyData(data); loadSetsUI(); loadGhUI(); loadFhKeyUI(); initChecklist(); renderDash(); renderTrades(); renderWL(); renderQ(); renderRsiScan(); const rsi = cache.regime?.spyRsi14; if (rsi) { document.getElementById('spyRsi').value = rsi; updRegime(false); } }
+    setSyncState('synced', storageModeLabel());
+    updateStorageInfo();
+    toast('Синхронизировано ✓');
+  } catch(e) { setSyncState('synced', '⚠ ОШИБКА'); toast('Ошибка: ' + e.message, true); }
 }
 
-async function probeStorage() {
-  // Optimistically assume GitHub works, verify on first load
-  storageMode = 'github';
-}
-
-function storageModeLabel() {
-  return { github:'🐙 GITHUB', local:'💾 ЛОКАЛЬНО', session:'📋 СЕССИЯ', detecting:'...' }[storageMode] || storageMode;
-}
-
-function getGhCreds() {
-  return { token: GH_TOKEN, gistId: null };
-}
-
-// ── Legacy aliases ─────────────────────────────────────────
-async function persistToCloud() { return doSave(); }
-async function saveCloud()      { scheduleSave(); return true; }
-async function cloudDel() {
-  try { localStorage.removeItem(LS_KEY); } catch {}
-  // Wipe data.json
-  try {
-    await fetchGhSha();
-    const body = {
-      message: 'clear journal data',
-      content: btoa('{}'),
-      sha: ghFileSha,
-      branch: 'main'
-    };
-    await fetch(GH_API, {
-      method: 'PUT',
-      headers: { 'Authorization': `Bearer ${GH_TOKEN}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    });
-  } catch {}
-}
+async function forceSync() { return syncFromGithub(); }
 
 function applyData(data) {
   if (!data) return;
@@ -1031,99 +1055,52 @@ function applyData(data) {
   if (Array.isArray(data.watchlist)) cache.watchlist = data.watchlist;
   if (data.quarterly) cache.quarterly = data.quarterly;
   if (data.checklist) cache.checklist = data.checklist;
-  if (data.settings)  {
-    cache.settings = data.settings;
-    if (!cache.settings.finnhubKey) cache.settings.finnhubKey = FINNHUB_KEY;
-  }
-  if (data.regime)   cache.regime   = data.regime;
-  if (data.rsiScans) cache.rsiScans = data.rsiScans;
+  if (data.settings)  { cache.settings = data.settings; if (!cache.settings.finnhubKey) cache.settings.finnhubKey = FINNHUB_KEY; }
+  if (data.regime)    cache.regime    = data.regime;
+  if (data.rsiScans)  cache.rsiScans  = data.rsiScans;
 }
 
 function updateStorageInfo() {
   const el = document.getElementById('storageInfo');
   if (!el) return;
-  const active = storageMode === 'github';
+  const gh = storageMode === 'github';
+  const hasToken = !!getToken();
   el.innerHTML = `
-    <div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--bg4)">
-      <span style="color:${active?'var(--acc)':'var(--t3)'};font-weight:700">${active?'✓':'○'}</span>
-      <span style="color:${active?'var(--acc)':'var(--t3)'}">🐙 ${GH_OWNER}/${GH_REPO}</span>
-      ${active?'<span style="background:var(--acc);color:var(--bg);font-size:8px;padding:1px 6px;border-radius:10px;font-weight:700">АКТИВНО</span>':''}
+    <div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--bg4)">
+      <span style="color:${gh?'var(--acc)':hasToken?'var(--acc3)':'var(--t3)'}">🐙</span>
+      <span style="font-size:11px;color:${gh?'var(--acc)':'var(--t2)'}">GitHub · ${GH_OWNER}/${GH_REPO}</span>
+      ${gh?'<span style="background:var(--acc);color:var(--bg);font-size:8px;padding:1px 5px;border-radius:8px;font-weight:700;margin-left:auto">АКТИВНО</span>':''}
     </div>
-    <div style="display:flex;align-items:center;gap:10px;padding:6px 0">
-      <span style="color:var(--acc3);font-weight:700">✓</span>
-      <span style="color:var(--acc3)">💾 localStorage</span>
-      ${storageMode==='local'?'<span style="background:var(--acc3);color:var(--bg);font-size:8px;padding:1px 6px;border-radius:10px;font-weight:700">РЕЗЕРВ</span>':'<span style="font-size:9px;color:var(--t3)">кэш</span>'}
+    <div style="display:flex;align-items:center;gap:8px;padding:5px 0">
+      <span style="color:var(--acc3)">💾</span>
+      <span style="font-size:11px;color:var(--t2)">localStorage</span>
+      ${storageMode==='local'?'<span style="background:var(--acc3);color:var(--bg);font-size:8px;padding:1px 5px;border-radius:8px;font-weight:700;margin-left:auto">АКТИВНО</span>':'<span style="font-size:9px;color:var(--t3);margin-left:auto">кэш</span>'}
     </div>
-    <div style="margin-top:8px;font-family:var(--mono);font-size:9px;color:var(--t3)">
-      Режим: <b style="color:var(--text)">${storageModeLabel()}</b>
-      ${ghFileSha ? ` · SHA: ${ghFileSha.slice(0,8)}` : ''}
-    </div>`;
+    <div style="margin-top:6px;font-size:9px;color:var(--t3)">Режим: <b style="color:var(--text)">${storageModeLabel()}</b>${ghFileSha?' · SHA: '+ghFileSha.slice(0,7):''}</div>`;
 }
 
 function setSyncState(state, label) {
-  ['syncDot','syncDot2'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.className = 'sync-dot ' + state;
-  });
-  const sl = document.getElementById('syncLabel');
-  if (sl) sl.textContent = label;
-  const s2 = document.getElementById('syncStatus2');
-  if (s2) s2.textContent = label;
+  ['syncDot','syncDot2'].forEach(id => { const el=document.getElementById(id); if(el) el.className='sync-dot '+state; });
+  const sl=document.getElementById('syncLabel'); if(sl) sl.textContent=label;
+  const s2=document.getElementById('syncStatus2'); if(s2) s2.textContent=label;
 }
 
-async function syncFromGithub() {
-  setSyncState('syncing', 'ЗАГРУЗКА...');
+// Legacy aliases
+async function persistToCloud() { return doSave(); }
+async function saveCloud()      { scheduleSave(); return true; }
+async function cloudDel() {
+  try { localStorage.removeItem(LS_KEY); } catch {}
+  const token = getToken();
+  if (!token) return;
   try {
-    const data = await loadFromStorage();
-    if (data) {
-      applyData(data);
-      loadSetsUI(); loadGhUI(); loadFhKeyUI(); initChecklist();
-      renderDash(); renderTrades(); renderWL(); renderQ(); renderRsiScan();
-      const rsi = cache.regime?.spyRsi14;
-      if (rsi) { document.getElementById('spyRsi').value = rsi; updRegime(false); }
-    }
-    setSyncState('synced', storageModeLabel());
-    updateStorageInfo();
-    toast('Синхронизировано ✓');
-  } catch(e) {
-    setSyncState('synced', '⚠ ОШИБКА');
-    toast('Ошибка: ' + e.message, true);
-  }
+    if (!ghFileSha) await fetchGhSha(token);
+    await fetch(ghAPI(), { method:'PUT', headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json','X-GitHub-Api-Version':'2022-11-28'}, body:JSON.stringify({message:'clear',content:btoa('{}'),sha:ghFileSha,branch:'main'}) });
+  } catch {}
 }
 
-async function forceSync() { return syncFromGithub(); }
-
-// Settings UI (GitHub section now read-only — creds hardcoded)
-function saveGhCreds() { toast('Репозиторий подключён автоматически'); }
+function getGhCreds() { return { token: getToken(), gistId: null }; }
+function saveGhCreds() { saveGhToken(); }
 function loadGhCredsFromStorage() {}
-function loadGhUI() {
-  const tEl = document.getElementById('s_gh_token');
-  const gEl = document.getElementById('s_gh_gist');
-  if (tEl) { tEl.value = '••••••••••••••••••••••••'; tEl.disabled = true; }
-  if (gEl) { gEl.value = GH_REPO; gEl.disabled = true; }
-}
-
-async function testGithub() {
-  const el = document.getElementById('ghStatus');
-  el.textContent = '⏳ Проверка...'; el.style.color = 'var(--t2)';
-  try {
-    const res = await fetch(GH_API, {
-      headers: { 'Authorization': `Bearer ${GH_TOKEN}`, 'X-GitHub-Api-Version': '2022-11-28' }
-    });
-    if (res.ok) {
-      const d = await res.json();
-      ghFileSha = d.sha;
-      el.textContent = `✓ Подключено · data.json · SHA: ${d.sha.slice(0,8)}`;
-      el.style.color = 'var(--acc)';
-      storageMode = 'github';
-      updateStorageInfo();
-    } else {
-      el.textContent = `✗ HTTP ${res.status}`; el.style.color = 'var(--acc2)';
-    }
-  } catch(e) {
-    el.textContent = '✗ ' + e.message; el.style.color = 'var(--acc2)';
-  }
-}
 
 // ═══════════════════════════════════════════════════════════
 // NAVIGATION
@@ -2436,48 +2413,55 @@ async function cloudDel() {
 // START
 // ═══════════════════════════════════════════════════════════
 async function init() {
-  setSyncState('syncing', 'ЗАГРУЗКА...');
-  await probeStorage();
-
+  // Step 1: render immediately from localStorage (zero delay)
   try {
-    // Load GitHub creds from localStorage backup before first load
-    try {
-      const raw = localStorage.getItem('gh_creds');
-      if (raw) {
-        const { token, gistId } = JSON.parse(raw);
-        if (!cache.settings) cache.settings = {...DEF_SETS};
-        cache.settings.ghToken  = cache.settings.ghToken  || token  || '';
-        cache.settings.ghGistId = cache.settings.ghGistId || gistId || '';
-      }
-    } catch {}
+    const raw = localStorage.getItem(LS_KEY);
+    if (raw) applyData(JSON.parse(raw));
+  } catch {}
 
-    const data = await loadFromStorage();
-    applyData(data);
-  } catch(e) {
-    console.warn('init load error:', e);
-  }
-
-  // Ensure settings defaults
   if (!cache.settings || !Object.keys(cache.settings).length) cache.settings = {...DEF_SETS};
   if (!cache.settings.finnhubKey) cache.settings.finnhubKey = FINNHUB_KEY;
 
-  document.getElementById('hdrDate').textContent = today();
+  try { document.getElementById('hdrDate').textContent = today(); } catch {}
 
-  loadSetsUI();
-  loadGhUI();
-  loadFhKeyUI();
-  initChecklist();
-  renderDash();
-  renderTrades();
-  renderWL();
-  renderQ();
-  renderRsiScan();
+  loadSetsUI(); loadGhUI(); loadFhKeyUI(); initChecklist();
+  renderDash(); renderTrades(); renderWL(); renderQ(); renderRsiScan();
 
   const rsi = cache.regime?.spyRsi14;
-  if (rsi) { document.getElementById('spyRsi').value = rsi; updRegime(false); }
+  if (rsi) { try { document.getElementById('spyRsi').value = rsi; updRegime(false); } catch {} }
 
   setSyncState('synced', storageModeLabel());
   updateStorageInfo();
+
+  // Step 2: sync from GitHub in background (non-blocking)
+  const token = getToken();
+  if (token) {
+    setSyncState('syncing', 'СИНХРОНИЗАЦИЯ...');
+    try {
+      const controller = new AbortController();
+      const tid = setTimeout(() => controller.abort(), 8000);
+      const res = await fetch(ghRAW() + '?t=' + Date.now(), { signal: controller.signal });
+      clearTimeout(tid);
+
+      if (res.ok) {
+        const text = await res.text();
+        const trimmed = text.trim();
+        if (trimmed && trimmed !== '{}') {
+          const data = JSON.parse(trimmed);
+          applyData(data);
+          storageMode = 'github';
+          try { localStorage.setItem(LS_KEY, trimmed); } catch {}
+          loadSetsUI(); loadGhUI(); loadFhKeyUI(); initChecklist();
+          renderDash(); renderTrades(); renderWL(); renderQ(); renderRsiScan();
+          fetchGhSha(token);
+        }
+      }
+    } catch(e) {
+      if (e.name !== 'AbortError') console.warn('bg sync:', e.message);
+    }
+    setSyncState('synced', storageModeLabel());
+    updateStorageInfo();
+  }
 }
 
 init();
