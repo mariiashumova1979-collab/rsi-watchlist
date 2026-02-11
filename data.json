@@ -1,6 +1,25 @@
 {
   "trades": [
     {
+      "id": "1770803244882",
+      "createdAt": 1770803244882,
+      "ticker": "PNC",
+      "type": "SHORT",
+      "entryDate": "2026-02-10",
+      "entry": 241.41,
+      "shares": 4,
+      "stop": "251.07",
+      "target1": "231.75",
+      "target2": "222.10",
+      "rsi7": "",
+      "rsi14": "",
+      "spyRsi": "",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "notes": ""
+    },
+    {
       "id": "1770803148736",
       "createdAt": 1770803148736,
       "ticker": "USB",
