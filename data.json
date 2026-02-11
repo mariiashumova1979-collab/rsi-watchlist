@@ -1,6 +1,25 @@
 {
   "trades": [
     {
+      "id": "1770803148736",
+      "createdAt": 1770803148736,
+      "ticker": "USB",
+      "type": "SHORT",
+      "entryDate": "2026-02-10",
+      "entry": 60.72,
+      "shares": 18,
+      "stop": "63.15",
+      "target1": "58.29",
+      "target2": "55.86",
+      "rsi7": "",
+      "rsi14": "",
+      "spyRsi": "",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "notes": ""
+    },
+    {
       "id": "1770803009916",
       "createdAt": 1770803009916,
       "ticker": "ACN",
