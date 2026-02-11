@@ -1,25 +1,6 @@
 {
   "trades": [
     {
-      "id": "1770800011154",
-      "createdAt": 1770800011154,
-      "ticker": "TXN",
-      "type": "SHORT",
-      "entryDate": "2026-02-06",
-      "entry": 220.92,
-      "shares": 4,
-      "stop": "229.76",
-      "target1": "212.08",
-      "target2": "203.25",
-      "rsi7": "",
-      "rsi14": "",
-      "spyRsi": "",
-      "status": "OPEN",
-      "exitPrice": 0,
-      "exitReason": "",
-      "notes": ""
-    },
-    {
       "id": "1770800006232",
       "createdAt": 1770800006232,
       "ticker": "TXN",
