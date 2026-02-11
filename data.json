@@ -116,16 +116,6 @@
       "cooldownDate": "",
       "notes": "",
       "addedAt": 1770803602667
-    },
-    {
-      "ticker": "BA",
-      "sector": "Технологии",
-      "cap": "",
-      "beta": "",
-      "earningsDate": "",
-      "cooldownDate": "",
-      "notes": "",
-      "addedAt": 1770803451095
     }
   ],
   "quarterly": {},
@@ -149,7 +139,9 @@
       "BA_r7": 58.53,
       "BA_r14": 59.79,
       "MPC_r7": 90.38,
-      "MPC_r14": 77.93
+      "MPC_r14": 77.93,
+      "CARR_r7": 88.96,
+      "CARR_r14": 81.07
     }
   }
 }
