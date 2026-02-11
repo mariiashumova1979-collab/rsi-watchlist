@@ -98,6 +98,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "CARR",
+      "sector": "Технологии",
+      "cap": "",
+      "beta": "",
+      "earningsDate": "",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1770803738543
+    },
+    {
       "ticker": "MPC",
       "sector": "Технологии",
       "cap": "",
@@ -137,7 +147,9 @@
   "rsiScans": {
     "2026-02-11": {
       "BA_r7": 58.53,
-      "BA_r14": 59.79
+      "BA_r14": 59.79,
+      "MPC_r7": 90.38,
+      "MPC_r14": 77.93
     }
   }
 }
