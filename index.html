@@ -1,627 +1,2486 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>RSI Watchlist</title>
-  <style>
-    :root{
-      --bg:#0b1220; --card:#0f172a; --muted:#94a3b8; --text:#e2e8f0;
-      --line:rgba(148,163,184,.25); --btn:#2563eb; --btn2:#334155;
-      --ok:#16a34a; --warn:#f59e0b; --bad:#ef4444;
-      --radius:14px; --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
-    }
-    *{box-sizing:border-box}
-    body{margin:0; font-family:var(--sans); background:var(--bg); color:var(--text)}
-    .wrap{max-width:1200px; margin:24px auto; padding:0 16px}
-    h1{margin:0 0 16px 0; font-size:22px}
-    .grid{display:grid; grid-template-columns: 1.2fr 2fr; gap:14px}
-    .card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:0 10px 30px rgba(0,0,0,.25)}
-    label{display:block; font-size:12px; color:var(--muted); margin:0 0 6px}
-    input, select, button, textarea{
-      width:100%; padding:10px 12px; border-radius:12px; border:1px solid var(--line);
-      background:rgba(2,6,23,.35); color:var(--text); outline:none;
-    }
-    input[type="date"]{padding:9px 12px}
-    .row{display:grid; grid-template-columns: 1fr 1fr; gap:10px}
-    .row3{display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px}
-    .btns{display:flex; gap:10px; flex-wrap:wrap}
-    button{cursor:pointer; border:0}
-    .primary{background:var(--btn)}
-    .secondary{background:var(--btn2)}
-    .danger{background:var(--bad)}
-    .mono{font-family:var(--mono); font-size:12px}
-    table{width:100%; border-collapse:collapse; overflow:hidden; border-radius:12px; border:1px solid var(--line)}
-    th, td{padding:10px 10px; border-bottom:1px solid var(--line); vertical-align:middle}
-    th{font-size:12px; color:var(--muted); text-align:left; background:rgba(148,163,184,.06)}
-    tr:last-child td{border-bottom:0}
-    .tag{display:inline-flex; align-items:center; gap:6px; padding:3px 8px; border-radius:999px; font-size:12px; border:1px solid var(--line)}
-    .tag.ok{border-color:rgba(22,163,74,.45); color:#86efac}
-    .tag.bad{border-color:rgba(239,68,68,.45); color:#fecaca}
-    .small{font-size:12px; color:var(--muted)}
-    .right{display:flex; justify-content:flex-end}
-    .sticky-actions{display:flex; gap:10px; align-items:center; justify-content:space-between; margin-top:10px}
-    .notice{padding:10px 12px; border-radius:12px; border:1px solid var(--line); background:rgba(148,163,184,.06); color:var(--muted); font-size:12px}
-    .error{color:#fecaca}
-    .oktext{color:#86efac}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RSI Swing Journal</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;0,9..40,800;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:    #070710;
+  --bg2:   #0e0e1c;
+  --bg3:   #151525;
+  --bg4:   #1c1c30;
+  --line:  #232338;
+  --acc:   #7ee8a2;
+  --acc2:  #ff6b8a;
+  --acc3:  #ffc85a;
+  --acc4:  #5b9cf6;
+  --acc5:  #c084fc;
+  --text:  #eeeef8;
+  --t2:    #7777a0;
+  --t3:    #3a3a58;
+  --mono:  'IBM Plex Mono', monospace;
+  --sans:  'DM Sans', sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 
-    /* Tabs + Watchlist editor */
-    .tabs{display:flex; gap:10px; flex-wrap:wrap}
-    .tab{background:var(--btn2); padding:10px 12px; border-radius:12px; border:1px solid var(--line); cursor:pointer; user-select:none}
-    .tab.active{background:var(--btn); border-color:rgba(37,99,235,.35)}
-    .view{display:none}
-    .view.active{display:block}
-    .wl-grid{display:grid; grid-template-columns: 1fr 1fr 120px; gap:10px}
-    .wl-row{display:grid; grid-template-columns: 140px 1fr 120px; gap:10px; align-items:center}
-    .wl-row input{width:100%}
-    .smallbtn{padding:10px 12px; border-radius:12px}
-  </style>
+/* NOISE TEXTURE */
+body::after{
+  content:'';position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:9999;opacity:0.35
+}
+
+/* CLOUD SYNC BANNER */
+#syncBanner{
+  position:fixed;top:0;left:0;right:0;z-index:500;
+  background:linear-gradient(90deg,var(--acc4),var(--acc5));
+  color:#fff;font-family:var(--mono);font-size:11px;
+  padding:8px 20px;display:flex;align-items:center;justify-content:space-between;
+  transform:translateY(-100%);transition:transform 0.3s;letter-spacing:.5px
+}
+#syncBanner.show{transform:translateY(0)}
+#syncBanner.error{background:linear-gradient(90deg,var(--acc2),#c0392b)}
+
+/* HEADER */
+header{
+  position:sticky;top:0;z-index:200;
+  background:rgba(7,7,16,.96);backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--line);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 24px;height:60px;
+}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-mark{
+  width:32px;height:32px;border-radius:6px;
+  background:linear-gradient(135deg,var(--acc),var(--acc4));
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:11px;font-weight:700;color:#070710
+}
+.logo-name{font-size:16px;font-weight:800;letter-spacing:-.5px}
+.logo-ver{font-family:var(--mono);font-size:10px;color:var(--t2);letter-spacing:1px}
+.header-right{display:flex;align-items:center;gap:12px}
+.sync-dot{
+  width:8px;height:8px;border-radius:50%;background:var(--t3);
+  transition:background .3s;position:relative
+}
+.sync-dot.synced{background:var(--acc)}
+.sync-dot.syncing{background:var(--acc3);animation:pulse 1s infinite}
+.sync-dot.error{background:var(--acc2)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.sync-label{font-family:var(--mono);font-size:10px;color:var(--t2);letter-spacing:.5px}
+
+/* NAV */
+nav{
+  background:var(--bg2);border-bottom:1px solid var(--line);
+  display:flex;padding:0 24px;overflow-x:auto;
+  scrollbar-width:none;-ms-overflow-style:none
+}
+nav::-webkit-scrollbar{display:none}
+.ntab{
+  padding:14px 18px;font-size:12px;font-weight:700;
+  color:var(--t2);cursor:pointer;white-space:nowrap;
+  border-bottom:2px solid transparent;transition:all .2s;
+  letter-spacing:.3px;display:flex;align-items:center;gap:6px
+}
+.ntab:hover{color:var(--text)}
+.ntab.active{color:var(--acc);border-bottom-color:var(--acc)}
+
+/* MAIN */
+main{padding:28px 24px;max-width:1360px;margin:0 auto;position:relative;z-index:1}
+.tab{display:none}.tab.active{display:block}
+
+/* LOADING OVERLAY — hidden, UI renders instantly */
+#loadingOverlay{ display:none !important; }
+
+
+/* CARDS */
+.card{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:22px}
+.card+.card{margin-top:16px}
+.card-sm{padding:16px}
+
+/* GRID HELPERS */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.gauto{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+@media(max-width:800px){.g2,.g3,.g4{grid-template-columns:1fr}}
+
+/* STAT CARDS */
+.stat{
+  background:var(--bg2);border:1px solid var(--line);
+  border-radius:10px;padding:18px 20px;position:relative;overflow:hidden
+}
+.stat::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:var(--sc,var(--acc))
+}
+.stat-l{font-family:var(--mono);font-size:10px;color:var(--t2);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:6px}
+.stat-v{font-size:26px;font-weight:800;letter-spacing:-1px;line-height:1}
+.stat-s{font-family:var(--mono);font-size:10px;color:var(--t2);margin-top:4px}
+
+/* SECTION HEADS */
+.sh{
+  font-family:var(--mono);font-size:10px;font-weight:700;
+  color:var(--t2);letter-spacing:2px;text-transform:uppercase;
+  margin-bottom:14px;display:flex;align-items:center;gap:10px
+}
+.sh::after{content:'';flex:1;height:1px;background:var(--line)}
+
+/* FORMS */
+.fg{display:flex;flex-direction:column;gap:6px}
+.fg.full{grid-column:1/-1}
+label{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--t2);letter-spacing:1px;text-transform:uppercase}
+input,select,textarea{
+  background:var(--bg3);border:1px solid var(--line);border-radius:8px;
+  padding:9px 13px;color:var(--text);font-family:var(--mono);font-size:12px;
+  outline:none;transition:border-color .2s;width:100%
+}
+input:focus,select:focus,textarea:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(126,232,162,.08)}
+select option{background:var(--bg3)}
+textarea{resize:vertical;min-height:72px}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
+
+/* BUTTONS */
+.btn{
+  padding:9px 18px;border-radius:8px;font-family:var(--mono);font-size:11px;
+  font-weight:700;letter-spacing:.8px;cursor:pointer;border:1px solid;
+  transition:all .2s;text-transform:uppercase;display:inline-flex;align-items:center;gap:6px
+}
+.btn-p{background:var(--acc);color:var(--bg);border-color:var(--acc)}
+.btn-p:hover{background:transparent;color:var(--acc)}
+.btn-d{background:transparent;color:var(--acc2);border-color:var(--acc2)}
+.btn-d:hover{background:rgba(255,107,138,.1)}
+.btn-g{background:transparent;color:var(--t2);border-color:var(--line)}
+.btn-g:hover{color:var(--text);border-color:var(--t2)}
+.btn-s{padding:6px 12px;font-size:10px}
+.btn-sync{background:linear-gradient(135deg,var(--acc4),var(--acc5));color:#fff;border:none}
+.btn-sync:hover{opacity:.85}
+
+/* BADGES */
+.b{padding:3px 9px;border-radius:20px;font-size:9px;font-weight:700;font-family:var(--mono);letter-spacing:.5px;display:inline-block}
+.b-long{background:rgba(126,232,162,.15);color:var(--acc)}
+.b-short{background:rgba(255,107,138,.15);color:var(--acc2)}
+.b-open{background:rgba(91,156,246,.15);color:var(--acc4)}
+.b-win{background:rgba(126,232,162,.15);color:var(--acc)}
+.b-loss{background:rgba(255,107,138,.15);color:var(--acc2)}
+.b-warn{background:rgba(255,200,90,.15);color:var(--acc3)}
+
+/* TABLE */
+.tw{overflow-x:auto;border-radius:10px;border:1px solid var(--line)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{
+  text-align:left;padding:10px 14px;
+  font-family:var(--mono);font-size:9px;font-weight:700;
+  color:var(--t2);letter-spacing:1.5px;text-transform:uppercase;
+  border-bottom:1px solid var(--line);background:var(--bg3);white-space:nowrap
+}
+td{padding:11px 14px;border-bottom:1px solid rgba(35,35,56,.5);font-family:var(--mono);font-size:11px;vertical-align:middle;white-space:nowrap}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(126,232,162,.02)}
+
+/* COLORS */
+.g{color:var(--acc)}.r{color:var(--acc2)}.y{color:var(--acc3)}.bl{color:var(--acc4)}
+
+/* DAY BADGES */
+.db{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;font-size:10px;font-weight:700;font-family:var(--mono)}
+.d1{background:rgba(91,156,246,.2);color:var(--acc4)}
+.d2{background:rgba(91,156,246,.3);color:var(--acc4)}
+.d3{background:rgba(255,200,90,.2);color:var(--acc3)}
+.d4{background:rgba(255,200,90,.35);color:var(--acc3)}
+.d5{background:rgba(255,107,138,.25);color:var(--acc2);border:1px solid var(--acc2)}
+
+/* CHECKLIST */
+.cl{display:flex;flex-direction:column;gap:7px}
+.ci{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:9px 12px;border-radius:8px;
+  background:var(--bg3);border:1px solid var(--line);
+  cursor:pointer;transition:all .2s
+}
+.ci:hover{border-color:rgba(126,232,162,.3)}
+.ci.chk{background:rgba(126,232,162,.04);border-color:rgba(126,232,162,.2)}
+.ci.chk .cit{color:var(--t2);text-decoration:line-through}
+.cbox{
+  width:17px;height:17px;border:2px solid var(--line);border-radius:4px;
+  flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .2s
+}
+.ci.chk .cbox{background:var(--acc);border-color:var(--acc)}
+.cbox::after{content:'✓';color:var(--bg);font-size:10px;font-weight:700;opacity:0;transition:opacity .2s}
+.ci.chk .cbox::after{opacity:1}
+.cit{font-size:12px;color:var(--text);line-height:1.4}
+.csec{font-family:var(--mono);font-size:9px;color:var(--acc);letter-spacing:1.5px;text-transform:uppercase;font-weight:700;margin:14px 0 7px}
+
+/* MODAL */
+.mo{
+  position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:400;
+  display:flex;align-items:center;justify-content:center;padding:20px;
+  opacity:0;pointer-events:none;transition:opacity .2s;backdrop-filter:blur(6px)
+}
+.mo.open{opacity:1;pointer-events:all}
+.md{
+  background:var(--bg2);border:1px solid var(--line);border-radius:14px;
+  padding:28px;width:100%;max-width:680px;max-height:92vh;overflow-y:auto;
+  transform:translateY(16px);transition:transform .2s;
+  scrollbar-width:thin;scrollbar-color:var(--line) transparent
+}
+.mo.open .md{transform:translateY(0)}
+.mh{font-size:18px;font-weight:800;margin-bottom:22px;display:flex;justify-content:space-between;align-items:center}
+.mclose{cursor:pointer;color:var(--t2);font-size:18px;transition:color .2s}
+.mclose:hover{color:var(--acc2)}
+
+/* WATCHLIST */
+.wgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:10px}
+.wi{
+  background:var(--bg3);border:1px solid var(--line);border-radius:10px;
+  padding:13px;position:relative;transition:all .2s
+}
+.wi:hover{border-color:rgba(126,232,162,.4)}
+.wi.bo{opacity:.55;border-color:rgba(255,107,138,.4)}
+.wi.cd{border-color:rgba(255,200,90,.3)}
+.wt{font-size:15px;font-weight:800;margin-bottom:3px}
+.wm{font-family:var(--mono);font-size:9px;color:var(--t2);margin-bottom:6px}
+.wr{position:absolute;top:8px;right:8px;background:none;border:none;cursor:pointer;color:var(--t3);font-size:13px;transition:color .2s}
+.wr:hover{color:var(--acc2)}
+
+/* TOAST */
+#toast{
+  position:fixed;bottom:24px;right:24px;
+  background:var(--acc);color:var(--bg);
+  padding:11px 18px;border-radius:8px;
+  font-family:var(--mono);font-size:11px;font-weight:700;
+  z-index:9998;opacity:0;transform:translateY(8px);
+  transition:all .25s;pointer-events:none;letter-spacing:.5px
+}
+#toast.show{opacity:1;transform:translateY(0)}
+#toast.err{background:var(--acc2)}
+
+/* RSI INPUT IN TABLE */
+.rsi-inp{
+  width:60px;padding:4px 6px;border-radius:5px;
+  background:var(--bg4);border:1px solid var(--line);
+  color:var(--text);font-family:var(--mono);font-size:11px;
+  text-align:center;outline:none;transition:border-color .2s
+}
+.rsi-inp:focus{border-color:var(--acc)}
+
+/* RSI MINI BAR */
+.rsi-bar-wrap{display:flex;align-items:center;gap:6px}
+.rsi-mini{width:60px;height:5px;background:var(--bg4);border-radius:3px;overflow:hidden;flex-shrink:0}
+.rsi-mini-fill{height:100%;border-radius:3px;transition:width .3s,background .3s}
+.rsi-val{font-family:var(--mono);font-size:10px;font-weight:700;min-width:28px}
+
+/* SIGNAL BADGE */
+.sig-long{background:rgba(126,232,162,.2);color:var(--acc);border:1px solid rgba(126,232,162,.4);padding:3px 10px;border-radius:20px;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.5px}
+.sig-short{background:rgba(255,107,138,.2);color:var(--acc2);border:1px solid rgba(255,107,138,.4);padding:3px 10px;border-radius:20px;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.5px}
+.sig-watch{background:rgba(255,200,90,.15);color:var(--acc3);border:1px solid rgba(255,200,90,.3);padding:3px 10px;border-radius:20px;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.5px}
+.sig-none{color:var(--t3);font-family:var(--mono);font-size:10px}
+
+/* SIGNAL CARD ON DASHBOARD */
+.sig-card{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 16px;border-radius:10px;border:1px solid;
+  background:var(--bg3);margin-bottom:8px
+}
+.sig-card.long{border-color:rgba(126,232,162,.3)}
+.sig-card.short{border-color:rgba(255,107,138,.3)}
+.sig-card.watch{border-color:rgba(255,200,90,.25)}
+.gauge-wrap{position:relative;height:20px;border-radius:6px;overflow:hidden;margin:10px 0}
+.gauge-bg{
+  position:absolute;inset:0;
+  background:linear-gradient(90deg,
+    #ff4d6d 0%,#ff4d6d 20%,
+    #ffc85a 20%,#ffc85a 30%,
+    #7ee8a2 30%,#7ee8a2 55%,
+    #ffc85a 55%,#ffc85a 70%,
+    #ff4d6d 70%,#ff4d6d 75%,
+    #660020 75%)
+}
+.gauge-ptr{
+  position:absolute;top:-3px;width:3px;height:26px;
+  background:#fff;border-radius:2px;transform:translateX(-50%);
+  transition:left .5s ease;box-shadow:0 0 6px rgba(255,255,255,.6)
+}
+.gauge-labels{display:flex;justify-content:space-between;font-family:var(--mono);font-size:8px;color:var(--t3);margin-top:3px}
+
+/* REGIME DISPLAY */
+.regime-box{
+  padding:10px 14px;border-radius:8px;
+  font-family:var(--mono);font-size:12px;border:1px solid var(--line);
+  background:var(--bg3);transition:all .3s
+}
+
+/* ACTIONS ROW */
+.ar{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+
+/* FILTER BAR */
+.fb{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;align-items:center}
+.fb select,.fb input{padding:7px 11px;font-size:11px;max-width:160px}
+
+/* DIVIDER */
+hr{border:none;border-top:1px solid var(--line);margin:18px 0}
+
+/* EMPTY */
+.empty{text-align:center;padding:50px 20px;color:var(--t2)}
+.empty-i{font-size:40px;margin-bottom:12px}
+.empty-t{font-size:14px}
+
+/* OPEN POS CARD */
+.opc{
+  border:1px solid var(--line);border-radius:10px;padding:14px 16px;
+  margin-bottom:10px;background:var(--bg3);transition:border-color .2s
+}
+.opc.warn{border-color:rgba(255,107,138,.4)}
+
+/* PROGRESS */
+.pbw{height:5px;background:var(--bg3);border-radius:3px;overflow:hidden;margin-top:5px}
+.pb{height:100%;border-radius:3px;background:var(--acc);transition:width .5s}
+
+/* CALC BOX */
+.calcrow{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--bg4)}
+.calcrow:last-child{border:none}
+.calcrow span:first-child{color:var(--t2);font-family:var(--mono);font-size:10px}
+.calcrow span:last-child{font-family:var(--mono);font-size:11px;font-weight:700}
+</style>
 </head>
 <body>
-<div class="wrap">
-  <h1>RSI Watchlist</h1>
 
-  <div class="grid">
-    <!-- LEFT CARD -->
-    <div class="card">
-      <div class="row">
-        <div>
-          <label>Дата (торговый день)</label>
-          <input id="date" type="date" />
-        </div>
-        <div>
-          <label>GitHub token (Contents: Read &amp; Write)</label>
-          <input id="token" type="password" placeholder="fine-grained token" />
-          <div class="small">Токен не в коде. Можно сохранить в браузере.</div>
-        </div>
+<!-- LOADING -->
+<div id="loadingOverlay">
+  <div class="spinner"></div>
+  <div class="loading-text">ЗАГРУЗКА ДАННЫХ ИЗ ОБЛАКА...</div>
+</div>
+
+<!-- SYNC BANNER -->
+<div id="syncBanner">
+  <span id="syncMsg">☁ Синхронизация...</span>
+  <span style="cursor:pointer;opacity:.7" onclick="hideSyncBanner()">✕</span>
+</div>
+
+<header>
+  <div class="logo">
+    <div class="logo-mark">RSI</div>
+    <div>
+      <div class="logo-name">Swing Journal</div>
+      <div class="logo-ver">PURE RSI SYSTEM · CLOUD SYNC</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div style="display:flex;align-items:center;gap:6px">
+      <div class="sync-dot" id="syncDot"></div>
+      <span class="sync-label" id="syncLabel">НЕТ ДАННЫХ</span>
+    </div>
+    <span id="hdrRegime" style="font-family:var(--mono);font-size:10px;color:var(--t2);letter-spacing:.5px"></span>
+    <span style="font-family:var(--mono);font-size:10px;color:var(--t2)" id="hdrDate"></span>
+  </div>
+</header>
+
+<nav>
+  <div class="ntab active" onclick="goTab('dashboard')">📊 Дашборд</div>
+  <div class="ntab" onclick="goTab('checklist')">✅ Чеклист</div>
+  <div class="ntab" onclick="goTab('trades')">📋 Сделки</div>
+  <div class="ntab" onclick="goTab('watchlist')">👁 Список</div>
+  <div class="ntab" onclick="goTab('quarterly')">📅 Квартал</div>
+  <div class="ntab" onclick="goTab('settings')">⚙️ Настройки</div>
+</nav>
+
+<main>
+
+<!-- ═══════════════════════ DASHBOARD ═══════════════════════ -->
+<div class="tab active" id="tab-dashboard">
+  <div class="g4" id="statsGrid" style="margin-bottom:24px"></div>
+  <div class="g2">
+    <div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div class="sh" style="margin-bottom:0">Открытые позиции</div>
+        <button class="btn btn-g btn-s" onclick="refreshLivePrices()" id="liveBtn" style="font-family:var(--mono);font-size:10px">📡 ЦЕНЫ</button>
       </div>
-
-      <div style="height:10px"></div>
-
-      <div class="row3">
-        <div>
-          <label>Owner</label>
-          <input id="owner" value="mariiashumova1979-collab" />
+      <div id="openPos"></div>
+    </div>
+    <div>
+      <div class="sh">Рыночный фильтр SPY</div>
+      <div class="card" style="padding:18px">
+        <div class="fgrid" style="grid-template-columns:1fr 1fr;margin-bottom:14px">
+          <div class="fg">
+            <label>SPY RSI(14)</label>
+            <input type="number" id="spyRsi" min="0" max="100" step="0.1" placeholder="52.0" oninput="updRegime()">
+          </div>
+          <div class="fg">
+            <label>Состояние</label>
+            <div class="regime-box" id="regimeBox">—</div>
+          </div>
         </div>
-        <div>
-          <label>Repo</label>
-          <input id="repo" value="rsi-watchlist" />
+        <div class="gauge-wrap">
+          <div class="gauge-bg"></div>
+          <div class="gauge-ptr" id="gaugePtr" style="left:50%"></div>
         </div>
-        <div>
-          <label>Файл истории</label>
-          <input id="path" value="data/history.json" />
+        <div class="gauge-labels">
+          <span>0</span><span>20</span><span>30</span><span>45</span><span>55</span><span>70</span><span>80</span><span>100</span>
         </div>
-      </div>
-
-      <div style="height:10px"></div>
-
-      <div class="btns">
-        <button class="secondary" id="load">Load history from Git (sha)</button>
-        <button class="secondary" id="saveToken">Save token (local)</button>
-        <button class="danger" id="clearToken">Clear token</button>
-      </div>
-
-      <div style="height:10px"></div>
-      <div id="status" class="notice mono">Status: idle</div>
-
-      <div style="height:14px"></div>
-      <div class="notice">
-        Правила сигнала:
-        <div class="mono" style="margin-top:6px">
-          LONG: RSI7 crossed ↑20 (вчера &lt;=20, сегодня &gt;20) и RSI14 &lt; 40<br/>
-          SHORT: RSI7 crossed ↓80 (вчера &gt;=80, сегодня &lt;80) и RSI14 &gt; 60
-        </div>
-        <div class="small" style="margin-top:8px">
-          RSI7 вчера берётся из предыдущей даты в history.json (date-1).
+        <hr>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--t2);letter-spacing:1px;margin-bottom:6px">РАЗМЕР ЛОНГ / ШОРТ</div>
+        <div id="sizeGuide" style="font-size:22px;font-weight:800;letter-spacing:-1px">— / —</div>
+        <div id="tradeNote" style="font-family:var(--mono);font-size:10px;color:var(--t2);margin-top:4px"></div>
+        <div class="ar">
+          <button class="btn btn-p btn-s" onclick="saveRegime()">СОХРАНИТЬ</button>
         </div>
       </div>
     </div>
+  </div>
+  <div style="margin-top:28px">
+    <div class="sh">🎯 Сигналы дня <span style="font-family:var(--mono);font-size:9px;color:var(--t2);font-weight:400" id="signalsDate"></span></div>
+    <div id="signalsSection">
+      <div class="empty" style="padding:24px"><div class="empty-t" style="font-family:var(--mono);font-size:11px">Нет сигналов — заполните RSI в разделе «Список наблюдения»</div></div>
+    </div>
+  </div>
 
-    <!-- RIGHT CARD WITH TABS -->
-    <div class="card">
+  <div style="margin-top:28px">
+    <div class="sh">Последние 8 сделок</div>
+    <div class="tw">
+      <table><thead><tr>
+        <th>Дата</th><th>Тикер</th><th>Тип</th><th>Вход</th><th>Выход</th><th>P&L%</th><th>День</th><th>Статус</th>
+      </tr></thead>
+      <tbody id="recentTb"><tr><td colspan="8" style="text-align:center;color:var(--t2);padding:36px">Сделок нет</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
 
-      <div class="tabs" style="margin-bottom:12px">
-        <div class="tab active" id="tabScanner">Scanner</div>
-        <div class="tab" id="tabWatchlist">Watchlist</div>
+<!-- ═══════════════════════ CHECKLIST ═══════════════════════ -->
+<div class="tab" id="tab-checklist">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;flex-wrap:wrap;gap:12px">
+    <div>
+      <div style="font-size:22px;font-weight:800">Ежедневный чеклист</div>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--t2);margin-top:3px" id="clDate"></div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <span style="font-family:var(--mono);font-size:12px;color:var(--acc)" id="clProg">0/0</span>
+      <div id="clProgWrap" style="width:120px"><div class="pbw"><div class="pb" id="clProgBar" style="width:0%"></div></div></div>
+      <button class="btn btn-g btn-s" onclick="resetCl()">СБРОС</button>
+    </div>
+  </div>
+  <div class="g2">
+    <div>
+      <div class="csec">🌅 УТРО — РЫНОЧНЫЙ ФИЛЬТР</div>
+      <div class="cl" id="cl-mf"></div>
+      <div class="csec">🔍 СКАНИРОВАНИЕ СПИСКА</div>
+      <div class="cl" id="cl-ms"></div>
+      <div class="csec">⚖️ ПРОВЕРКА ЛИМИТОВ</div>
+      <div class="cl" id="cl-ml"></div>
+    </div>
+    <div>
+      <div class="csec">📈 ТОРГОВАЯ СЕССИЯ — ОТКРЫТИЕ</div>
+      <div class="cl" id="cl-en"></div>
+      <div class="csec">🔄 УПРАВЛЕНИЕ ПОЗИЦИЯМИ</div>
+      <div class="cl" id="cl-mg"></div>
+      <div class="csec">🌆 КОНЕЦ ДНЯ</div>
+      <div class="cl" id="cl-ed"></div>
+      <div class="csec">🌙 ПОДГОТОВКА К ЗАВТРАШНЕМУ ДНЮ</div>
+      <div class="cl" id="cl-pr"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ TRADES ═══════════════════════ -->
+<div class="tab" id="tab-trades">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;flex-wrap:wrap;gap:12px">
+    <div style="font-size:22px;font-weight:800">Журнал сделок</div>
+    <button class="btn btn-p" onclick="openTrade()">+ НОВАЯ СДЕЛКА</button>
+  </div>
+  <div class="fb">
+    <select id="fType" onchange="renderTrades()"><option value="">Все типы</option><option>LONG</option><option>SHORT</option></select>
+    <select id="fStatus" onchange="renderTrades()"><option value="">Все статусы</option><option value="OPEN">Открытые</option><option value="CLOSED">Закрытые</option></select>
+    <select id="fResult" onchange="renderTrades()"><option value="">Результат</option><option value="WIN">Выигрыш</option><option value="LOSS">Убыток</option></select>
+    <input id="fTicker" placeholder="Тикер..." oninput="renderTrades()" style="max-width:120px">
+  </div>
+  <div class="tw">
+    <table><thead><tr>
+      <th>Дата</th><th>Тикер</th><th>Тип</th><th>Вход $</th><th>Стоп $</th>
+      <th>Ц1 $</th><th>Ц2 $</th><th>RSI7</th><th>RSI14</th><th>SPY</th>
+      <th>День</th><th>P&L%</th><th>Статус</th><th></th>
+    </tr></thead>
+    <tbody id="tradesTb"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════════ WATCHLIST ═══════════════════════ -->
+<div class="tab" id="tab-watchlist">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;flex-wrap:wrap;gap:12px">
+    <div>
+      <div style="font-size:22px;font-weight:800">Список наблюдения</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--t2);margin-top:3px">Цель: 40–50 акций</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-g btn-s" onclick="saveRsiScan()">💾 СОХРАНИТЬ RSI</button>
+      <button class="btn btn-p" onclick="openWL()">+ ДОБАВИТЬ</button>
+    </div>
+  </div>
+
+  <div class="g4" style="max-width:600px;margin-bottom:22px">
+    <div class="stat" style="--sc:var(--acc)"><div class="stat-l">Всего</div><div class="stat-v" id="wlTot">0</div></div>
+    <div class="stat" style="--sc:var(--acc2)"><div class="stat-l">Блэкаут</div><div class="stat-v r" id="wlBo">0</div></div>
+    <div class="stat" style="--sc:var(--acc3)"><div class="stat-l">Ожидание</div><div class="stat-v y" id="wlCd">0</div></div>
+    <div class="stat" style="--sc:var(--acc)"><div class="stat-l">Активных</div><div class="stat-v g" id="wlAct">0</div></div>
+  </div>
+
+  <!-- RSI SCAN TABLE -->
+  <div style="margin-bottom:24px">
+    <div class="sh">Ежедневное сканирование RSI
+      <span style="font-family:var(--mono);font-size:9px;color:var(--t2);font-weight:400" id="scanDateLabel"></span>
+    </div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--t2);margin-bottom:12px;padding:10px 14px;background:var(--bg3);border-radius:8px;border:1px solid var(--line)">
+      Заполните RSI(7) и RSI(14) → нажмите «Сохранить RSI» → сигналы появятся на Дашборде автоматически
+    </div>
+    <div class="tw">
+      <table>
+        <thead><tr>
+          <th>Тикер</th>
+          <th>Сектор</th>
+          <th>RSI(7) сегодня</th>
+          <th>RSI(14) сегодня</th>
+          <th>История RSI(7) ← 5 дней</th>
+          <th>Сигнал</th>
+          <th>Статус</th>
+        </tr></thead>
+        <tbody id="rsiScanTbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- WATCHLIST CARDS -->
+  <div class="fb">
+    <input id="wlSrch" placeholder="Поиск..." oninput="renderWL()" style="max-width:180px">
+    <select id="wlSect" onchange="renderWL()">
+      <option value="">Все секторы</option>
+      <option>Технологии</option><option>Финансы</option><option>Здравоохранение</option>
+      <option>Потребительский</option><option>Энергетика</option><option>Другое</option>
+    </select>
+    <select id="wlStat" onchange="renderWL()">
+      <option value="">Все статусы</option>
+      <option value="active">Активные</option>
+      <option value="blackout">Блэкаут</option>
+      <option value="cooldown">Ожидание</option>
+    </select>
+  </div>
+  <div class="wgrid" id="wlGrid"></div>
+</div>
+
+<!-- ═══════════════════════ QUARTERLY ═══════════════════════ -->
+<div class="tab" id="tab-quarterly">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;flex-wrap:wrap;gap:12px">
+    <div>
+      <div style="font-size:22px;font-weight:800">Квартальный обзор</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--t2);margin-top:3px" id="qLabel"></div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-g btn-s" onclick="qOff--; renderQ()">← ПРЕД</button>
+      <button class="btn btn-g btn-s" onclick="qOff++; renderQ()">СЛЕД →</button>
+      <button class="btn btn-p btn-s" onclick="saveQ()">СОХРАНИТЬ</button>
+    </div>
+  </div>
+  <div class="g2">
+    <div>
+      <div class="card">
+        <div class="sh">Результаты</div>
+        <div class="fgrid">
+          <div class="fg"><label>Всего сделок</label><input type="number" id="q_t"></div>
+          <div class="fg"><label>% выигрышей</label><input type="number" id="q_wr" min="0" max="100" step=".1"></div>
+          <div class="fg"><label>Доходность %</label><input type="number" id="q_r" step=".1"></div>
+          <div class="fg"><label>Макс просадка %</label><input type="number" id="q_d" step=".1"></div>
+          <div class="fg"><label>Средний выигрыш %</label><input type="number" id="q_aw" step=".1"></div>
+          <div class="fg"><label>Средний убыток %</label><input type="number" id="q_al" step=".1"></div>
+        </div>
       </div>
-
-      <!-- VIEW: SCANNER -->
-      <div class="view active" id="viewScanner">
-        <div class="sticky-actions">
-          <div class="small" id="meta"></div>
-          <div class="btns">
-            <button class="secondary" id="exportDay">Export day JSON</button>
-            <button class="primary" id="saveGit">Save day to GitHub</button>
-          </div>
+      <div class="card">
+        <div class="sh">Пересмотр списка</div>
+        <div class="cl" id="q-cl"></div>
+        <div class="fgrid" style="margin-top:14px">
+          <div class="fg"><label>Удалённые акции</label><input type="text" id="q_rem" placeholder="RIVN, NIO..."></div>
+          <div class="fg"><label>Добавленные акции</label><input type="text" id="q_add" placeholder="SOFI, AFRM..."></div>
         </div>
-
-        <div style="height:10px"></div>
-
-        <table>
-          <thead>
-          <tr>
-            <th style="width:120px">Ticker</th>
-            <th style="width:110px">RSI7 today</th>
-            <th style="width:110px">RSI14 today</th>
-            <th style="width:110px">RSI7 вчера</th>
-            <th style="width:120px">Signal</th>
-            <th style="width:110px">Pick</th>
-            <th>Notes</th>
-          </tr>
-          </thead>
-          <tbody id="tbody"></tbody>
-        </table>
-
-        <div style="height:10px"></div>
-        <div class="right small">Изменения остаются в браузере до “Save day to GitHub”.</div>
+        <div class="fg" style="margin-top:14px">
+          <label>Размер позиции</label>
+          <select id="q_ps">
+            <option value="100">100% — нормальный</option>
+            <option value="50">50% — осторожный</option>
+            <option value="10">10% — сброс дисциплины</option>
+          </select>
+        </div>
       </div>
-
-      <!-- VIEW: WATCHLIST -->
-      <div class="view" id="viewWatchlist">
-        <div class="notice">
-          Здесь редактируется <span class="mono">data/watchlist.json</span>.
-          История (<span class="mono">history.json</span>) не трогается.
-        </div>
-
-        <div style="height:12px"></div>
-
-        <div class="wl-grid">
-          <div>
-            <label>Ticker</label>
-            <input id="wlNewTicker" placeholder="например, META" />
-          </div>
-          <div>
-            <label>Sector</label>
-            <input id="wlNewSector" placeholder="например, Tech" />
-          </div>
-          <div style="display:flex; align-items:end">
-            <button class="secondary smallbtn" id="wlAdd">+ Add</button>
-          </div>
-        </div>
-
-        <div style="height:12px"></div>
-
-        <div class="sticky-actions">
-          <div class="small" id="wlMeta"></div>
-          <div class="btns">
-            <button class="secondary" id="wlReload">Reload watchlist (sha)</button>
-            <button class="primary" id="wlSave">Save watchlist to GitHub</button>
-          </div>
-        </div>
-
-        <div style="height:10px"></div>
-
-        <div id="wlList" style="display:flex; flex-direction:column; gap:10px"></div>
+    </div>
+    <div>
+      <div class="card">
+        <div class="sh">Анализ квартала</div>
+        <div class="fg" style="margin-bottom:12px"><label>Что работало хорошо</label><textarea id="q_gd" placeholder="..."></textarea></div>
+        <div class="fg" style="margin-bottom:12px"><label>Что улучшить</label><textarea id="q_im" placeholder="..."></textarea></div>
+        <div class="fg" style="margin-bottom:12px"><label>Нарушения правил</label><textarea id="q_vl" placeholder="..."></textarea></div>
+        <div class="fg"><label>Изменения на следующий квартал</label><textarea id="q_ch" placeholder="..."></textarea></div>
       </div>
     </div>
   </div>
 </div>
 
-<script>
-  // Raw URLs (read-only)
-  const WATCHLIST_URL = "https://raw.githubusercontent.com/mariiashumova1979-collab/rsi-watchlist/refs/heads/main/data/watchlist.json";
-  const HISTORY_RAW   = "https://raw.githubusercontent.com/mariiashumova1979-collab/rsi-watchlist/refs/heads/main/data/history.json";
+<!-- ═══════════════════════ SETTINGS ═══════════════════════ -->
+<div class="tab" id="tab-settings">
+  <div style="font-size:22px;font-weight:800;margin-bottom:22px">Настройки</div>
+  <div class="g2">
+    <div>
+      <div class="card">
+        <div class="sh">Параметры портфеля</div>
+        <div class="fgrid">
+          <div class="fg"><label>Портфель ($)</label><input type="number" id="s_pf" placeholder="100000"></div>
+          <div class="fg"><label>Риск/сделка (%)</label><input type="number" id="s_rp" placeholder="1.5" step=".1"></div>
+          <div class="fg"><label>Макс позиций</label><input type="number" id="s_mp" placeholder="6"></div>
+          <div class="fg"><label>Макс позиция (%)</label><input type="number" id="s_mpp" placeholder="20"></div>
+          <div class="fg"><label>Стоп (%)</label><input type="number" id="s_sp" placeholder="4" step=".5"></div>
+          <div class="fg"><label>Цель 1 (%)</label><input type="number" id="s_t1" placeholder="4" step=".5"></div>
+          <div class="fg"><label>Цель 2 (%)</label><input type="number" id="s_t2" placeholder="8" step=".5"></div>
+          <div class="fg"><label>Макс дней</label><input type="number" id="s_md" placeholder="5"></div>
+        </div>
+        <div class="ar">
+          <button class="btn btn-p btn-s" onclick="saveSets()">СОХРАНИТЬ</button>
+          <button class="btn btn-g btn-s" onclick="defSets()">ПО УМОЛЧАНИЮ</button>
+        </div>
+      </div>
 
-  const $ = (id)=>document.getElementById(id);
+      <div class="card">
+        <div class="sh">Finnhub API — живые цены</div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--t2);margin-bottom:12px;line-height:1.7">
+          Получайте текущие цены и RSI прямо в журнале.<br>
+          Бесплатно на <b style="color:var(--text)">finnhub.io</b> → Dashboard → API Key
+        </div>
+        <div class="fg" style="margin-bottom:12px">
+          <label>API Ключ</label>
+          <div style="display:flex;gap:8px">
+            <input type="text" id="s_fhkey" placeholder="ваш ключ..." style="flex:1;font-family:var(--mono);font-size:11px" oninput="saveFinnhubKey()">
+            <button class="btn btn-g btn-s" onclick="testFinnhub()">ПРОВЕРИТЬ</button>
+          </div>
+        </div>
+        <div id="fhStatus" style="font-family:var(--mono);font-size:10px;color:var(--t2);min-height:18px"></div>
+      </div>
 
-  const state = {
-    watchlist: [],
-    history: null,
-    date: null,
-    dayRows: [],
-    historySha: null,
-    watchlistObj: null,
-    watchlistSha: null
-  };
+      <div class="card">
+        <div class="sh">🐙 GitHub — синхронизация</div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--t2);margin-bottom:14px;line-height:1.8">
+          Данные хранятся в репозитории <b style="color:var(--acc)">rsi-watchlist</b>.<br>
+          Файл: <b style="color:var(--acc)">data.json</b> · автосохранение при каждом изменении.
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+          <button class="btn btn-g btn-s" onclick="testGithub()">✓ ПРОВЕРИТЬ</button>
+          <button class="btn btn-sync btn-s" onclick="syncFromGithub()">🔄 СИНХРОНИЗИРОВАТЬ</button>
+        </div>
+        <div id="ghStatus" style="font-family:var(--mono);font-size:10px;color:var(--t2);min-height:18px;margin-bottom:10px"></div>
+        <div id="storageInfo" style="padding:10px 14px;background:var(--bg3);border-radius:8px;font-family:var(--mono);font-size:11px;border:1px solid var(--line)">
+          Определяется...
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:12px">
+          <div class="sync-dot" id="syncDot2"></div>
+          <span style="font-family:var(--mono);font-size:11px;color:var(--t2)" id="syncStatus2">Проверка...</span>
+        </div>
+      </div>
+    </div>
 
-  function setStatus(msg, type="") {
-    const el = $("status");
-    el.textContent = "Status: " + msg;
-    el.classList.remove("error","oktext");
-    if (type==="error") el.classList.add("error");
-    if (type==="ok") el.classList.add("oktext");
-  }
+    <div>
+      <div class="card">
+        <div class="sh">Калькулятор позиции</div>
+        <div class="fgrid" style="margin-bottom:14px">
+          <div class="fg"><label>Цена входа ($)</label><input type="number" id="c_e" placeholder="0" oninput="calcPos()"></div>
+          <div class="fg"><label>Стоп (%)</label><input type="number" id="c_s" placeholder="4" oninput="calcPos()"></div>
+        </div>
+        <div style="background:var(--bg3);border-radius:8px;padding:14px">
+          <div class="calcrow"><span>Риск ($)</span><span id="c_rd" class="y">—</span></div>
+          <div class="calcrow"><span>Размер позиции ($)</span><span id="c_ps" class="g">—</span></div>
+          <div class="calcrow"><span>Кол-во акций</span><span id="c_sh" class="g">—</span></div>
+          <div class="calcrow"><span>Стоп-цена ($)</span><span id="c_sp" class="r">—</span></div>
+          <div class="calcrow"><span>Цель 1 ($)</span><span id="c_t1" class="g">—</span></div>
+          <div class="calcrow"><span>Цель 2 ($)</span><span id="c_t2" class="g">—</span></div>
+        </div>
+      </div>
 
-  function fmtDate(d){ return d.toISOString().slice(0,10); }
+      <div class="card">
+        <div class="sh">Резервные копии</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <button class="btn btn-g" onclick="exportJSON()">📥 ЭКСПОРТ JSON</button>
+          <label class="btn btn-g" style="cursor:pointer;justify-content:center">
+            📤 ИМПОРТ JSON
+            <input type="file" accept=".json" onchange="importJSON(event)" style="display:none">
+          </label>
+          <button class="btn btn-d" onclick="clearCloud()">🗑 ОЧИСТИТЬ ВСЕ ДАННЫЕ</button>
+        </div>
+        <div style="margin-top:14px;padding:12px;background:var(--bg3);border-radius:8px;font-family:var(--mono);font-size:10px;color:var(--t3);line-height:1.7">
+          Экспорт создаёт локальный JSON-файл.<br>
+          Используйте как дополнительный бэкап.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-  function prevDateStr(dateStr){
-    const d = new Date(dateStr+"T00:00:00");
-    d.setDate(d.getDate()-1);
-    return fmtDate(d);
-  }
+</main>
 
-  function safeNum(v){
-    if (v===null || v===undefined || v==="") return null;
-    const n = Number(v);
-    return Number.isFinite(n) ? n : null;
-  }
+<!-- TRADE MODAL -->
+<div class="mo" id="moTrade">
+  <div class="md">
+    <div class="mh"><span id="moTradeTitle">Новая сделка</span><span class="mclose" onclick="closeMo('moTrade')">✕</span></div>
+    <input type="hidden" id="te_id">
 
-  function computeSignal(rsi7Today, rsi14Today, rsi7Prev){
-    if (rsi7Today==null || rsi14Today==null || rsi7Prev==null) return "";
-    const long = (rsi7Prev <= 20 && rsi7Today > 20 && rsi14Today < 40);
-    const short = (rsi7Prev >= 80 && rsi7Today < 80 && rsi14Today > 60);
-    if (long) return "LONG";
-    if (short) return "SHORT";
-    return "";
-  }
+    <!-- ROW 1: ticker / type / date -->
+    <div class="fgrid" style="margin-bottom:0">
+      <div class="fg">
+        <label>Тикер</label>
+        <div style="display:flex;gap:6px">
+          <input type="text" id="te_tk" placeholder="NVDA" style="text-transform:uppercase;flex:1" oninput="this.value=this.value.toUpperCase()">
+          <button class="btn btn-g btn-s" onclick="fetchTickerData()" title="Получить цену и RSI" style="flex-shrink:0;white-space:nowrap" id="fetchBtn">📡 ЦЕНА</button>
+        </div>
+      </div>
+      <div class="fg"><label>Тип</label><select id="te_tp" onchange="tradeAutoCalc()"><option>LONG</option><option>SHORT</option></select></div>
+      <div class="fg"><label>Дата входа</label><input type="date" id="te_dt"></div>
+    </div>
+    <div id="fetchStatus" style="font-family:var(--mono);font-size:9px;color:var(--t2);margin-top:6px;display:none"></div>
 
-  function signalTag(signal){
-    if (signal==="LONG") return `<span class="tag ok">LONG</span>`;
-    if (signal==="SHORT") return `<span class="tag bad">SHORT</span>`;
-    return `<span class="tag">—</span>`;
-  }
+    <hr style="margin:14px 0">
 
-  async function loadWatchlistRaw(){
-    const res = await fetch(WATCHLIST_URL, { cache:"no-store" });
-    if (!res.ok) throw new Error("Watchlist not loaded");
-    const data = await res.json();
-    return (data.tickers || []).map(x => ({
-      ticker: (x.ticker || "").toUpperCase().trim(),
-      sector: (x.sector || "").trim()
-    }));
-  }
+    <!-- ROW 2: entry + auto-calculated fields -->
+    <div style="font-family:var(--mono);font-size:9px;color:var(--acc);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px">
+      💡 Введите цену входа — стоп и цели рассчитаются автоматически
+    </div>
+    <div class="fgrid">
+      <div class="fg">
+        <label>Цена входа ($)</label>
+        <input type="number" id="te_en" step=".01" placeholder="0.00" oninput="tradeAutoCalc()">
+      </div>
+      <div class="fg">
+        <label>Кол-во акций <span id="te_sh_auto" style="color:var(--acc);font-size:9px"></span></label>
+        <input type="number" id="te_sh" placeholder="авто"
+          oninput="tradeMarkManual('sh'); document.getElementById('te_sh_auto').textContent=''; tradeAutoCalc()">
+      </div>
+      <div class="fg">
+        <label>Стоп ($) <span style="color:var(--t3);font-size:9px">авто −4%</span></label>
+        <input type="number" id="te_st" step=".01" placeholder="авто" oninput="tradeMarkManual('st')">
+      </div>
+      <div class="fg">
+        <label>Цель 1 ($) <span style="color:var(--t3);font-size:9px">авто +4%</span></label>
+        <input type="number" id="te_t1" step=".01" placeholder="авто" oninput="tradeMarkManual('t1')">
+      </div>
+      <div class="fg">
+        <label>Цель 2 ($) <span style="color:var(--t3);font-size:9px">авто +8%</span></label>
+        <input type="number" id="te_t2" step=".01" placeholder="авто" oninput="tradeMarkManual('t2')">
+      </div>
+    </div>
 
-  async function loadHistoryRaw(){
-    const res = await fetch(HISTORY_RAW, { cache:"no-store" });
-    if (!res.ok) throw new Error("History not loaded");
-    return await res.json();
-  }
+    <!-- AUTO CALC PREVIEW -->
+    <div id="te_calc_preview" style="display:none;background:var(--bg3);border:1px solid var(--line);border-radius:8px;padding:12px;margin:10px 0;font-family:var(--mono);font-size:10px">
+      <div style="display:flex;flex-wrap:wrap;gap:14px" id="te_calc_rows"></div>
+      <div id="te_calc_basis" style="margin-top:10px;padding-top:8px;border-top:1px solid var(--bg4);font-size:9px;color:var(--t3);line-height:1.6"></div>
+    </div>
 
-  function ensureBaseHistory(h){
-    if (!h || typeof h !== "object") h = {};
-    if (!h.meta) h.meta = { timezone: "Europe/Nicosia" };
-    if (!h.days) h.days = {};
-    return h;
-  }
+    <hr style="margin:14px 0">
 
-  function buildDayRows(dateStr){
-    const prev = prevDateStr(dateStr);
-    const prevRows = (state.history.days[prev] || []);
-    const prevMap = new Map(prevRows.map(r => [r.ticker, r.rsi7_prev ?? r.rsi7 ?? null])); // tolerate old formats
+    <!-- ROW 3: RSI + status -->
+    <div class="fgrid">
+      <div class="fg"><label>RSI(7)</label><input type="number" id="te_r7" step=".1" placeholder="18.5"></div>
+      <div class="fg"><label>RSI(14)</label><input type="number" id="te_r14" step=".1" placeholder="32.0"></div>
+      <div class="fg"><label>SPY RSI(14)</label><input type="number" id="te_spy" step=".1" placeholder="52.0"></div>
+      <div class="fg"><label>Статус</label><select id="te_sta" onchange="toggleExitFields()"><option value="OPEN">Открыта</option><option value="CLOSED">Закрыта</option></select></div>
+    </div>
 
-    const todayExisting = (state.history.days[dateStr] || []);
-    const todayMap = new Map(todayExisting.map(r => [r.ticker, r]));
-
-    const rows = state.watchlist.map(w => {
-      const t = (w.ticker || "").toUpperCase().trim();
-      const existing = todayMap.get(t) || {};
-      const rsi7prev = prevMap.has(t) ? prevMap.get(t) : (existing.rsi7_prev ?? null);
-      const rsi7 = existing.rsi7 ?? null;
-      const rsi14 = existing.rsi14 ?? null;
-      const pick = existing.pick ?? "";
-      const notes = existing.notes ?? "";
-      const signal = computeSignal(rsi7, rsi14, rsi7prev);
-      return { ticker:t, rsi7, rsi14, rsi7_prev:rsi7prev, signal, pick, notes };
-    });
-
-    state.dayRows = rows;
-    renderTable();
-    $("meta").textContent = `Loaded: ${state.watchlist.length} tickers | Date: ${dateStr} | Prev date: ${prev}`;
-  }
-
-  function renderTable(){
-    const tb = $("tbody");
-    tb.innerHTML = state.dayRows.map((r, idx)=>`
-      <tr data-idx="${idx}">
-        <td class="mono">${r.ticker}</td>
-        <td><input inputmode="decimal" value="${r.rsi7 ?? ""}" data-k="rsi7" /></td>
-        <td><input inputmode="decimal" value="${r.rsi14 ?? ""}" data-k="rsi14" /></td>
-        <td class="mono">${r.rsi7_prev ?? ""}</td>
-        <td>${signalTag(r.signal)}</td>
-        <td>
-          <select data-k="pick">
-            <option value="" ${r.pick===""?"selected":""}>—</option>
-            <option value="YES" ${r.pick==="YES"?"selected":""}>YES</option>
-            <option value="WAIT" ${r.pick==="WAIT"?"selected":""}>WAIT</option>
-            <option value="NO" ${r.pick==="NO"?"selected":""}>NO</option>
+    <!-- EXIT FIELDS (shown only when CLOSED) -->
+    <div id="te_exit_section" style="display:none">
+      <hr style="margin:14px 0">
+      <div style="font-family:var(--mono);font-size:9px;color:var(--acc2);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px">ДАННЫЕ ВЫХОДА</div>
+      <div class="fgrid">
+        <div class="fg"><label>Цена выхода ($)</label><input type="number" id="te_ex" step=".01" placeholder="0.00" oninput="tradeAutoCalc()"></div>
+        <div class="fg"><label>Причина выхода</label>
+          <select id="te_er">
+            <option value="">—</option>
+            <option value="TARGET1">Цель 1 (+4%)</option>
+            <option value="TARGET2">Цель 2 (+8%)</option>
+            <option value="STOP">Стоп-лосс (−4%)</option>
+            <option value="TIME">День 5 (время)</option>
+            <option value="RSI">RSI сигнал</option>
+            <option value="REGIME">Смена режима</option>
           </select>
-        </td>
-        <td><input value="${(r.notes||"").replaceAll('"',"&quot;")}" data-k="notes" /></td>
-      </tr>
-    `).join("");
+        </div>
+        <div class="fg" id="pnl_preview_fg" style="display:none">
+          <label>P&L</label>
+          <div id="pnl_preview" style="padding:9px 13px;border-radius:8px;font-family:var(--mono);font-size:14px;font-weight:800;background:var(--bg3);border:1px solid var(--line)">—</div>
+        </div>
+      </div>
+    </div>
 
-    tb.querySelectorAll("input,select").forEach(el=>{
-      el.addEventListener("change", (e)=>{
-        const tr = e.target.closest("tr");
-        const idx = Number(tr.dataset.idx);
-        const key = e.target.dataset.k;
-        if (key === "rsi7" || key === "rsi14") {
-          state.dayRows[idx][key] = safeNum(e.target.value);
-        } else {
-          state.dayRows[idx][key] = e.target.value;
-        }
-        const r = state.dayRows[idx];
-        r.signal = computeSignal(r.rsi7, r.rsi14, r.rsi7_prev);
-        tr.children[4].innerHTML = signalTag(r.signal);
-      });
-    });
-  }
+    <div class="fg" style="margin-top:10px"><label>Заметки</label><textarea id="te_nt" placeholder="Описание настройки, наблюдения..."></textarea></div>
 
-  function renderWatchlist(){
-    const root = $("wlList");
-    $("wlMeta").textContent = `Tickers: ${state.watchlist.length}`;
-    root.innerHTML = "";
+    <div class="ar">
+      <button class="btn btn-p" onclick="saveTrade()">СОХРАНИТЬ</button>
+      <button class="btn btn-g" onclick="closeMo('moTrade')">ОТМЕНА</button>
+    </div>
+  </div>
+</div>
 
-    state.watchlist.forEach((w, idx) => {
-      const row = document.createElement("div");
-      row.className = "wl-row";
-      row.dataset.idx = String(idx);
-      row.innerHTML = `
-        <input class="mono" data-k="ticker" value="${(w.ticker||"").replaceAll('"',"&quot;")}" />
-        <input data-k="sector" value="${(w.sector||"").replaceAll('"',"&quot;")}" />
-        <button class="danger smallbtn" data-act="del">Delete</button>
-      `;
-      root.appendChild(row);
-    });
+<!-- WATCHLIST MODAL -->
+<div class="mo" id="moWL">
+  <div class="md" style="max-width:460px">
+    <div class="mh"><span id="moWLTitle">Добавить акцию</span><span class="mclose" onclick="closeMo('moWL')">✕</span></div>
+    <input type="hidden" id="wl_orig_ticker">
+    <div class="fgrid">
+      <div class="fg"><label>Тикер</label><input type="text" id="wl_tk" placeholder="TSLA" style="text-transform:uppercase"></div>
+      <div class="fg"><label>Сектор</label>
+        <select id="wl_se">
+          <option>Технологии</option><option>Финансы</option><option>Здравоохранение</option>
+          <option>Потребительский</option><option>Энергетика</option><option>Другое</option>
+        </select>
+      </div>
+      <div class="fg"><label>Капитализация (млрд $)</label><input type="number" id="wl_cap" placeholder="50"></div>
+      <div class="fg"><label>Бета</label><input type="number" id="wl_bt" placeholder="1.4" step=".1"></div>
+      <div class="fg"><label>Дата отчёта (earnings)</label><input type="date" id="wl_bo"></div>
+      <div class="fg"><label>Кулдаун до (после стопа)</label><input type="date" id="wl_cd"></div>
+      <div class="fg full"><label>Заметки</label><input type="text" id="wl_nt" placeholder="Доп. инфо..."></div>
+    </div>
+    <div class="ar">
+      <button class="btn btn-p" id="wlSaveBtn" onclick="saveWL()">ДОБАВИТЬ</button>
+      <button class="btn btn-g" onclick="closeMo('moWL')">ОТМЕНА</button>
+    </div>
+  </div>
+</div>
 
-    root.querySelectorAll("input").forEach(el=>{
-      el.addEventListener("change", (e)=>{
-        const row = e.target.closest(".wl-row");
-        const idx = Number(row.dataset.idx);
-        const key = e.target.dataset.k;
-        state.watchlist[idx][key] = (e.target.value || "").trim();
-        if(key === "ticker") state.watchlist[idx].ticker = state.watchlist[idx].ticker.toUpperCase().trim();
-      });
-    });
+<div id="toast"></div>
 
-    root.querySelectorAll("button[data-act='del']").forEach(btn=>{
-      btn.addEventListener("click", (e)=>{
-        const row = e.target.closest(".wl-row");
-        const idx = Number(row.dataset.idx);
-        state.watchlist.splice(idx, 1);
-        renderWatchlist();
-      });
-    });
-  }
+<script>
+// ═══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
+// STORAGE ENGINE v5  —  GitHub Repository (primary) + localStorage (cache)
+// Repo: mariiashumova1979-collab/rsi-watchlist
+// Data file: data.json  |  Journal: index.html
+// ═══════════════════════════════════════════════════════════
+const GH_TOKEN  = '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';
+const GH_OWNER  = 'mariiashumova1979-collab';
+const GH_REPO   = 'rsi-watchlist';
+const GH_FILE   = 'data.json';
+const GH_API    = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`;
+const GH_RAW    = `https://raw.githubusercontent.com/${GH_OWNER}/${GH_REPO}/main/${GH_FILE}`;
+const LS_KEY    = 'rsi_journal_v2';
+const SS_KEY    = 'rsi_journal_session';
 
-  function getAuthToken(){
-    return $("token").value.trim() || localStorage.getItem("gh_token") || "";
-  }
+// SHA of current data.json (needed for GitHub PATCH)
+let ghFileSha = null;
+let storageMode = 'detecting';
 
-  function saveToken(){
-    const t = $("token").value.trim();
-    if (!t) { setStatus("token empty", "error"); return; }
-    localStorage.setItem("gh_token", t);
-    setStatus("token saved locally", "ok");
-  }
+// In-memory cache
+const cache = { trades:[], watchlist:[], quarterly:{}, checklist:{}, settings:{}, regime:{}, rsiScans:{} };
 
-  function clearToken(){
-    localStorage.removeItem("gh_token");
-    $("token").value = "";
-    setStatus("token cleared", "ok");
-  }
+let saveTimer = null;
 
-  async function githubGetFile(owner, repo, path){
-    const url = `https://api.github.com/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}`;
-    const token = getAuthToken();
-    const res = await fetch(url, {
-      headers: {
-        "Accept": "application/vnd.github+json",
-        ...(token ? { "Authorization": "Bearer " + token } : {})
-      }
-    });
-    if (!res.ok) {
-      const txt = await res.text();
-      throw new Error(`GitHub GET failed: ${res.status} ${txt}`);
-    }
-    return await res.json(); // includes content + sha
-  }
+function scheduleSave() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(doSave, 800);
+}
 
-  async function githubPutFile(owner, repo, path, contentObj, sha, message){
-    const url = `https://api.github.com/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}`;
-    const token = getAuthToken();
-    if (!token) throw new Error("No GitHub token provided");
+// ── WRITE ──────────────────────────────────────────────────
+async function doSave() {
+  const payload = JSON.stringify(cache, null, 2);
+  // Always cache locally first (instant)
+  try { localStorage.setItem(LS_KEY, JSON.stringify(cache)); } catch {}
 
+  setSyncState('syncing', 'СОХРАНЕНИЕ...');
+  try {
     const body = {
-      message: message || `Update ${path}`,
-      content: btoa(unescape(encodeURIComponent(JSON.stringify(contentObj, null, 2)))),
-      sha
+      message: `journal update ${new Date().toISOString().slice(0,16)}`,
+      content: btoa(unescape(encodeURIComponent(payload))),
+      branch: 'main'
     };
+    if (ghFileSha) body.sha = ghFileSha;
 
-    const res = await fetch(url, {
-      method: "PUT",
+    const res = await fetch(GH_API, {
+      method: 'PUT',
       headers: {
-        "Accept": "application/vnd.github+json",
-        "Authorization": "Bearer " + token,
-        "Content-Type": "application/json"
+        'Authorization': `Bearer ${GH_TOKEN}`,
+        'Content-Type': 'application/json',
+        'X-GitHub-Api-Version': '2022-11-28'
       },
       body: JSON.stringify(body)
     });
 
-    if (!res.ok) {
-      const txt = await res.text();
-      throw new Error(`GitHub PUT failed: ${res.status} ${txt}`);
+    if (res.ok) {
+      const data = await res.json();
+      ghFileSha = data.content?.sha || ghFileSha;
+      storageMode = 'github';
+      setSyncState('synced', '🐙 GITHUB');
+      updateStorageInfo();
+    } else {
+      const err = await res.json().catch(() => ({}));
+      // If conflict (SHA mismatch), reload SHA and retry once
+      if (res.status === 409 || res.status === 422) {
+        await fetchGhSha();
+        setTimeout(doSave, 500);
+        return;
+      }
+      throw new Error(err.message || `HTTP ${res.status}`);
     }
-    return await res.json();
+  } catch(e) {
+    storageMode = 'local';
+    setSyncState('synced', '⚠ ЛОКАЛЬНО');
+    console.warn('GitHub save error:', e.message);
+    updateStorageInfo();
+  }
+}
+
+async function fetchGhSha() {
+  try {
+    const res = await fetch(GH_API, {
+      headers: { 'Authorization': `Bearer ${GH_TOKEN}`, 'X-GitHub-Api-Version': '2022-11-28' }
+    });
+    if (res.ok) {
+      const d = await res.json();
+      ghFileSha = d.sha;
+    }
+  } catch {}
+}
+
+// ── READ ───────────────────────────────────────────────────
+async function loadFromStorage() {
+  // Try GitHub raw URL (fast, no auth needed for public repo)
+  try {
+    const res = await fetch(GH_RAW + '?t=' + Date.now());
+    if (res.ok) {
+      const text = await res.text();
+      if (text && text.trim() !== '{}' && text.trim() !== '') {
+        const data = JSON.parse(text);
+        storageMode = 'github';
+        // Cache locally
+        try { localStorage.setItem(LS_KEY, text); } catch {}
+        // Also get SHA for future writes
+        fetchGhSha();
+        return data;
+      }
+    }
+  } catch(e) {
+    console.warn('GitHub raw load failed:', e.message);
   }
 
-  async function loadWatchlistFromGit(){
-    const owner = $("owner").value.trim();
-    const repo  = $("repo").value.trim();
-    const path  = "data/watchlist.json";
-
-    const file = await githubGetFile(owner, repo, path);
-    const decoded = decodeURIComponent(escape(atob(file.content.replaceAll("\n",""))));
-    const obj = JSON.parse(decoded);
-
-    state.watchlistSha = file.sha;
-    state.watchlistObj = obj;
-
-    state.watchlist = (obj.tickers || []).map(x => ({
-      ticker: (x.ticker || "").toUpperCase().trim(),
-      sector: (x.sector || "").trim()
-    }));
+  // Fallback: GitHub API (works even for private repos)
+  try {
+    const res = await fetch(GH_API, {
+      headers: { 'Authorization': `Bearer ${GH_TOKEN}`, 'X-GitHub-Api-Version': '2022-11-28' }
+    });
+    if (res.ok) {
+      const d = await res.json();
+      ghFileSha = d.sha;
+      const content = decodeURIComponent(escape(atob(d.content.replace(/\n/g, ''))));
+      if (content && content.trim() !== '{}') {
+        storageMode = 'github';
+        try { localStorage.setItem(LS_KEY, content); } catch {}
+        return JSON.parse(content);
+      }
+    }
+  } catch(e) {
+    console.warn('GitHub API load failed:', e.message);
   }
 
-  async function saveWatchlistToGit(){
-    const owner = $("owner").value.trim();
-    const repo  = $("repo").value.trim();
-    const path  = "data/watchlist.json";
+  // Fallback: localStorage
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (raw) { storageMode = 'local'; return JSON.parse(raw); }
+  } catch {}
 
-    if(!state.watchlistSha){
-      throw new Error("No watchlist sha. Click 'Reload watchlist (sha)' first.");
+  storageMode = 'local';
+  return null;
+}
+
+async function probeStorage() {
+  // Optimistically assume GitHub works, verify on first load
+  storageMode = 'github';
+}
+
+function storageModeLabel() {
+  return { github:'🐙 GITHUB', local:'💾 ЛОКАЛЬНО', session:'📋 СЕССИЯ', detecting:'...' }[storageMode] || storageMode;
+}
+
+function getGhCreds() {
+  return { token: GH_TOKEN, gistId: null };
+}
+
+// ── Legacy aliases ─────────────────────────────────────────
+async function persistToCloud() { return doSave(); }
+async function saveCloud()      { scheduleSave(); return true; }
+async function cloudDel() {
+  try { localStorage.removeItem(LS_KEY); } catch {}
+  // Wipe data.json
+  try {
+    await fetchGhSha();
+    const body = {
+      message: 'clear journal data',
+      content: btoa('{}'),
+      sha: ghFileSha,
+      branch: 'main'
+    };
+    await fetch(GH_API, {
+      method: 'PUT',
+      headers: { 'Authorization': `Bearer ${GH_TOKEN}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+  } catch {}
+}
+
+function applyData(data) {
+  if (!data) return;
+  if (Array.isArray(data.trades))    cache.trades    = data.trades;
+  if (Array.isArray(data.watchlist)) cache.watchlist = data.watchlist;
+  if (data.quarterly) cache.quarterly = data.quarterly;
+  if (data.checklist) cache.checklist = data.checklist;
+  if (data.settings)  {
+    cache.settings = data.settings;
+    if (!cache.settings.finnhubKey) cache.settings.finnhubKey = FINNHUB_KEY;
+  }
+  if (data.regime)   cache.regime   = data.regime;
+  if (data.rsiScans) cache.rsiScans = data.rsiScans;
+}
+
+function updateStorageInfo() {
+  const el = document.getElementById('storageInfo');
+  if (!el) return;
+  const active = storageMode === 'github';
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--bg4)">
+      <span style="color:${active?'var(--acc)':'var(--t3)'};font-weight:700">${active?'✓':'○'}</span>
+      <span style="color:${active?'var(--acc)':'var(--t3)'}">🐙 ${GH_OWNER}/${GH_REPO}</span>
+      ${active?'<span style="background:var(--acc);color:var(--bg);font-size:8px;padding:1px 6px;border-radius:10px;font-weight:700">АКТИВНО</span>':''}
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;padding:6px 0">
+      <span style="color:var(--acc3);font-weight:700">✓</span>
+      <span style="color:var(--acc3)">💾 localStorage</span>
+      ${storageMode==='local'?'<span style="background:var(--acc3);color:var(--bg);font-size:8px;padding:1px 6px;border-radius:10px;font-weight:700">РЕЗЕРВ</span>':'<span style="font-size:9px;color:var(--t3)">кэш</span>'}
+    </div>
+    <div style="margin-top:8px;font-family:var(--mono);font-size:9px;color:var(--t3)">
+      Режим: <b style="color:var(--text)">${storageModeLabel()}</b>
+      ${ghFileSha ? ` · SHA: ${ghFileSha.slice(0,8)}` : ''}
+    </div>`;
+}
+
+function setSyncState(state, label) {
+  ['syncDot','syncDot2'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.className = 'sync-dot ' + state;
+  });
+  const sl = document.getElementById('syncLabel');
+  if (sl) sl.textContent = label;
+  const s2 = document.getElementById('syncStatus2');
+  if (s2) s2.textContent = label;
+}
+
+async function syncFromGithub() {
+  setSyncState('syncing', 'ЗАГРУЗКА...');
+  try {
+    const data = await loadFromStorage();
+    if (data) {
+      applyData(data);
+      loadSetsUI(); loadGhUI(); loadFhKeyUI(); initChecklist();
+      renderDash(); renderTrades(); renderWL(); renderQ(); renderRsiScan();
+      const rsi = cache.regime?.spyRsi14;
+      if (rsi) { document.getElementById('spyRsi').value = rsi; updRegime(false); }
     }
+    setSyncState('synced', storageModeLabel());
+    updateStorageInfo();
+    toast('Синхронизировано ✓');
+  } catch(e) {
+    setSyncState('synced', '⚠ ОШИБКА');
+    toast('Ошибка: ' + e.message, true);
+  }
+}
 
-    const obj = state.watchlistObj && typeof state.watchlistObj === "object"
-      ? state.watchlistObj
-      : { tickers: [] };
+async function forceSync() { return syncFromGithub(); }
 
-    obj.tickers = state.watchlist.map(w => ({
-      ticker: (w.ticker || "").toUpperCase().trim(),
-      sector: (w.sector || "").trim()
-    }));
+// Settings UI (GitHub section now read-only — creds hardcoded)
+function saveGhCreds() { toast('Репозиторий подключён автоматически'); }
+function loadGhCredsFromStorage() {}
+function loadGhUI() {
+  const tEl = document.getElementById('s_gh_token');
+  const gEl = document.getElementById('s_gh_gist');
+  if (tEl) { tEl.value = '••••••••••••••••••••••••'; tEl.disabled = true; }
+  if (gEl) { gEl.value = GH_REPO; gEl.disabled = true; }
+}
 
-    const resp = await githubPutFile(owner, repo, path, obj, state.watchlistSha, "Update watchlist");
-    state.watchlistSha = resp.content.sha;
-    state.watchlistObj = obj;
+async function testGithub() {
+  const el = document.getElementById('ghStatus');
+  el.textContent = '⏳ Проверка...'; el.style.color = 'var(--t2)';
+  try {
+    const res = await fetch(GH_API, {
+      headers: { 'Authorization': `Bearer ${GH_TOKEN}`, 'X-GitHub-Api-Version': '2022-11-28' }
+    });
+    if (res.ok) {
+      const d = await res.json();
+      ghFileSha = d.sha;
+      el.textContent = `✓ Подключено · data.json · SHA: ${d.sha.slice(0,8)}`;
+      el.style.color = 'var(--acc)';
+      storageMode = 'github';
+      updateStorageInfo();
+    } else {
+      el.textContent = `✗ HTTP ${res.status}`; el.style.color = 'var(--acc2)';
+    }
+  } catch(e) {
+    el.textContent = '✗ ' + e.message; el.style.color = 'var(--acc2)';
+  }
+}
 
-    // update scanner
-    buildDayRows(state.date);
+// ═══════════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════════
+function goTab(name) {
+  document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelector(`[onclick="goTab('${name}')"]`).classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════
+let toastTimer;
+function toast(msg, err=false) {
+  clearTimeout(toastTimer);
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'show' + (err?' err':'');
+  toastTimer = setTimeout(()=>el.className='', 2600);
+}
+
+// ═══════════════════════════════════════════════════════════
+// SYNC BANNER
+// ═══════════════════════════════════════════════════════════
+function showSyncBanner(msg, err=false) {
+  const b = document.getElementById('syncBanner');
+  document.getElementById('syncMsg').textContent = msg;
+  b.className = err ? 'show error' : 'show';
+  setTimeout(hideSyncBanner, 2500);
+}
+function hideSyncBanner() { document.getElementById('syncBanner').className=''; }
+
+// ═══════════════════════════════════════════════════════════
+// REGIME
+// ═══════════════════════════════════════════════════════════
+function updRegime(flash=true) {
+  const val = parseFloat(document.getElementById('spyRsi').value);
+  const ptr = document.getElementById('gaugePtr');
+  if (!isNaN(val)) ptr.style.left = Math.min(100,Math.max(0,val)) + '%';
+
+  const box  = document.getElementById('regimeBox');
+  const size = document.getElementById('sizeGuide');
+  const note = document.getElementById('tradeNote');
+  const hdr  = document.getElementById('hdrRegime');
+
+  if (isNaN(val)) return;
+
+  let regime, longS, shortS, noteT, color;
+
+  if (val > 80 || val < 20) {
+    regime='🚫 ТОРГОВЛЯ ОТКЛЮЧЕНА'; longS='—'; shortS='—';
+    noteT='Только кэш — паника на рынке'; color='var(--acc2)';
+  } else if (val > 75) {
+    regime='⚠️ ЭКСТРЕМ. ПЕРЕКУПЛЕННОСТЬ'; longS='НЕТ'; shortS='100%';
+    noteT='Только шорты'; color='var(--acc2)';
+  } else if (val >= 55) {
+    regime='📈 БЫЧИЙ'; longS='50%'; shortS='100%';
+    noteT='Лонги 50% размера'; color='var(--acc3)';
+  } else if (val >= 45) {
+    regime='⚖️ НЕЙТРАЛЬНЫЙ'; longS='100%'; shortS='100%';
+    noteT='Полная система активна'; color='var(--acc)';
+  } else if (val >= 30) {
+    regime='📉 МЕДВЕЖИЙ'; longS='100%'; shortS='50%';
+    noteT='Шорты 50% размера'; color='var(--acc3)';
+  } else {
+    regime='⚠️ ЭКСТРЕМ. ПЕРЕПРОДАННОСТЬ'; longS='100%'; shortS='НЕТ';
+    noteT='Только лонги'; color='var(--acc)';
   }
 
-  // Tabs
-  function setTab(name){
-    const scannerOn = name === "scanner";
-    $("tabScanner").classList.toggle("active", scannerOn);
-    $("tabWatchlist").classList.toggle("active", !scannerOn);
-    $("viewScanner").classList.toggle("active", scannerOn);
-    $("viewWatchlist").classList.toggle("active", !scannerOn);
+  box.textContent = regime; box.style.color = color;
+  size.innerHTML = `<span class="g">${longS}</span> <span style="color:var(--t2)"> / </span> <span class="r">${shortS}</span>`;
+  note.textContent = noteT;
+  hdr.textContent = regime.replace(/[^а-яёА-ЯЁa-zA-Z\s\.%]/g,'').trim();
+}
+
+async function saveRegime() {
+  const val = parseFloat(document.getElementById('spyRsi').value);
+  if (isNaN(val)) return;
+  cache.regime = { spyRsi14: val, savedAt: new Date().toISOString() };
+  const ok = await saveCloud(KEYS.regime, cache.regime);
+  if (ok) toast('Режим сохранён ✓');
+}
+
+// ═══════════════════════════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════════════════════════
+function loadSetsUI() {
+  const s = cache.settings;
+  Object.entries(s).forEach(([k,v]) => { const el=document.getElementById('s_'+k.replace('Pct','p').replace('portfolio','pf').replace('maxPos','mp').replace('maxPosPct','mpp').replace('stopPct','sp').replace('target','t').replace('maxDays','md')); });
+  // direct mapping
+  const map = {pf:'portfolio',rp:'riskPct',mp:'maxPos',mpp:'maxPosPct',sp:'stopPct',t1:'target1',t2:'target2',md:'maxDays'};
+  Object.entries(map).forEach(([id,key]) => { const el=document.getElementById('s_'+id); if(el&&s[key]!==undefined) el.value=s[key]; });
+}
+
+async function saveSets() {
+  const map = {pf:'portfolio',rp:'riskPct',mp:'maxPos',mpp:'maxPosPct',sp:'stopPct',t1:'target1',t2:'target2',md:'maxDays'};
+  const s = {};
+  Object.entries(map).forEach(([id,key]) => { const el=document.getElementById('s_'+id); if(el) s[key]=parseFloat(el.value)||0; });
+  cache.settings = s;
+  const ok = await saveCloud(KEYS.settings, s);
+  if(ok) toast('Настройки сохранены ✓');
+}
+
+async function defSets() {
+  if(!confirm('Сбросить к значениям по умолчанию?')) return;
+  cache.settings = {...DEF_SETS};
+  await saveCloud(KEYS.settings, cache.settings);
+  loadSetsUI(); toast('Сброшено ✓');
+}
+
+function getSets() { return {...DEF_SETS,...cache.settings}; }
+
+function calcPos() {
+  const s = getSets();
+  const entry = parseFloat(document.getElementById('c_e').value);
+  const stopP = parseFloat(document.getElementById('c_s').value) || s.stopPct;
+  if (!entry || !s.portfolio) return;
+  const riskD  = s.portfolio * (s.riskPct/100);
+  const stopDist = entry * (stopP/100);
+  let shares = Math.floor(riskD/stopDist);
+  let pos = shares * entry;
+  const maxP = s.portfolio * (s.maxPosPct/100);
+  if(pos > maxP){ pos=maxP; shares=Math.floor(pos/entry); }
+  document.getElementById('c_rd').textContent = '$'+(shares*stopDist).toFixed(2);
+  document.getElementById('c_ps').textContent = '$'+(shares*entry).toFixed(2);
+  document.getElementById('c_sh').textContent = shares;
+  document.getElementById('c_sp').textContent = '$'+(entry-stopDist).toFixed(2);
+  document.getElementById('c_t1').textContent = '$'+(entry*(1+s.target1/100)).toFixed(2);
+  document.getElementById('c_t2').textContent = '$'+(entry*(1+s.target2/100)).toFixed(2);
+}
+
+// ═══════════════════════════════════════════════════════════
+// PRICE ENGINE — Claude API с web_search (работает в sandbox)
+// ═══════════════════════════════════════════════════════════
+const FINNHUB_KEY = 'd65uv7pr01qiish15ra0d65uv7pr01qiish15rag';
+
+function getFhKey() {
+  return cache.settings?.finnhubKey || FINNHUB_KEY;
+}
+
+function saveFinnhubKey() {
+  const key = document.getElementById('s_fhkey')?.value?.trim() || '';
+  if (!cache.settings) cache.settings = {...DEF_SETS};
+  cache.settings.finnhubKey = key || FINNHUB_KEY;
+  scheduleSave();
+}
+
+function loadFhKeyUI() {
+  const el = document.getElementById('s_fhkey');
+  if (el) el.value = getFhKey();
+}
+
+let livePrices = {};
+
+// ── Запрос через Claude API (единственный способ в sandbox) ─
+async function fetchPricesViaClaude(tickers) {
+  const list = Array.isArray(tickers) ? tickers : [tickers];
+  const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-5-20250929',
+      max_tokens: 1024,
+      tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+      messages: [{
+        role: 'user',
+        content: `Search for current stock prices for: ${list.join(', ')}.
+For each ticker return: current price, today % change, RSI(7) and RSI(14).
+Respond ONLY with a valid JSON array, no markdown, no explanation:
+[{"ticker":"AAPL","price":189.50,"change":0.82,"rsi7":45.2,"rsi14":52.1}]`
+      }]
+    })
+  });
+  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  const data = await resp.json();
+  const text = (data.content || []).map(b => b.text || '').join('');
+  const match = text.match(/\[[\s\S]*?\]/);
+  if (!match) throw new Error('Нет данных');
+  return JSON.parse(match[0]);
+}
+
+function calcRSI(closes, period) {
+  if (!closes || closes.length < period + 1) return null;
+  const slice = closes.slice(-(period + 1));
+  let gains = 0, losses = 0;
+  for (let i = 1; i < slice.length; i++) {
+    const diff = slice[i] - slice[i-1];
+    if (diff > 0) gains += diff; else losses -= diff;
+  }
+  const avgGain = gains / period, avgLoss = losses / period;
+  if (avgLoss === 0) return 100;
+  return parseFloat((100 - 100 / (1 + avgGain / avgLoss)).toFixed(1));
+}
+
+function setManualPrice(ticker, val) {
+  const price = parseFloat(val);
+  if (!price) { delete livePrices[ticker]; renderDash(); return; }
+  livePrices[ticker] = { price, manual: true };
+  renderDash();
+}
+
+function manualPriceInput(t) {
+  const lp = livePrices[t.ticker];
+  const cur = lp?.price || '';
+  return `<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--bg3);border-radius:6px;border:1px solid var(--line);flex-wrap:wrap">
+    <span style="font-family:var(--mono);font-size:9px;color:var(--t2)">Тек. цена $</span>
+    <input type="number" step=".01" placeholder="${t.entry||'0.00'}" value="${cur}"
+      style="width:90px;font-family:var(--mono);font-size:13px;font-weight:700;padding:3px 8px;background:var(--bg4);border:1px solid var(--line);border-radius:6px;color:var(--text);text-align:center"
+      oninput="setManualPrice('${t.ticker}', this.value)">
+    <span style="font-family:var(--mono);font-size:9px;color:var(--t3)">→ P&L</span>
+  </div>`;
+}
+
+async function refreshLivePrices() {
+  const op = cache.trades.filter(t => t.status === 'OPEN');
+  if (!op.length) { toast('Нет открытых позиций'); return; }
+  const btn = document.getElementById('liveBtn');
+  if (btn) { btn.textContent = '⏳'; btn.disabled = true; }
+  const tickers = [...new Set(op.map(t => t.ticker))];
+  toast('Загружаю цены...');
+  try {
+    const results = await fetchPricesViaClaude(tickers);
+    results.forEach(r => {
+      if (r.ticker && r.price) livePrices[r.ticker] = { price: r.price, change: r.change, rsi7: r.rsi7, rsi14: r.rsi14 };
+    });
+    // Update SPY RSI if found
+    const spy = results.find(r => r.ticker === 'SPY');
+    if (spy?.rsi14) { document.getElementById('spyRsi').value = spy.rsi14; updRegime(); }
+    renderDash();
+    toast('Цены обновлены ✓');
+  } catch(e) {
+    toast('Ошибка: ' + e.message, true);
+  } finally {
+    if (btn) { btn.textContent = '📡'; btn.disabled = false; }
+  }
+}
+
+async function fetchTickerData() {
+  const ticker = document.getElementById('te_tk').value.trim().toUpperCase();
+  if (!ticker) { toast('Введите тикер!', true); return; }
+  const btn = document.getElementById('fetchBtn');
+  const status = document.getElementById('fetchStatus');
+  btn.textContent = '⏳'; btn.disabled = true;
+  status.style.display = ''; status.style.color = 'var(--t2)';
+  status.textContent = 'Загружаю ' + ticker + '...';
+  try {
+    const results = await fetchPricesViaClaude([ticker]);
+    const r = results.find(x => x.ticker === ticker) || results[0];
+    if (!r?.price) throw new Error('Нет данных');
+    document.getElementById('te_en').value = r.price.toFixed(2);
+    if (r.rsi7  != null) document.getElementById('te_r7').value  = r.rsi7;
+    if (r.rsi14 != null) document.getElementById('te_r14').value = r.rsi14;
+    const spyVal = document.getElementById('spyRsi').value;
+    if (spyVal) document.getElementById('te_spy').value = spyVal;
+    status.style.color = 'var(--acc)';
+    status.textContent = '✓ ' + ticker + ': $' + r.price + ' (' + (r.change >= 0 ? '+' : '') + (r.change||0).toFixed(2) + '%) · RSI7: ' + (r.rsi7||'—') + ' · RSI14: ' + (r.rsi14||'—');
+    tradeAutoCalc();
+  } catch(e) {
+    status.style.color = 'var(--acc2)';
+    status.textContent = '✗ ' + e.message;
+  } finally {
+    btn.textContent = '📡 ЦЕНА'; btn.disabled = false;
+  }
+}
+
+async function testFinnhub() {
+  const el = document.getElementById('fhStatus');
+  el.textContent = '⏳ Проверка...'; el.style.color = 'var(--t2)';
+  try {
+    const results = await fetchPricesViaClaude(['SPY']);
+    const r = results[0];
+    if (r?.price) {
+      el.textContent = '✓ Работает — SPY: $' + r.price; el.style.color = 'var(--acc)';
+    } else {
+      el.textContent = '✗ Нет данных'; el.style.color = 'var(--acc2)';
+    }
+  } catch(e) {
+    el.textContent = '✗ ' + e.message; el.style.color = 'var(--acc2)';
+  }
+}
+
+
+// Track manually overridden fields so auto-calc doesn't overwrite them
+const manualFields = new Set();
+function tradeMarkManual(field) { manualFields.add(field); }
+function resetShares() {
+  manualFields.delete('sh');
+  document.getElementById('te_sh').value = '';
+  document.getElementById('te_sh_auto').textContent = '';
+  tradeAutoCalc();
+}
+
+function toggleExitFields() {
+  const closed = document.getElementById('te_sta').value === 'CLOSED';
+  document.getElementById('te_exit_section').style.display = closed ? '' : 'none';
+  if (closed) tradeAutoCalc();
+}
+
+function tradeAutoCalc() {
+  const entry  = parseFloat(document.getElementById('te_en').value);
+  const type   = document.getElementById('te_tp').value;
+  const s      = getSets();
+
+  const preview = document.getElementById('te_calc_preview');
+  const rows    = document.getElementById('te_calc_rows');
+
+  if (!entry || entry <= 0) { preview.style.display = 'none'; return; }
+
+  const dir = type === 'LONG' ? 1 : -1;
+
+  // Auto-fill stop if not manually set
+  if (!manualFields.has('st')) {
+    const stopPrice = entry * (1 - dir * s.stopPct / 100);
+    document.getElementById('te_st').value = stopPrice.toFixed(2);
+  }
+  // Auto-fill target1
+  if (!manualFields.has('t1')) {
+    const t1 = entry * (1 + dir * s.target1 / 100);
+    document.getElementById('te_t1').value = t1.toFixed(2);
+  }
+  // Auto-fill target2
+  if (!manualFields.has('t2')) {
+    const t2 = entry * (1 + dir * s.target2 / 100);
+    document.getElementById('te_t2').value = t2.toFixed(2);
   }
 
-  // Actions
-  $("saveToken").addEventListener("click", saveToken);
-  $("clearToken").addEventListener("click", clearToken);
-
-  $("tabScanner").addEventListener("click", ()=>setTab("scanner"));
-  $("tabWatchlist").addEventListener("click", ()=>{
-    setTab("watchlist");
-    renderWatchlist();
-    setStatus("watchlist opened. To save, click Reload watchlist (sha) first (needs token).", "ok");
-  });
-
-  $("wlAdd").addEventListener("click", ()=>{
-    const t = $("wlNewTicker").value.trim();
-    const s = $("wlNewSector").value.trim();
-    if(!t) return;
-    state.watchlist.unshift({ ticker: t.toUpperCase().trim(), sector: s });
-    $("wlNewTicker").value = "";
-    $("wlNewSector").value = "";
-    renderWatchlist();
-  });
-
-  $("wlReload").addEventListener("click", async ()=>{
-    try{
-      setStatus("loading watchlist from GitHub API (sha acquired)...", "");
-      await loadWatchlistFromGit();
-      renderWatchlist();
-      setStatus("watchlist loaded via GitHub API. You can save now.", "ok");
-    } catch(e){
-      setStatus(e.message, "error");
+  // Calculate position size only if shares not manually set
+  const sharesEl = document.getElementById('te_sh');
+  if (!manualFields.has('sh') && (!sharesEl.value || sharesEl.value == '0')) {
+    const stopPrice  = parseFloat(document.getElementById('te_st').value) || 0;
+    const stopDist   = Math.abs(entry - stopPrice);
+    if (stopDist > 0) {
+      const riskDollars = s.portfolio * (s.riskPct / 100);
+      let shares = Math.floor(riskDollars / stopDist);
+      const maxPos = s.portfolio * (s.maxPosPct / 100);
+      if (shares * entry > maxPos) shares = Math.floor(maxPos / entry);
+      sharesEl.value = shares;
+      document.getElementById('te_sh_auto').textContent = '(авто)';
     }
-  });
+  }
 
-  $("wlSave").addEventListener("click", async ()=>{
-    try{
-      setStatus("saving watchlist to GitHub...", "");
-      await saveWatchlistToGit();
-      setStatus("watchlist saved to GitHub", "ok");
-    } catch(e){
-      setStatus(e.message, "error");
+  // Preview block
+  const stop  = parseFloat(document.getElementById('te_st').value) || 0;
+  const t1    = parseFloat(document.getElementById('te_t1').value) || 0;
+  const t2    = parseFloat(document.getElementById('te_t2').value) || 0;
+  const sh    = parseInt(document.getElementById('te_sh').value)   || 0;
+  const stopPct = stop && entry ? Math.abs((stop-entry)/entry*100).toFixed(1) : '—';
+  const t1Pct   = t1   && entry ? ((t1-entry)/entry*100*dir).toFixed(1) : '—';
+  const t2Pct   = t2   && entry ? ((t2-entry)/entry*100*dir).toFixed(1) : '—';
+  const posSize = sh * entry;
+  const riskAmt = sh && stop ? Math.abs(sh * (entry - stop)) : 0;
+  const isManualSh = manualFields.has('sh');
+
+  rows.innerHTML = [
+    { l:'Стоп',     v:`$${stop.toFixed(2)}`, sub:`−${stopPct}%`,  c:'var(--acc2)' },
+    { l:'Цель 1',   v:`$${t1.toFixed(2)}`,   sub:`+${t1Pct}%`,    c:'var(--acc)'  },
+    { l:'Цель 2',   v:`$${t2.toFixed(2)}`,   sub:`+${t2Pct}%`,    c:'var(--acc)'  },
+    { l:'Акций',    v:sh + (isManualSh ? ' ✏' : ' авто'), sub: isManualSh ? '<a onclick="resetShares()" style="color:var(--acc4);cursor:pointer;text-decoration:underline">↺ пересчитать</a>' : 'из риска', c:'var(--acc4)' },
+    { l:'Позиция',  v:`$${posSize.toFixed(0)}`, sub:sh?`${(posSize/s.portfolio*100).toFixed(1)}% порт.`:'', c:'var(--text)' },
+    { l:'Риск $',   v:`$${riskAmt.toFixed(0)}`, sub:s.portfolio?`${(riskAmt/s.portfolio*100).toFixed(2)}% порт.`:'', c:'var(--acc3)' },
+  ].map(({l,v,sub,c}) => `<div style="min-width:80px">
+    <div style="font-family:var(--mono);font-size:8px;color:var(--t2);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px">${l}</div>
+    <div style="font-family:var(--mono);font-size:13px;font-weight:700;color:${c}">${v}</div>
+    <div style="font-family:var(--mono);font-size:9px;color:var(--t3)">${sub}</div>
+  </div>`).join('');
+
+  // Show formula basis
+  const basisEl = document.getElementById('te_calc_basis');
+  if (basisEl) {
+    basisEl.innerHTML = `Портфель: <b>$${s.portfolio.toLocaleString()}</b> · Риск/сделку: <b>${s.riskPct}%</b> ($${(s.portfolio*s.riskPct/100).toFixed(0)}) · Стоп: <b>${s.stopPct}%</b> · Макс позиция: <b>${s.maxPosPct}%</b> ($${(s.portfolio*s.maxPosPct/100).toFixed(0)})`;
+  }
+  preview.style.display = '';
+
+  // P&L preview for exit
+  const exitPrice = parseFloat(document.getElementById('te_ex')?.value);
+  const pnlFg = document.getElementById('pnl_preview_fg');
+  const pnlEl = document.getElementById('pnl_preview');
+  if (exitPrice && entry && pnlFg && pnlEl) {
+    const pnl = dir * (exitPrice - entry) / entry * 100;
+    pnlFg.style.display = '';
+    pnlEl.textContent = (pnl >= 0 ? '+' : '') + pnl.toFixed(2) + '%';
+    pnlEl.style.color = pnl >= 0 ? 'var(--acc)' : 'var(--acc2)';
+  } else if (pnlFg) { pnlFg.style.display = 'none'; }
+}
+
+function openTrade(id=null) {
+  manualFields.clear(); // reset all manual overrides including 'sh'
+  document.getElementById('moTradeTitle').textContent = id ? 'Редактировать сделку' : 'Новая сделка';
+  document.getElementById('te_id').value = id || '';
+
+  if (id) {
+    const t = cache.trades.find(x => x.id === id);
+    if (t) {
+      const map = {tk:'ticker',tp:'type',dt:'entryDate',en:'entry',sh:'shares',st:'stop',t1:'target1',t2:'target2',r7:'rsi7',r14:'rsi14',spy:'spyRsi',sta:'status',ex:'exitPrice',er:'exitReason',nt:'notes'};
+      Object.entries(map).forEach(([elId,key]) => {
+        const el = document.getElementById('te_'+elId); if(el) el.value = t[key] || '';
+      });
+      // Mark existing prices as manually set (don't overwrite)
+      if (t.stop)    manualFields.add('st');
+      if (t.target1) manualFields.add('t1');
+      if (t.target2) manualFields.add('t2');
     }
-  });
+  } else {
+    ['tk','en','sh','st','t1','t2','r7','r14','spy','ex','nt'].forEach(f => {
+      const el = document.getElementById('te_'+f); if(el) el.value = '';
+    });
+    document.getElementById('te_dt').value  = today();
+    document.getElementById('te_tp').value  = 'LONG';
+    document.getElementById('te_sta').value = 'OPEN';
+    document.getElementById('te_er').value  = '';
+    const rsi = document.getElementById('spyRsi').value;
+    if (rsi) document.getElementById('te_spy').value = rsi;
+  }
 
-  $("date").addEventListener("change", async ()=>{
-    try{
-      state.date = $("date").value;
-      state.history = ensureBaseHistory(await loadHistoryRaw());
-      buildDayRows(state.date);
-      setStatus("date changed; refreshed history raw", "ok");
-    } catch(e){
-      setStatus(e.message, "error");
-    }
-  });
+  toggleExitFields();
+  tradeAutoCalc();
+  openMo('moTrade');
+}
 
-  $("exportDay").addEventListener("click", ()=>{
-    const dateStr = state.date;
-    const payload = { [dateStr]: state.dayRows.filter(r => r.rsi7!=null || r.rsi14!=null || r.pick || r.notes) };
-    navigator.clipboard.writeText(JSON.stringify(payload, null, 2));
-    setStatus("day JSON copied to clipboard", "ok");
-  });
+async function saveTrade() {
+  const ticker = document.getElementById('te_tk').value.trim().toUpperCase();
+  if(!ticker) { toast('Введите тикер!',true); return; }
+  const id = document.getElementById('te_id').value;
+  const map = {tk:'ticker',tp:'type',dt:'entryDate',en:'entry',sh:'shares',st:'stop',t1:'target1',t2:'target2',r7:'rsi7',r14:'rsi14',spy:'spyRsi',sta:'status',ex:'exitPrice',er:'exitReason',nt:'notes'};
+  const t = { id: id||Date.now().toString(), createdAt: Date.now() };
+  Object.entries(map).forEach(([elId,key]) => { const el=document.getElementById('te_'+elId); if(el) t[key]=el.value; });
+  t.ticker = ticker;
+  t.entry = parseFloat(t.entry)||0;
+  t.exitPrice = parseFloat(t.exitPrice)||0;
+  t.shares = parseInt(t.shares)||0;
+  if(t.exitPrice && t.entry) {
+    const pnl = t.type==='LONG' ? ((t.exitPrice-t.entry)/t.entry)*100 : ((t.entry-t.exitPrice)/t.entry)*100;
+    t.pnlPct = parseFloat(pnl.toFixed(2));
+    t.result = pnl>=0 ? 'WIN' : 'LOSS';
+  }
+  if(id) { const i=cache.trades.findIndex(x=>x.id===id); if(i>=0) cache.trades[i]=t; else cache.trades.unshift(t); }
+  else cache.trades.unshift(t);
+  const ok = await saveCloud(KEYS.trades, cache.trades);
+  if(ok) { closeMo('moTrade'); renderTrades(); renderDash(); toast(id?'Сделка обновлена ✓':'Сделка добавлена ✓'); }
+}
 
-  // History (day) load/save via GitHub API
-  $("load").addEventListener("click", async ()=>{
-    try{
-      setStatus("loading history.json from GitHub API (sha acquired)...", "");
-      const owner = $("owner").value.trim();
-      const repo  = $("repo").value.trim();
-      const path  = $("path").value.trim();
+async function delTrade(id) {
+  if(!confirm('Удалить сделку?')) return;
+  cache.trades = cache.trades.filter(t=>t.id!==id);
+  const ok = await saveCloud(KEYS.trades, cache.trades);
+  if(ok) { renderTrades(); renderDash(); toast('Удалено'); }
+}
 
-      const file = await githubGetFile(owner, repo, path);
-      state.historySha = file.sha;
+function tradingDay(entryDate) {
+  if(!entryDate) return 1;
+  const entry = new Date(entryDate); const now = new Date();
+  let days=0; const d=new Date(entry);
+  while(d<=now){ d.setDate(d.getDate()+1); const dow=d.getDay(); if(dow!==0&&dow!==6) days++; }
+  return Math.max(1,days);
+}
 
-      const decoded = decodeURIComponent(escape(atob(file.content.replaceAll("\n",""))));
-      state.history = ensureBaseHistory(JSON.parse(decoded));
+function renderTrades() {
+  const tr = cache.trades;
+  const tf = document.getElementById('fType')?.value||'';
+  const sf = document.getElementById('fStatus')?.value||'';
+  const rf = document.getElementById('fResult')?.value||'';
+  const tk = (document.getElementById('fTicker')?.value||'').toUpperCase();
+  const fl = tr.filter(t=>(!tf||t.type===tf)&&(!sf||t.status===sf)&&(!rf||t.result===rf)&&(!tk||t.ticker.includes(tk)));
+  const tb = document.getElementById('tradesTb');
+  if(!fl.length){ tb.innerHTML='<tr><td colspan="14" style="text-align:center;color:var(--t2);padding:36px">Сделок нет</td></tr>'; return; }
+  tb.innerHTML = fl.map(t => {
+    const day = t.status==='OPEN' ? tradingDay(t.entryDate) : '—';
+    const db = t.status==='OPEN' ? `<span class="db d${Math.min(5,day)}">${day}</span>` : '—';
+    const pnl = t.pnlPct!==undefined ? `<span class="${t.pnlPct>=0?'g':'r'}">${t.pnlPct>0?'+':''}${t.pnlPct}%</span>` : '<span style="color:var(--t2)">—</span>';
+    const stBadge = t.status==='OPEN' ? '<span class="b b-open">ОТКРЫТА</span>' : t.result==='WIN' ? '<span class="b b-win">ВЫИГРЫШ</span>' : '<span class="b b-loss">УБЫТОК</span>';
+    return `<tr>
+      <td>${t.entryDate||'—'}</td>
+      <td style="font-weight:800">${t.ticker}</td>
+      <td><span class="b ${t.type==='LONG'?'b-long':'b-short'}">${t.type}</span></td>
+      <td>$${t.entry||'—'}</td><td class="r">$${t.stop||'—'}</td>
+      <td class="g">$${t.target1||'—'}</td><td class="g">$${t.target2||'—'}</td>
+      <td>${t.rsi7||'—'}</td><td>${t.rsi14||'—'}</td><td>${t.spyRsi||'—'}</td>
+      <td>${db}</td><td>${pnl}</td><td>${stBadge}</td>
+      <td><div style="display:flex;gap:5px">
+        <button class="btn btn-g btn-s" onclick="openTrade('${t.id}')">✏</button>
+        <button class="btn btn-d btn-s" onclick="delTrade('${t.id}')">✕</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
 
-      buildDayRows(state.date);
-      setStatus("history loaded via GitHub API. You can save day now.", "ok");
-    } catch(e){
-      setStatus(e.message, "error");
-    }
-  });
+// ═══════════════════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════════════════
+function renderDash() {
+  const tr = cache.trades;
+  const cl = tr.filter(t=>t.status==='CLOSED'&&t.pnlPct!==undefined);
+  const op = tr.filter(t=>t.status==='OPEN');
+  const wins = cl.filter(t=>t.result==='WIN');
+  const loss = cl.filter(t=>t.result==='LOSS');
+  const wr = cl.length ? ((wins.length/cl.length)*100).toFixed(1) : 0;
+  const aw = wins.length ? (wins.reduce((a,t)=>a+t.pnlPct,0)/wins.length).toFixed(2) : 0;
+  const al = loss.length ? (loss.reduce((a,t)=>a+t.pnlPct,0)/loss.length).toFixed(2) : 0;
+  const tot = cl.reduce((a,t)=>a+(t.pnlPct||0),0).toFixed(2);
 
-  $("saveGit").addEventListener("click", async ()=>{
-    try{
-      const owner = $("owner").value.trim();
-      const repo  = $("repo").value.trim();
-      const path  = $("path").value.trim();
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat" style="--sc:var(--acc4)"><div class="stat-l">Всего сделок</div><div class="stat-v">${tr.length}</div><div class="stat-s">${op.length} открытых</div></div>
+    <div class="stat" style="--sc:var(--acc)"><div class="stat-l">% выигрышей</div><div class="stat-v g">${wr}%</div><div class="stat-s">${wins.length}W / ${loss.length}L</div></div>
+    <div class="stat" style="--sc:var(--acc3)"><div class="stat-l">Средний выигрыш</div><div class="stat-v g">+${aw}%</div><div class="stat-s">Убыток: ${al}%</div></div>
+    <div class="stat" style="--sc:${parseFloat(tot)>=0?'var(--acc)':'var(--acc2)'}"><div class="stat-l">Суммарный P&L</div><div class="stat-v ${parseFloat(tot)>=0?'g':'r'}">${parseFloat(tot)>0?'+':''}${tot}%</div><div class="stat-s">по закрытым</div></div>`;
 
-      if (!state.historySha) {
-        throw new Error("No history sha. Click 'Load history from Git (sha)' first.");
+  const opEl = document.getElementById('openPos');
+  if (!op.length) {
+    opEl.innerHTML = '<div class="empty"><div class="empty-i">📭</div><div class="empty-t">Нет открытых позиций</div></div>';
+  } else {
+    opEl.innerHTML = op.map(t => {
+      const day    = tradingDay(t.entryDate);
+      const entry  = parseFloat(t.entry)  || 0;
+      const stop   = parseFloat(t.stop)   || 0;
+      const t1     = parseFloat(t.target1)|| 0;
+      const t2     = parseFloat(t.target2)|| 0;
+      const shares = parseInt(t.shares)   || 0;
+      const dir    = t.type === 'LONG' ? 1 : -1;
+
+      // Current P&L estimate (we don't have live price, show vs targets)
+      const pnlVsT1  = t1 && entry ? ((t1 - entry) / entry * 100 * dir).toFixed(1) : null;
+      const pnlVsT2  = t2 && entry ? ((t2 - entry) / entry * 100 * dir).toFixed(1) : null;
+      const stopPct  = stop && entry ? Math.abs((stop - entry) / entry * 100).toFixed(1) : null;
+
+      // ── Smart action hints ──────────────────────────────
+      const hints = [];
+
+      // Day 1–2: monitor only
+      if (day <= 2) {
+        hints.push({ icon:'👁', text:'Мониторинг — ждём движения', color:'var(--acc4)', urgency:0 });
       }
 
-      const cleaned = state.dayRows
-        .filter(r => r.rsi7!=null || r.rsi14!=null || r.pick || r.notes)
-        .map(r => ({
-          ticker: r.ticker,
-          rsi7: r.rsi7,
-          rsi14: r.rsi14,
-          rsi7_prev: r.rsi7_prev,
-          signal: r.signal || "",
-          pick: r.pick || "",
-          notes: r.notes || ""
-        }));
+      // Day 3: if profit < +1.5% → close 50%
+      if (day === 3) {
+        hints.push({
+          icon:'⚠️',
+          text:`День 3: если прибыль < +1.5% → закрыть 50% на ЗАКРЫТИИ (16:00 EST)`,
+          color:'var(--acc3)', urgency:1
+        });
+        if (t1) hints.push({
+          icon:'✅',
+          text:`Если прибыль ≥ +4% (≥ $${t1.toFixed(2)}) → закрыть 50% по рынку`,
+          color:'var(--acc)', urgency:1
+        });
+      }
 
-      state.history.days[state.date] = cleaned;
+      // Day 3+: Target 1 hit rule
+      if (day >= 2 && t1) {
+        hints.push({
+          icon:'🎯',
+          text:`Цель 1 = $${t1.toFixed(2)} (+${pnlVsT1}%) → закрыть 50%, стоп → breakeven`,
+          color:'var(--acc)', urgency:0
+        });
+      }
 
-      setStatus("saving day to GitHub...", "");
-      const resp = await githubPutFile(owner, repo, path, state.history, state.historySha, `Update history ${state.date}`);
-      state.historySha = resp.content.sha;
-      setStatus("day saved to GitHub successfully", "ok");
-    } catch(e){
-      setStatus(e.message, "error");
-    }
-  });
+      // Day 4: must close if not profitable
+      if (day === 4) {
+        hints.push({
+          icon:'🔴',
+          text:`День 4: ОБЯЗАТЕЛЬНО закрыть сегодня на закрытии (16:00 EST) если нет +4%`,
+          color:'var(--acc2)', urgency:2
+        });
+      }
 
-  async function init(){
-    // default date today
-    const today = new Date();
-    $("date").value = fmtDate(today);
-    state.date = $("date").value;
+      // Day 5: mandatory exit
+      if (day >= 5) {
+        hints.push({
+          icon:'🚨',
+          text:`ДЕНЬ 5 — ВЫХОД ОБЯЗАТЕЛЕН сегодня на закрытии (16:00 EST) по любой цене`,
+          color:'var(--acc2)', urgency:3
+        });
+      }
 
-    // preload token if exists
-    const t = localStorage.getItem("gh_token");
-    if (t) $("token").value = t;
+      // Stop reminder always
+      if (stop) {
+        hints.push({
+          icon:'🛑',
+          text:`Стоп-лосс: $${stop.toFixed(2)} (−${stopPct}%) — GTC ордер должен стоять`,
+          color:'var(--t2)', urgency:0
+        });
+      }
 
-    setStatus("loading raw watchlist + raw history...");
-    state.watchlist = await loadWatchlistRaw();
-    state.history = ensureBaseHistory(await loadHistoryRaw());
-    buildDayRows(state.date);
-    $("wlMeta").textContent = `Tickers: ${state.watchlist.length}`;
-    setStatus("loaded from raw GitHub. For saving to GitHub, load sha via API buttons.", "ok");
+      // Target 2 reminder
+      if (t2) {
+        hints.push({
+          icon:'🏆',
+          text:`Цель 2: $${t2.toFixed(2)} (+${pnlVsT2}%) → закрыть оставшиеся 50%`,
+          color:'var(--acc)', urgency:0
+        });
+      }
+
+      // Sort by urgency desc
+      hints.sort((a,b) => b.urgency - a.urgency);
+
+      const urgency = hints[0]?.urgency || 0;
+      const borderCol = urgency >= 3 ? 'var(--acc2)' : urgency >= 2 ? 'rgba(255,107,138,.5)' : urgency >= 1 ? 'rgba(255,200,90,.4)' : 'var(--line)';
+
+      return `<div class="opc" style="border-color:${borderCol};margin-bottom:12px">
+        <!-- Header row -->
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <span style="font-size:17px;font-weight:800">${t.ticker}</span>
+            <span class="b ${t.type==='LONG'?'b-long':'b-short'}">${t.type}</span>
+            <span class="db d${Math.min(5,day)}">Д${day}</span>
+            <span style="font-family:var(--mono);font-size:9px;color:var(--t2)">${t.entryDate||''}</span>
+          </div>
+          <button class="btn btn-g btn-s" onclick="openTrade('${t.id}')">✏ ОБНОВИТЬ</button>
+        </div>
+
+        <!-- Price row -->
+        <div style="display:flex;gap:16px;margin-top:10px;flex-wrap:wrap;font-family:var(--mono);font-size:11px">
+          <span>Вход: <span style="color:var(--text);font-weight:700">$${entry||'—'}</span></span>
+          <span>Стоп: <span class="r">$${stop||'—'}</span></span>
+          <span>Ц1: <span class="g">$${t1||'—'}</span></span>
+          <span>Ц2: <span class="g">$${t2||'—'}</span></span>
+          ${shares ? `<span>Акций: <span style="color:var(--text)">${shares}</span></span>` : ''}
+          ${shares && t1 ? `<span>½ закрыть: <span style="color:var(--acc4)">${Math.ceil(shares/2)} шт.</span></span>` : ''}
+        </div>
+
+        <!-- Live price row -->
+        ${(() => {
+          const lp = livePrices[t.ticker];
+          if (lp && lp.error) return `
+            <div style="margin-top:8px">
+              <div style="font-family:var(--mono);font-size:9px;color:var(--acc2);margin-bottom:6px">⚠ ${lp.error}</div>
+              ${manualPriceInput(t)}
+            </div>`;
+          if (!lp) return `<div style="margin-top:8px">${manualPriceInput(t)}</div>`;
+          const livePnl = entry ? (dir * (lp.price - entry) / entry * 100) : null;
+          const pnlCol  = livePnl === null ? 'var(--t2)' : livePnl >= 0 ? 'var(--acc)' : 'var(--acc2)';
+          const chgCol  = (lp.change||0) >= 0 ? 'var(--acc)' : 'var(--acc2)';
+          const src     = lp.manual ? '✏ вручную' : '📡 Finnhub';
+          return `<div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;padding:8px 10px;background:var(--bg3);border-radius:6px;border:1px solid var(--line);align-items:center">
+            <span style="font-family:var(--mono);font-size:11px">Сейчас: <span style="color:var(--text);font-weight:800">$${lp.price}</span></span>
+            ${!lp.manual && lp.change !== undefined ? `<span style="font-family:var(--mono);font-size:11px;color:${chgCol}">${(lp.change||0)>=0?'+':''}${(lp.change||0).toFixed(2)}% день</span>` : ''}
+            ${livePnl !== null ? `<span style="font-family:var(--mono);font-size:12px;color:${pnlCol};font-weight:800">P&L: ${livePnl>=0?'+':''}${livePnl.toFixed(2)}%${shares?` ($${Math.abs(livePnl/100*entry*shares).toFixed(0)})`:''}</span>` : ''}
+            <span style="font-family:var(--mono);font-size:8px;color:var(--t3);margin-left:auto">${src}</span>
+            <input type="number" step=".01" placeholder="обновить цену" value="${lp.price}"
+              style="width:110px;font-family:var(--mono);font-size:11px;padding:4px 8px;background:var(--bg4);border:1px solid var(--line);border-radius:6px;color:var(--text)"
+              onchange="setManualPrice('${t.ticker}', this.value)">
+          </div>`;
+        })()}
+
+        <!-- Action hints -->
+        ${hints.length ? `<div style="margin-top:10px;display:flex;flex-direction:column;gap:5px">
+          ${hints.slice(0,4).map(h => `
+            <div style="display:flex;align-items:flex-start;gap:7px;padding:7px 10px;border-radius:6px;background:rgba(255,255,255,.03);border-left:3px solid ${h.color}">
+              <span style="flex-shrink:0">${h.icon}</span>
+              <span style="font-family:var(--mono);font-size:10px;color:${h.urgency>=2?'var(--text)':'var(--t2)'};line-height:1.4">${h.text}</span>
+            </div>`).join('')}
+        </div>` : ''}
+      </div>`;
+    }).join('');
   }
 
-  init().catch(e => setStatus(e.message, "error"));
+  // Recent
+  const rb = document.getElementById('recentTb');
+  const rec = tr.slice(0,8);
+  if(!rec.length){ rb.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--t2);padding:36px">Сделок нет</td></tr>'; return; }
+  rb.innerHTML = rec.map(t => {
+    const day = t.status==='OPEN'?tradingDay(t.entryDate):'—';
+    const pnl = t.pnlPct!==undefined?`<span class="${t.pnlPct>=0?'g':'r'}">${t.pnlPct>0?'+':''}${t.pnlPct}%</span>`:'—';
+    return `<tr>
+      <td>${t.entryDate||'—'}</td><td style="font-weight:800">${t.ticker}</td>
+      <td><span class="b ${t.type==='LONG'?'b-long':'b-short'}">${t.type}</span></td>
+      <td>$${t.entry||'—'}</td><td>${t.exitPrice?'$'+t.exitPrice:'—'}</td>
+      <td>${pnl}</td>
+      <td>${t.status==='OPEN'?`<span class="db d${Math.min(5,day)}">${day}</span>`:'—'}</td>
+      <td>${t.status==='OPEN'?'<span class="b b-open">ОТКРЫТА</span>':t.result==='WIN'?'<span class="b b-win">ВЫИГРЫШ</span>':'<span class="b b-loss">УБЫТОК</span>'}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// CHECKLIST
+// ═══════════════════════════════════════════════════════════
+const CL_DATA = {
+  'mf':['Открыть дневной график SPY','Считать SPY RSI(14) → внести в Дашборд','Определить режим: РИСК-ОН / НЕЙТРАЛЬНЫЙ / РИСК-ОФФ','Зафиксировать коэффициент размера позиции (50% или 100%)'],
+  'ms':['Открыть список наблюдения','Для каждой акции записать RSI(7) и RSI(14)','Пометить лонги: RSI(7) пересёк >20 И RSI(14)<40','Пометить шорты: RSI(7) пересёк <80 И RSI(14)>60','Проверить отчётность: нет событий в след. 6 дней','Ранжировать сигналы по дальности RSI(14) от 50'],
+  'ml':['Подсчитать открытые позиции (макс 6)','Проверить экспозицию по секторам (макс 40%)','Проверить кулдауны: нет повторных входов','Убедиться что совокупный риск портфеля < 6%'],
+  'en':['Рассчитать размер позиции по формуле','Выставить рыночный ордер (9:30–9:45 EST)','Зафиксировать цену исполнения в журнале','Выставить стоп-лосс GTC немедленно','Установить алерты Цель 1 (+4%) и Цель 2 (+8%)','Добавить сделку во вкладку Сделки'],
+  'mg':['Проверить достижение Цели 1 (+4%)','Если Цель 1 достигнута: выйти 50%, стоп → +1.5%','Если RSI(7)>70 (лонг) или <30 (шорт): выйти','Если День 5: ВЫЙТИ ИЗ ВСЕХ НА ЗАКРЫТИИ','Если День 3 и прибыль <+1.5%: выйти 50%','Проверить смену режима SPY (выйти если РИСК-ОФФ)'],
+  'ed':['Зафиксировать цены закрытия позиций','Обновить счётчик дней удержания (Д1–Д5)','Обновить P&L открытых позиций','Отметить позиции требующие выхода завтра'],
+  'pr':['Найти акции с RSI(7) 22–28 (лонг-кандидат завтра)','Найти акции с RSI(7) 72–78 (шорт-кандидат завтра)','Установить алерты для этих тикеров','Обновить даты кулдауна в списке наблюдения']
+};
+
+function initChecklist() {
+  const td = today();
+  const saved = cache.checklist[td] || {};
+  Object.entries(CL_DATA).forEach(([sec, items]) => {
+    const el = document.getElementById('cl-'+sec);
+    if(!el) return;
+    el.innerHTML = items.map((txt,i) => {
+      const k = sec+'_'+i;
+      const chk = saved[k]||false;
+      return `<div class="ci ${chk?'chk':''}" onclick="toggleCl('${sec}','${i}',this)">
+        <div class="cbox"></div><div class="cit">${txt}</div>
+      </div>`;
+    }).join('');
+  });
+  updClProg();
+}
+
+async function toggleCl(sec, i, el) {
+  el.classList.toggle('chk');
+  const td = today();
+  if(!cache.checklist[td]) cache.checklist[td] = {};
+  cache.checklist[td][sec+'_'+i] = el.classList.contains('chk');
+  updClProg();
+  await saveCloud(KEYS.checklist, cache.checklist);
+}
+
+function updClProg() {
+  const all = document.querySelectorAll('.ci').length;
+  const done = document.querySelectorAll('.ci.chk').length;
+  document.getElementById('clProg').textContent = `${done}/${all}`;
+  document.getElementById('clProgBar').style.width = (all?done/all*100:0)+'%';
+}
+
+async function resetCl() {
+  if(!confirm('Сбросить чеклист на сегодня?')) return;
+  const td = today();
+  cache.checklist[td] = {};
+  await saveCloud(KEYS.checklist, cache.checklist);
+  initChecklist(); toast('Чеклист сброшен');
+}
+
+// ═══════════════════════════════════════════════════════════
+// WATCHLIST
+// ═══════════════════════════════════════════════════════════
+
+// Blackout = earnings date is within next 6 calendar days FROM today
+function isBlackout(w) {
+  if (!w.earningsDate) return false;
+  const td  = new Date(today());
+  const ear = new Date(w.earningsDate);
+  const diffDays = Math.round((ear - td) / 86400000);
+  return diffDays >= 0 && diffDays <= 6;  // 0..6 days ahead
+}
+
+// Cooldown = cooldownDate is set and >= today
+function isCooldown(w) {
+  if (!w.cooldownDate) return false;
+  return w.cooldownDate >= today() && !isBlackout(w);
+}
+
+function openWL(ticker = null) {
+  document.getElementById('wl_orig_ticker').value = ticker || '';
+  const isEdit = !!ticker;
+  document.getElementById('moWLTitle').textContent = isEdit ? 'Редактировать акцию' : 'Добавить акцию';
+  document.getElementById('wlSaveBtn').textContent = isEdit ? 'СОХРАНИТЬ' : 'ДОБАВИТЬ';
+
+  if (isEdit) {
+    const w = cache.watchlist.find(x => x.ticker === ticker);
+    if (w) {
+      document.getElementById('wl_tk').value  = w.ticker      || '';
+      document.getElementById('wl_se').value  = w.sector      || 'Технологии';
+      document.getElementById('wl_cap').value = w.cap         || '';
+      document.getElementById('wl_bt').value  = w.beta        || '';
+      document.getElementById('wl_bo').value  = w.earningsDate|| '';
+      document.getElementById('wl_cd').value  = w.cooldownDate|| '';
+      document.getElementById('wl_nt').value  = w.notes       || '';
+    }
+  } else {
+    ['tk','cap','bt','bo','cd','nt'].forEach(f => {
+      const el = document.getElementById('wl_'+f); if(el) el.value = '';
+    });
+    document.getElementById('wl_se').value = 'Технологии';
+  }
+  openMo('moWL');
+}
+
+async function saveWL() {
+  const ticker = document.getElementById('wl_tk').value.trim().toUpperCase();
+  if (!ticker) { toast('Введите тикер!', true); return; }
+
+  const origTicker = document.getElementById('wl_orig_ticker').value;
+  const isEdit = !!origTicker;
+
+  const item = {
+    ticker,
+    sector:       document.getElementById('wl_se').value,
+    cap:          document.getElementById('wl_cap').value,
+    beta:         document.getElementById('wl_bt').value,
+    earningsDate: document.getElementById('wl_bo').value,   // renamed from blackoutDate
+    cooldownDate: document.getElementById('wl_cd').value,
+    notes:        document.getElementById('wl_nt').value,
+    addedAt:      Date.now()
+  };
+
+  if (isEdit) {
+    const idx = cache.watchlist.findIndex(w => w.ticker === origTicker);
+    if (idx >= 0) {
+      item.addedAt = cache.watchlist[idx].addedAt; // preserve original add date
+      cache.watchlist[idx] = item;
+    }
+  } else {
+    if (cache.watchlist.find(w => w.ticker === ticker)) {
+      toast('Уже в списке!', true); return;
+    }
+    cache.watchlist.unshift(item);
+  }
+
+  const ok = await saveCloud(KEYS.watchlist, cache.watchlist);
+  if (ok) {
+    closeMo('moWL');
+    renderWL();
+    toast(isEdit ? `${ticker} обновлён ✓` : `${ticker} добавлен ✓`);
+  }
+}
+
+async function delWL(ticker) {
+  if (!confirm(`Удалить ${ticker}?`)) return;
+  cache.watchlist = cache.watchlist.filter(w => w.ticker !== ticker);
+  const ok = await saveCloud(KEYS.watchlist, cache.watchlist);
+  if (ok) { renderWL(); toast(`${ticker} удалён`); }
+}
+
+function renderWL() {
+  const wl  = cache.watchlist;
+  const srch = (document.getElementById('wlSrch')?.value  || '').toUpperCase();
+  const sect = document.getElementById('wlSect')?.value   || '';
+  const stat = document.getElementById('wlStat')?.value   || '';
+
+  // Count stats on full list before filtering
+  let bo = 0, cd = 0;
+  wl.forEach(w => {
+    if (isBlackout(w))       bo++;
+    else if (isCooldown(w))  cd++;
+  });
+
+  document.getElementById('wlTot').textContent = wl.length;
+  document.getElementById('wlBo').textContent  = bo;
+  document.getElementById('wlCd').textContent  = cd;
+  document.getElementById('wlAct').textContent = wl.length - bo - cd;
+
+  const fl = wl.filter(w => {
+    const boBool = isBlackout(w);
+    const cdBool = isCooldown(w);
+    const st = boBool ? 'blackout' : cdBool ? 'cooldown' : 'active';
+    return (!srch || w.ticker.includes(srch))
+        && (!sect || w.sector === sect)
+        && (!stat || stat === st);
+  });
+
+  const grid = document.getElementById('wlGrid');
+  if (!fl.length) {
+    grid.innerHTML = '<div class="empty" style="grid-column:1/-1"><div class="empty-i">📋</div><div class="empty-t">Список пуст</div></div>';
+    return;
+  }
+
+  grid.innerHTML = fl.map(w => {
+    const boBool = isBlackout(w);
+    const cdBool = isCooldown(w);
+    const cls  = boBool ? 'bo' : cdBool ? 'cd' : '';
+    let statusText, statusColor;
+    if (boBool) {
+      // Show how many days until earnings
+      const ear  = new Date(w.earningsDate);
+      const diff = Math.round((ear - new Date(today())) / 86400000);
+      statusText  = diff === 0 ? '🚫 Отчёт СЕГОДНЯ' : `🚫 Отчёт через ${diff}д (${w.earningsDate})`;
+      statusColor = 'var(--acc2)';
+    } else if (cdBool) {
+      statusText  = `⏳ Кулдаун до ${w.cooldownDate}`;
+      statusColor = 'var(--acc3)';
+    } else {
+      statusText  = '✅ Активна';
+      statusColor = 'var(--acc)';
+      // Show upcoming earnings if set but not yet in blackout window
+      if (w.earningsDate && w.earningsDate >= today()) {
+        const diff = Math.round((new Date(w.earningsDate) - new Date(today())) / 86400000);
+        statusText += ` · 📅 отчёт +${diff}д`;
+      }
+    }
+
+    return `<div class="wi ${cls}">
+      <div style="position:absolute;top:8px;right:8px;display:flex;gap:4px">
+        <button class="wr" style="position:static;font-size:12px" onclick="openWL('${w.ticker}')">✏</button>
+        <button class="wr" style="position:static" onclick="delWL('${w.ticker}')">✕</button>
+      </div>
+      <div class="wt">${w.ticker}</div>
+      <div class="wm">${w.sector||'—'} · β${w.beta||'—'}${w.cap ? ' · $'+w.cap+'B' : ''}</div>
+      <div style="font-family:var(--mono);font-size:9px;color:${statusColor};line-height:1.5">${statusText}</div>
+      ${w.notes ? `<div style="font-family:var(--mono);font-size:9px;color:var(--t3);margin-top:4px">${w.notes}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// RSI DAILY SCAN
+// ═══════════════════════════════════════════════════════════
+
+function getRsiColor(val) {
+  if (val === '' || val === null || isNaN(val)) return 'var(--t3)';
+  if (val <= 20) return 'var(--acc)';   // oversold — long signal zone
+  if (val <= 30) return 'var(--acc)';   // approaching
+  if (val >= 80) return 'var(--acc2)';  // overbought — short signal zone
+  if (val >= 70) return 'var(--acc2)';
+  return 'var(--acc3)';                 // neutral
+}
+
+function computeSignal(w, scan) {
+  // scan = { rsi7, rsi7prev, rsi14 }
+  const { rsi7, rsi7prev, rsi14 } = scan;
+  if (rsi7 === '' || rsi14 === '') return 'none';
+
+  const r7  = parseFloat(rsi7);
+  const r7p = parseFloat(rsi7prev);
+  const r14 = parseFloat(rsi14);
+  if (isNaN(r7) || isNaN(r14)) return 'none';
+
+  // LONG: RSI7 crossed above 20 (prev <20, now >20) AND RSI14 < 40
+  if (!isNaN(r7p) && r7p < 20 && r7 > 20 && r14 < 40) return 'LONG_SIGNAL';
+
+  // SHORT: RSI7 crossed below 80 (prev >80, now <80) AND RSI14 > 60
+  if (!isNaN(r7p) && r7p > 80 && r7 < 80 && r14 > 60) return 'SHORT_SIGNAL';
+
+  // WATCH LONG: RSI7 < 25 (approaching signal)
+  if (r7 < 25) return 'WATCH_LONG';
+
+  // WATCH SHORT: RSI7 > 75 (approaching signal)
+  if (r7 > 75) return 'WATCH_SHORT';
+
+  return 'none';
+}
+
+function renderRsiScan() {
+  const td = today();
+  document.getElementById('scanDateLabel').textContent = new Date().toLocaleDateString('ru-RU',{weekday:'short',day:'2-digit',month:'short'});
+
+  const wl = cache.watchlist;
+  if (!wl.length) {
+    document.getElementById('rsiScanTbody').innerHTML =
+      '<tr><td colspan="7" style="text-align:center;color:var(--t2);padding:30px">Добавьте акции в список наблюдения</td></tr>';
+    return;
+  }
+
+  const scans = cache.rsiScans || {};
+  const todayScan  = scans[td]     || {};
+  const yesterday  = getPrevDate(td);
+  const yesterScan = scans[yesterday] || {};
+
+  // Build last 5 trading days (excluding today)
+  const histDates = [];
+  let d = td;
+  for (let i = 0; i < 5; i++) { d = getPrevDate(d); histDates.push(d); }
+
+  document.getElementById('rsiScanTbody').innerHTML = wl.map(w => {
+    const boBool = isBlackout(w);
+    const cdBool = isCooldown(w);
+    const inactive = boBool || cdBool;
+
+    const r7cur  = todayScan[w.ticker + '_r7']  ?? '';
+    const r14cur = todayScan[w.ticker + '_r14'] ?? '';
+    const r7prev = yesterScan[w.ticker + '_r7'] ?? '';
+
+    const sig = inactive ? 'blocked' : computeSignal(w, { rsi7: r7cur, rsi7prev: r7prev, rsi14: r14cur });
+
+    let sigHtml;
+    switch(sig) {
+      case 'LONG_SIGNAL':  sigHtml = '<span class="sig-long">🟢 ЛОНГ СИГНАЛ</span>'; break;
+      case 'SHORT_SIGNAL': sigHtml = '<span class="sig-short">🔴 ШОРТ СИГНАЛ</span>'; break;
+      case 'WATCH_LONG':   sigHtml = '<span class="sig-watch">👀 СЛЕДИМ ЛОНГ</span>'; break;
+      case 'WATCH_SHORT':  sigHtml = '<span class="sig-watch">👀 СЛЕДИМ ШОРТ</span>'; break;
+      case 'blocked':      sigHtml = `<span class="sig-none">${boBool ? '🚫 БЛЭКАУТ' : '⏳ КУЛДАУН'}</span>`; break;
+      default:             sigHtml = '<span class="sig-none">—</span>';
+    }
+
+    const stText = boBool ? `<span class="r" style="font-size:9px;font-family:var(--mono)">БЛЭКАУТ</span>`
+                 : cdBool ? `<span class="y" style="font-size:9px;font-family:var(--mono)">КУЛДАУН</span>`
+                 : `<span class="g" style="font-size:9px;font-family:var(--mono)">АКТИВНА</span>`;
+
+    const r7color  = getRsiColor(r7cur  !== '' ? parseFloat(r7cur)  : NaN);
+    const r14color = getRsiColor(r14cur !== '' ? parseFloat(r14cur) : NaN);
+
+    const rowBg = sig === 'LONG_SIGNAL'  ? 'background:rgba(126,232,162,.04)' :
+                  sig === 'SHORT_SIGNAL' ? 'background:rgba(255,107,138,.04)' :
+                  sig === 'WATCH_LONG' || sig === 'WATCH_SHORT' ? 'background:rgba(255,200,90,.03)' : '';
+
+    // Build 5-day history sparkline for RSI(7)
+    const histVals = histDates.map(dt => {
+      const v = (scans[dt] || {})[w.ticker + '_r7'];
+      return v !== undefined && v !== '' ? parseFloat(v) : null;
+    });
+
+    const histHtml = `<div style="display:flex;align-items:center;gap:4px">
+      ${histVals.map((v, i) => {
+        if (v === null) return `<div title="${histDates[i]}" style="display:flex;flex-direction:column;align-items:center;gap:2px"><div style="width:22px;height:28px;background:var(--bg4);border-radius:3px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:2px"><span style="font-family:var(--mono);font-size:7px;color:var(--t3)">—</span></div><span style="font-family:var(--mono);font-size:7px;color:var(--t3)">${histDates[i].slice(5)}</span></div>`;
+        const barH = Math.round((v / 100) * 28);
+        const col  = getRsiColor(v);
+        return `<div title="${histDates[i]}: RSI7=${v.toFixed(1)}" style="display:flex;flex-direction:column;align-items:center;gap:2px">
+          <div style="width:22px;height:28px;background:var(--bg4);border-radius:3px;display:flex;align-items:flex-end;overflow:hidden">
+            <div style="width:100%;height:${barH}px;background:${col};border-radius:2px;transition:height .3s"></div>
+          </div>
+          <span style="font-family:var(--mono);font-size:7px;color:${col};font-weight:700">${v.toFixed(0)}</span>
+          <span style="font-family:var(--mono);font-size:6px;color:var(--t3)">${histDates[i].slice(5)}</span>
+        </div>`;
+      }).join('')}
+      ${r7cur !== '' ? `<div style="display:flex;flex-direction:column;align-items:center;gap:2px;margin-left:2px;border-left:1px solid var(--line);padding-left:4px">
+        <div style="width:22px;height:28px;background:var(--bg4);border-radius:3px;display:flex;align-items:flex-end;overflow:hidden;border:1px solid ${r7color}40">
+          <div style="width:100%;height:${Math.round((parseFloat(r7cur)/100)*28)}px;background:${r7color};border-radius:2px"></div>
+        </div>
+        <span style="font-family:var(--mono);font-size:7px;color:${r7color};font-weight:700">${parseFloat(r7cur).toFixed(0)}</span>
+        <span style="font-family:var(--mono);font-size:6px;color:var(--acc)">сег.</span>
+      </div>` : ''}
+    </div>`;
+
+    return `<tr style="${rowBg}">
+      <td style="font-weight:800">${w.ticker}</td>
+      <td style="color:var(--t2)">${w.sector||'—'}</td>
+      <td>
+        <div class="rsi-bar-wrap">
+          <input class="rsi-inp" type="number" min="0" max="100" step="0.1"
+            value="${r7cur}" placeholder="—"
+            onchange="updateRsiScan('${w.ticker}','r7',this.value)"
+            ${inactive ? 'disabled style="opacity:.4"' : ''}>
+          ${r7cur !== '' ? `<div class="rsi-mini"><div class="rsi-mini-fill" style="width:${Math.min(100,parseFloat(r7cur)||0)}%;background:${r7color}"></div></div><span class="rsi-val" style="color:${r7color}">${parseFloat(r7cur).toFixed(0)}</span>` : ''}
+        </div>
+      </td>
+      <td>
+        <div class="rsi-bar-wrap">
+          <input class="rsi-inp" type="number" min="0" max="100" step="0.1"
+            value="${r14cur}" placeholder="—"
+            onchange="updateRsiScan('${w.ticker}','r14',this.value)"
+            ${inactive ? 'disabled style="opacity:.4"' : ''}>
+          ${r14cur !== '' ? `<div class="rsi-mini"><div class="rsi-mini-fill" style="width:${Math.min(100,parseFloat(r14cur)||0)}%;background:${r14color}"></div></div><span class="rsi-val" style="color:${r14color}">${parseFloat(r14cur).toFixed(0)}</span>` : ''}
+        </div>
+      </td>
+      <td style="padding:8px 14px">${histHtml}</td>
+      <td>${sigHtml}</td>
+      <td>${stText}</td>
+    </tr>`;
+  }).join('');
+
+  renderDashSignals();
+}
+
+function updateRsiScan(ticker, field, value) {
+  const td = today();
+  if (!cache.rsiScans) cache.rsiScans = {};
+  if (!cache.rsiScans[td]) cache.rsiScans[td] = {};
+  cache.rsiScans[td][ticker + '_' + field] = value === '' ? '' : parseFloat(value);
+  // Update signal cell in this row live
+  const rows = document.querySelectorAll('#rsiScanTbody tr');
+  const wl = cache.watchlist;
+  rows.forEach((row, i) => {
+    if (!wl[i]) return;
+    if (wl[i].ticker !== ticker && !row.querySelector(`[onchange*="'${ticker}'"]`)) return;
+    // find by ticker in first cell
+    if (row.cells[0]?.textContent?.trim() !== ticker) return;
+    const scans     = cache.rsiScans || {};
+    const todayScan = scans[td] || {};
+    const yesterday = getPrevDate(td);
+    const yesterScan= scans[yesterday] || {};
+    const r7cur  = todayScan[ticker + '_r7']  ?? '';
+    const r7prev = yesterScan[ticker + '_r7'] ?? '';
+    const r14cur = todayScan[ticker + '_r14'] ?? '';
+    const sig = computeSignal(wl[i], { rsi7: r7cur, rsi7prev: r7prev, rsi14: r14cur });
+    // Update signal cell (index 5)
+    const sigCell = row.cells[5];
+    if (sigCell) {
+      switch(sig) {
+        case 'LONG_SIGNAL':  sigCell.innerHTML = '<span class="sig-long">🟢 ЛОНГ СИГНАЛ</span>'; break;
+        case 'SHORT_SIGNAL': sigCell.innerHTML = '<span class="sig-short">🔴 ШОРТ СИГНАЛ</span>'; break;
+        case 'WATCH_LONG':   sigCell.innerHTML = '<span class="sig-watch">👀 СЛЕДИМ ЛОНГ</span>'; break;
+        case 'WATCH_SHORT':  sigCell.innerHTML = '<span class="sig-watch">👀 СЛЕДИМ ШОРТ</span>'; break;
+        default:             sigCell.innerHTML = '<span class="sig-none">—</span>';
+      }
+      // row highlight
+      const bg = sig === 'LONG_SIGNAL'  ? 'rgba(126,232,162,.04)' :
+                 sig === 'SHORT_SIGNAL' ? 'rgba(255,107,138,.04)' :
+                 (sig.includes('WATCH'))? 'rgba(255,200,90,.03)'  : '';
+      row.style.background = bg;
+    }
+    // Update mini bar in changed cell
+    const colIdx = field === 'r7' ? 2 : 3;
+    const cell = row.cells[colIdx];
+    if (cell && value !== '') {
+      const color = getRsiColor(parseFloat(value));
+      const barWrap = cell.querySelector('.rsi-bar-wrap');
+      if (barWrap) {
+        let mini = barWrap.querySelector('.rsi-mini');
+        let val  = barWrap.querySelector('.rsi-val');
+        if (!mini) {
+          mini = document.createElement('div'); mini.className = 'rsi-mini'; barWrap.appendChild(mini);
+          val  = document.createElement('span'); val.className  = 'rsi-val';  barWrap.appendChild(val);
+        }
+        mini.innerHTML = `<div class="rsi-mini-fill" style="width:${Math.min(100,parseFloat(value)||0)}%;background:${color}"></div>`;
+        val.textContent = parseFloat(value).toFixed(0);
+        val.style.color = color;
+      }
+    }
+  });
+  renderDashSignals();
+}
+
+async function saveRsiScan() {
+  const td = today();
+  // Flush all current input values into cache before saving
+  if (!cache.rsiScans) cache.rsiScans = {};
+  if (!cache.rsiScans[td]) cache.rsiScans[td] = {};
+  document.querySelectorAll('#rsiScanTbody tr').forEach(row => {
+    const ticker = row.cells[0]?.textContent?.trim();
+    if (!ticker) return;
+    const inp7  = row.cells[2]?.querySelector('input');
+    const inp14 = row.cells[3]?.querySelector('input');
+    if (inp7  && inp7.value  !== '') cache.rsiScans[td][ticker + '_r7']  = parseFloat(inp7.value);
+    if (inp14 && inp14.value !== '') cache.rsiScans[td][ticker + '_r14'] = parseFloat(inp14.value);
+  });
+  await persistToCloud();
+  renderRsiScan();
+  toast('RSI сохранён ✓');
+}
+
+function renderDashSignals() {
+  const td = today();
+  const scans = cache.rsiScans || {};
+  const todayScan  = scans[td]          || {};
+  const yesterday  = getPrevDate(td);
+  const yesterScan = scans[yesterday]   || {};
+  const wl = cache.watchlist;
+
+  const signals = [];
+  wl.forEach(w => {
+    if (isBlackout(w) || isCooldown(w)) return;
+    const r7cur  = todayScan[w.ticker + '_r7']  ?? '';
+    const r14cur = todayScan[w.ticker + '_r14'] ?? '';
+    const r7prev = yesterScan[w.ticker + '_r7'] ?? '';
+    const sig = computeSignal(w, { rsi7: r7cur, rsi7prev: r7prev, rsi14: r14cur });
+    if (sig !== 'none') signals.push({ w, sig, r7: r7cur, r14: r14cur, r7prev });
+  });
+
+  // Sort: SIGNAL first, then WATCH
+  signals.sort((a,b) => {
+    const rank = s => s.includes('SIGNAL') ? 0 : 1;
+    return rank(a.sig) - rank(b.sig);
+  });
+
+  const el = document.getElementById('signalsSection');
+  const dateEl = document.getElementById('signalsDate');
+  if (dateEl) dateEl.textContent = new Date().toLocaleDateString('ru-RU',{weekday:'short',day:'2-digit',month:'short'});
+
+  if (!signals.length) {
+    el.innerHTML = '<div class="empty" style="padding:20px"><div class="empty-t" style="font-family:var(--mono);font-size:11px">Нет сигналов — заполните RSI в разделе «Список»</div></div>';
+    return;
+  }
+
+  el.innerHTML = signals.map(({ w, sig, r7, r14, r7prev }) => {
+    const isSignal = sig.includes('SIGNAL');
+    const isLong   = sig.includes('LONG');
+    const cls      = isSignal ? (isLong ? 'long' : 'short') : 'watch';
+
+    const label = sig === 'LONG_SIGNAL'  ? '🟢 ЛОНГ СИГНАЛ — ВХОД ЗАВТРА'
+                : sig === 'SHORT_SIGNAL' ? '🔴 ШОРТ СИГНАЛ — ВХОД ЗАВТРА'
+                : sig === 'WATCH_LONG'   ? '👀 НАБЛЮДАЕМ ЛОНГ'
+                :                          '👀 НАБЛЮДАЕМ ШОРТ';
+
+    return `<div class="sig-card ${cls}">
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="font-size:17px;font-weight:800">${w.ticker}</span>
+        <span style="font-family:var(--mono);font-size:9px;color:var(--t2)">${w.sector||''}</span>
+      </div>
+      <div style="font-family:var(--mono);font-size:11px;font-weight:700;${isSignal?'color:var(--text)':'color:var(--t2)'}">${label}</div>
+      <div style="display:flex;gap:14px;font-family:var(--mono);font-size:10px;color:var(--t2)">
+        <span>RSI7: <span style="color:${getRsiColor(parseFloat(r7))};font-weight:700">${r7||'—'}</span></span>
+        <span>RSI14: <span style="color:${getRsiColor(parseFloat(r14))};font-weight:700">${r14||'—'}</span></span>
+        <span>RSI7вч: <span style="color:var(--text)">${r7prev||'—'}</span></span>
+      </div>
+      ${isSignal ? `<button class="btn btn-p btn-s" onclick="openTrade();setTimeout(()=>{document.getElementById('te_tk').value='${w.ticker}';document.getElementById('te_r7').value='${r7}';document.getElementById('te_r14').value='${r14}';},50)">+ СДЕЛКА</button>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function getPrevDate(dateStr) {
+  const d = new Date(dateStr);
+  // Step back skipping weekends
+  do { d.setDate(d.getDate() - 1); } while (d.getDay() === 0 || d.getDay() === 6);
+  return d.toISOString().split('T')[0];
+}
+
+// ═══════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════════
+const Q_CHECKS = [
+  'Объём всех акций > $200 млн/день','30-дневный диапазон > 12%','RSI(14) диапазон > 50 пт за 90 дней',
+  'Бета в диапазоне 0.9–2.5','Удалить акции с 2+ стоп-лоссами за квартал',
+  'Добавить новые акции по критериям','Поддерживать 40–50 акций в списке',
+  'Обновить даты кулдауна','Не более 40% в одном секторе','Экспортировать резервную копию JSON'
+];
+let qOff = 0;
+
+function qKey(off=0){ const d=new Date(); d.setMonth(d.getMonth()+off*3); return `Q${Math.floor(d.getMonth()/3)+1}_${d.getFullYear()}`; }
+function qLbl(off=0){
+  const d=new Date(); d.setMonth(d.getMonth()+off*3);
+  const q=Math.floor(d.getMonth()/3)+1;
+  const m=[['Январь','Март'],['Апрель','Июнь'],['Июль','Сентябрь'],['Октябрь','Декабрь']];
+  return `Q${q} ${d.getFullYear()} · ${m[q-1][0]} – ${m[q-1][1]}`;
+}
+
+function renderQ() {
+  const key = qKey(qOff);
+  document.getElementById('qLabel').textContent = qLbl(qOff);
+  const data = (cache.quarterly||{})[key]||{};
+  ['t','wr','r','d','aw','al','rem','add','gd','im','vl','ch'].forEach(f=>{ const el=document.getElementById('q_'+f); if(el) el.value=data[f]||''; });
+  document.getElementById('q_ps').value = data.ps||'100';
+  const saved = data.checks||{};
+  document.getElementById('q-cl').innerHTML = Q_CHECKS.map((txt,i)=>{
+    const chk = saved[i]||false;
+    return `<div class="ci ${chk?'chk':''}" onclick="toggleQCl(${i},this)">
+      <div class="cbox"></div><div class="cit">${txt}</div>
+    </div>`;
+  }).join('');
+}
+
+async function toggleQCl(i,el) {
+  el.classList.toggle('chk');
+  const key=qKey(qOff);
+  if(!cache.quarterly[key]) cache.quarterly[key]={};
+  if(!cache.quarterly[key].checks) cache.quarterly[key].checks={};
+  cache.quarterly[key].checks[i]=el.classList.contains('chk');
+  await saveCloud(KEYS.quarterly, cache.quarterly);
+}
+
+async function saveQ() {
+  const key=qKey(qOff);
+  if(!cache.quarterly[key]) cache.quarterly[key]={};
+  const d = cache.quarterly[key];
+  ['t','wr','r','d','aw','al','rem','add','gd','im','vl','ch'].forEach(f=>{ const el=document.getElementById('q_'+f); if(el) d[f]=el.value; });
+  d.ps = document.getElementById('q_ps').value;
+  const ok = await saveCloud(KEYS.quarterly, cache.quarterly);
+  if(ok) toast('Квартал сохранён ✓');
+}
+
+// ═══════════════════════════════════════════════════════════
+// MODAL HELPERS
+// ═══════════════════════════════════════════════════════════
+function openMo(id){ document.getElementById(id).classList.add('open'); }
+function closeMo(id){ document.getElementById(id).classList.remove('open'); }
+document.addEventListener('click',e=>{ if(e.target.classList.contains('mo')) e.target.classList.remove('open'); });
+
+// ═══════════════════════════════════════════════════════════
+// EXPORT / IMPORT / CLEAR
+// ═══════════════════════════════════════════════════════════
+function exportJSON() {
+  const data = { trades:cache.trades, watchlist:cache.watchlist, quarterly:cache.quarterly, checklist:cache.checklist, settings:cache.settings, regime:cache.regime, exportedAt:new Date().toISOString() };
+  const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download=`rsi-journal-backup-${today()}.json`; a.click();
+  URL.revokeObjectURL(url); toast('JSON экспортирован ✓');
+}
+
+function importJSON(e) {
+  const file = e.target.files[0]; if(!file) return;
+  const r = new FileReader();
+  r.onload = async ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if(!confirm('Импорт заменит все данные в облаке. Продолжить?')) return;
+      if(data.trades)    cache.trades    = data.trades;
+      if(data.watchlist) cache.watchlist = data.watchlist;
+      if(data.quarterly) cache.quarterly = data.quarterly;
+      if(data.checklist) cache.checklist = data.checklist;
+      if(data.settings)  cache.settings  = data.settings;
+      if(data.regime)    cache.regime    = data.regime;
+      await persistToCloud();
+      renderDash(); renderTrades(); renderWL(); renderQ(); initChecklist(); loadSetsUI();
+      toast('Импорт завершён ✓');
+    } catch { toast('Ошибка импорта!',true); }
+  };
+  r.readAsText(file);
+}
+
+async function clearCloud() {
+  if(!confirm('Удалить ВСЕ данные из облака? Это необратимо!')) return;
+  if(!confirm('Подтвердите ещё раз: удалить всё?')) return;
+  await cloudDel();
+  Object.assign(cache,{trades:[],watchlist:[],quarterly:{},checklist:{},settings:{...DEF_SETS},regime:{}});
+  renderDash(); renderTrades(); renderWL(); renderQ(); initChecklist(); loadSetsUI();
+  setSyncState('synced','ОЧИЩЕНО');
+  toast('Данные удалены');
+}
+
+// ═══════════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════════
+function today(){ return new Date().toISOString().split('T')[0]; }
+
+// Aliases for legacy calls
+async function persistToCloud() { return doSave(); }
+async function saveCloud()      { scheduleSave(); return true; }
+async function cloudDel() {
+  try { localStorage.removeItem(LS_KEY); } catch {}
+  try { sessionStorage.removeItem(SS_KEY); } catch {}
+  // Optionally wipe Gist content
+  const { token, gistId } = getGhCreds();
+  if (token && gistId) {
+    try {
+      await fetch(`https://api.github.com/gists/${gistId}`, {
+        method: 'PATCH',
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ files: { 'rsi-journal.json': { content: '{}' } } })
+      });
+    } catch {}
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// START
+// ═══════════════════════════════════════════════════════════
+async function init() {
+  setSyncState('syncing', 'ЗАГРУЗКА...');
+  await probeStorage();
+
+  try {
+    // Load GitHub creds from localStorage backup before first load
+    try {
+      const raw = localStorage.getItem('gh_creds');
+      if (raw) {
+        const { token, gistId } = JSON.parse(raw);
+        if (!cache.settings) cache.settings = {...DEF_SETS};
+        cache.settings.ghToken  = cache.settings.ghToken  || token  || '';
+        cache.settings.ghGistId = cache.settings.ghGistId || gistId || '';
+      }
+    } catch {}
+
+    const data = await loadFromStorage();
+    applyData(data);
+  } catch(e) {
+    console.warn('init load error:', e);
+  }
+
+  // Ensure settings defaults
+  if (!cache.settings || !Object.keys(cache.settings).length) cache.settings = {...DEF_SETS};
+  if (!cache.settings.finnhubKey) cache.settings.finnhubKey = FINNHUB_KEY;
+
+  document.getElementById('hdrDate').textContent = today();
+
+  loadSetsUI();
+  loadGhUI();
+  loadFhKeyUI();
+  initChecklist();
+  renderDash();
+  renderTrades();
+  renderWL();
+  renderQ();
+  renderRsiScan();
+
+  const rsi = cache.regime?.spyRsi14;
+  if (rsi) { document.getElementById('spyRsi').value = rsi; updRegime(false); }
+
+  setSyncState('synced', storageModeLabel());
+  updateStorageInfo();
+}
+
+init();
 </script>
 </body>
 </html>
