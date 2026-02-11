@@ -2,10 +2,10 @@
   "trades": [
     {
       "id": "1770803316220",
-      "createdAt": 1770803316220,
+      "createdAt": 1770803328044,
       "ticker": "SE",
       "type": "LONG",
-      "entryDate": "2026-02-11",
+      "entryDate": "2026-02-10",
       "entry": 108.06,
       "shares": 9,
       "stop": "103.74",
