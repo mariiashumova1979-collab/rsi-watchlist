@@ -761,9 +761,8 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
         <input type="number" id="te_en" step=".01" placeholder="0.00" oninput="tradeAutoCalc()">
       </div>
       <div class="fg">
-        <label>Кол-во акций <span id="te_sh_auto" style="color:var(--acc);font-size:9px"></span></label>
-        <input type="number" id="te_sh" placeholder="авто"
-          oninput="tradeMarkManual('sh'); document.getElementById('te_sh_auto').textContent=''; tradeAutoCalc()">
+        <label>Кол-во акций</label>
+        <input type="number" id="te_sh" placeholder="0">
       </div>
       <div class="fg">
         <label>Стоп ($) <span style="color:var(--t3);font-size:9px">авто −4%</span></label>
@@ -801,6 +800,7 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
       <div style="font-family:var(--mono);font-size:9px;color:var(--acc2);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px">ДАННЫЕ ВЫХОДА</div>
       <div class="fgrid">
         <div class="fg"><label>Цена выхода ($)</label><input type="number" id="te_ex" step=".01" placeholder="0.00" oninput="tradeAutoCalc()"></div>
+        <div class="fg"><label>Комиссии ($) <span style="color:var(--t3);font-size:9px">вход+выход</span></label><input type="number" id="te_comm" step=".01" placeholder="0.00" oninput="tradeAutoCalc()"></div>
         <div class="fg"><label>Причина выхода</label>
           <select id="te_er">
             <option value="">—</option>
@@ -1324,9 +1324,20 @@ function calcRSI(closes, period) {
 
 function setManualPrice(ticker, val) {
   const price = parseFloat(val);
-  if (!price) { delete livePrices[ticker]; renderDash(); return; }
+  if (!price) { delete livePrices[ticker]; return; }
   livePrices[ticker] = { price, manual: true };
-  renderDash();
+  // Update P&L display in-place — do NOT call renderDash() to avoid losing focus
+  document.querySelectorAll(`[data-ticker-pnl="${ticker}"]`).forEach(el => {
+    const entry  = parseFloat(el.dataset.entry)  || 0;
+    const shares = parseInt(el.dataset.shares)   || 0;
+    const dir    = el.dataset.dir === '-1' ? -1 : 1;
+    if (!entry) return;
+    const pnlPct = dir * (price - entry) / entry * 100;
+    const pnlAmt = shares ? pnlPct / 100 * entry * shares : null;
+    const col    = pnlPct >= 0 ? 'var(--acc)' : 'var(--acc2)';
+    el.innerHTML = `<span style="font-size:13px;font-weight:800;color:${col}">${pnlPct>=0?'+':''}${pnlPct.toFixed(2)}%</span>`
+      + (pnlAmt !== null ? ` <span style="font-size:10px;color:var(--t2)">($${Math.abs(pnlAmt).toFixed(0)})</span>` : '');
+  });
 }
 
 function manualPriceInput(t) {
@@ -1454,21 +1465,6 @@ function tradeAutoCalc() {
     document.getElementById('te_t2').value = t2.toFixed(2);
   }
 
-  // Calculate position size only if shares not manually set
-  const sharesEl = document.getElementById('te_sh');
-  if (!manualFields.has('sh') && (!sharesEl.value || sharesEl.value == '0')) {
-    const stopPrice  = parseFloat(document.getElementById('te_st').value) || 0;
-    const stopDist   = Math.abs(entry - stopPrice);
-    if (stopDist > 0) {
-      const riskDollars = s.portfolio * (s.riskPct / 100);
-      let shares = Math.floor(riskDollars / stopDist);
-      const maxPos = s.portfolio * (s.maxPosPct / 100);
-      if (shares * entry > maxPos) shares = Math.floor(maxPos / entry);
-      sharesEl.value = shares;
-      document.getElementById('te_sh_auto').textContent = '(авто)';
-    }
-  }
-
   // Preview block
   const stop  = parseFloat(document.getElementById('te_st').value) || 0;
   const t1    = parseFloat(document.getElementById('te_t1').value) || 0;
@@ -1479,16 +1475,14 @@ function tradeAutoCalc() {
   const t2Pct   = t2   && entry ? ((t2-entry)/entry*100*dir).toFixed(1) : '—';
   const posSize = sh * entry;
   const riskAmt = sh && stop ? Math.abs(sh * (entry - stop)) : 0;
-  const isManualSh = manualFields.has('sh');
 
   rows.innerHTML = [
     { l:'Стоп',     v:`$${stop.toFixed(2)}`, sub:`−${stopPct}%`,  c:'var(--acc2)' },
     { l:'Цель 1',   v:`$${t1.toFixed(2)}`,   sub:`+${t1Pct}%`,    c:'var(--acc)'  },
     { l:'Цель 2',   v:`$${t2.toFixed(2)}`,   sub:`+${t2Pct}%`,    c:'var(--acc)'  },
-    { l:'Акций',    v:sh + (isManualSh ? ' ✏' : ' авто'), sub: isManualSh ? '<a onclick="resetShares()" style="color:var(--acc4);cursor:pointer;text-decoration:underline">↺ пересчитать</a>' : 'из риска', c:'var(--acc4)' },
-    { l:'Позиция',  v:`$${posSize.toFixed(0)}`, sub:sh?`${(posSize/s.portfolio*100).toFixed(1)}% порт.`:'', c:'var(--text)' },
-    { l:'Риск $',   v:`$${riskAmt.toFixed(0)}`, sub:s.portfolio?`${(riskAmt/s.portfolio*100).toFixed(2)}% порт.`:'', c:'var(--acc3)' },
-  ].map(({l,v,sub,c}) => `<div style="min-width:80px">
+    sh ? { l:'Позиция',  v:`$${posSize.toFixed(0)}`, sub:`${sh} акц · ${sh&&s.portfolio?(posSize/s.portfolio*100).toFixed(1):'—'}% порт.`, c:'var(--text)' } : null,
+    sh && stop ? { l:'Риск $', v:`$${riskAmt.toFixed(0)}`, sub:s.portfolio?`${(riskAmt/s.portfolio*100).toFixed(2)}% порт.`:'', c:'var(--acc3)' } : null,
+  ].filter(Boolean).map(({l,v,sub,c}) => `<div style="min-width:80px">
     <div style="font-family:var(--mono);font-size:8px;color:var(--t2);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px">${l}</div>
     <div style="font-family:var(--mono);font-size:13px;font-weight:700;color:${c}">${v}</div>
     <div style="font-family:var(--mono);font-size:9px;color:var(--t3)">${sub}</div>
@@ -1501,15 +1495,19 @@ function tradeAutoCalc() {
   }
   preview.style.display = '';
 
-  // P&L preview for exit
+  // P&L preview for exit (с комиссиями)
   const exitPrice = parseFloat(document.getElementById('te_ex')?.value);
+  const comm      = parseFloat(document.getElementById('te_comm')?.value) || 0;
   const pnlFg = document.getElementById('pnl_preview_fg');
   const pnlEl = document.getElementById('pnl_preview');
   if (exitPrice && entry && pnlFg && pnlEl) {
-    const pnl = dir * (exitPrice - entry) / entry * 100;
+    const grossPnl = dir * (exitPrice - entry) * (sh || 1);
+    const netPnl   = grossPnl - comm;
+    const basis    = entry * (sh || 1);
+    const pnlPct   = netPnl / basis * 100;
     pnlFg.style.display = '';
-    pnlEl.textContent = (pnl >= 0 ? '+' : '') + pnl.toFixed(2) + '%';
-    pnlEl.style.color = pnl >= 0 ? 'var(--acc)' : 'var(--acc2)';
+    pnlEl.innerHTML = `<span style="color:${pnlPct>=0?'var(--acc)':'var(--acc2)'}">${pnlPct>=0?'+':''}${pnlPct.toFixed(2)}%</span>`
+      + (sh ? ` <span style="font-size:11px;color:var(--t2)">($${netPnl.toFixed(0)}${comm?` · −$${comm} комис.`:''})</span>` : '');
   } else if (pnlFg) { pnlFg.style.display = 'none'; }
 }
 
@@ -1521,7 +1519,7 @@ function openTrade(id=null) {
   if (id) {
     const t = cache.trades.find(x => x.id === id);
     if (t) {
-      const map = {tk:'ticker',tp:'type',dt:'entryDate',en:'entry',sh:'shares',st:'stop',t1:'target1',t2:'target2',r7:'rsi7',r14:'rsi14',spy:'spyRsi',sta:'status',ex:'exitPrice',er:'exitReason',nt:'notes'};
+      const map = {tk:'ticker',tp:'type',dt:'entryDate',en:'entry',sh:'shares',st:'stop',t1:'target1',t2:'target2',r7:'rsi7',r14:'rsi14',spy:'spyRsi',sta:'status',ex:'exitPrice',er:'exitReason',comm:'commission',nt:'notes'};
       Object.entries(map).forEach(([elId,key]) => {
         const el = document.getElementById('te_'+elId); if(el) el.value = t[key] || '';
       });
@@ -1531,7 +1529,7 @@ function openTrade(id=null) {
       if (t.target2) manualFields.add('t2');
     }
   } else {
-    ['tk','en','sh','st','t1','t2','r7','r14','spy','ex','nt'].forEach(f => {
+    ['tk','en','sh','st','t1','t2','r7','r14','spy','ex','comm','nt'].forEach(f => {
       const el = document.getElementById('te_'+f); if(el) el.value = '';
     });
     document.getElementById('te_dt').value  = today();
@@ -1551,17 +1549,23 @@ async function saveTrade() {
   const ticker = document.getElementById('te_tk').value.trim().toUpperCase();
   if(!ticker) { toast('Введите тикер!',true); return; }
   const id = document.getElementById('te_id').value;
-  const map = {tk:'ticker',tp:'type',dt:'entryDate',en:'entry',sh:'shares',st:'stop',t1:'target1',t2:'target2',r7:'rsi7',r14:'rsi14',spy:'spyRsi',sta:'status',ex:'exitPrice',er:'exitReason',nt:'notes'};
+  const map = {tk:'ticker',tp:'type',dt:'entryDate',en:'entry',sh:'shares',st:'stop',t1:'target1',t2:'target2',r7:'rsi7',r14:'rsi14',spy:'spyRsi',sta:'status',ex:'exitPrice',er:'exitReason',comm:'commission',nt:'notes'};
   const t = { id: id||Date.now().toString(), createdAt: Date.now() };
   Object.entries(map).forEach(([elId,key]) => { const el=document.getElementById('te_'+elId); if(el) t[key]=el.value; });
   t.ticker = ticker;
-  t.entry = parseFloat(t.entry)||0;
-  t.exitPrice = parseFloat(t.exitPrice)||0;
-  t.shares = parseInt(t.shares)||0;
+  t.entry      = parseFloat(t.entry)      || 0;
+  t.exitPrice  = parseFloat(t.exitPrice)  || 0;
+  t.shares     = parseInt(t.shares)       || 0;
+  t.commission = parseFloat(t.commission) || 0;
   if(t.exitPrice && t.entry) {
-    const pnl = t.type==='LONG' ? ((t.exitPrice-t.entry)/t.entry)*100 : ((t.entry-t.exitPrice)/t.entry)*100;
-    t.pnlPct = parseFloat(pnl.toFixed(2));
-    t.result = pnl>=0 ? 'WIN' : 'LOSS';
+    const grossPnl = t.type==='LONG'
+      ? (t.exitPrice - t.entry) * t.shares
+      : (t.entry - t.exitPrice) * t.shares;
+    const netPnl = grossPnl - t.commission;
+    const basis  = t.entry * t.shares || 1;
+    t.pnlPct  = parseFloat((netPnl / basis * 100).toFixed(2));
+    t.pnlNet  = parseFloat(netPnl.toFixed(2));
+    t.result  = netPnl >= 0 ? 'WIN' : 'LOSS';
   }
   if(id) { const i=cache.trades.findIndex(x=>x.id===id); if(i>=0) cache.trades[i]=t; else cache.trades.unshift(t); }
   else cache.trades.unshift(t);
@@ -1751,25 +1755,23 @@ function renderDash() {
         <!-- Live price row -->
         ${(() => {
           const lp = livePrices[t.ticker];
-          if (lp && lp.error) return `
-            <div style="margin-top:8px">
-              <div style="font-family:var(--mono);font-size:9px;color:var(--acc2);margin-bottom:6px">⚠ ${lp.error}</div>
-              ${manualPriceInput(t)}
-            </div>`;
-          if (!lp) return `<div style="margin-top:8px">${manualPriceInput(t)}</div>`;
-          const livePnl = entry ? (dir * (lp.price - entry) / entry * 100) : null;
-          const pnlCol  = livePnl === null ? 'var(--t2)' : livePnl >= 0 ? 'var(--acc)' : 'var(--acc2)';
-          const chgCol  = (lp.change||0) >= 0 ? 'var(--acc)' : 'var(--acc2)';
-          const src     = lp.manual ? '✏ вручную' : '📡 Finnhub';
-          return `<div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;padding:8px 10px;background:var(--bg3);border-radius:6px;border:1px solid var(--line);align-items:center">
-            <span style="font-family:var(--mono);font-size:11px">Сейчас: <span style="color:var(--text);font-weight:800">$${lp.price}</span></span>
-            ${!lp.manual && lp.change !== undefined ? `<span style="font-family:var(--mono);font-size:11px;color:${chgCol}">${(lp.change||0)>=0?'+':''}${(lp.change||0).toFixed(2)}% день</span>` : ''}
-            ${livePnl !== null ? `<span style="font-family:var(--mono);font-size:12px;color:${pnlCol};font-weight:800">P&L: ${livePnl>=0?'+':''}${livePnl.toFixed(2)}%${shares?` ($${Math.abs(livePnl/100*entry*shares).toFixed(0)})`:''}</span>` : ''}
-            <span style="font-family:var(--mono);font-size:8px;color:var(--t3);margin-left:auto">${src}</span>
-            <input type="number" step=".01" placeholder="обновить цену" value="${lp.price}"
-              style="width:110px;font-family:var(--mono);font-size:11px;padding:4px 8px;background:var(--bg4);border:1px solid var(--line);border-radius:6px;color:var(--text)"
-              onchange="setManualPrice('${t.ticker}', this.value)">
+          const dirAttr = dir === -1 ? '-1' : '1';
+          const pnlDiv  = `<div data-ticker-pnl="${t.ticker}" data-entry="${entry}" data-shares="${shares}" data-dir="${dirAttr}" style="min-width:80px;min-height:18px">`
+            + (lp?.price && entry
+                ? (() => { const p=dir*(lp.price-entry)/entry*100; const col=p>=0?'var(--acc)':'var(--acc2)';
+                    return `<span style="font-size:13px;font-weight:800;color:${col}">${p>=0?'+':''}${p.toFixed(2)}%</span>`
+                      +(shares?` <span style="font-size:10px;color:var(--t2)">($${Math.abs(p/100*entry*shares).toFixed(0)})</span>`:''); })()
+                : '')
+            + `</div>`;
+
+          const inputRow = `<div style="display:flex;align-items:center;gap:8px;margin-top:8px;padding:7px 10px;background:var(--bg3);border-radius:8px;border:1px solid var(--line);flex-wrap:wrap">
+            <span style="font-family:var(--mono);font-size:9px;color:var(--t2);white-space:nowrap">Тек. цена $</span>
+            <input type="number" step=".01" placeholder="${entry||'0.00'}" value="${lp?.price||''}"
+              style="width:90px;font-family:var(--mono);font-size:13px;font-weight:700;padding:3px 8px;background:var(--bg4);border:1px solid var(--line);border-radius:6px;color:var(--text);text-align:center"
+              oninput="setManualPrice('${t.ticker}', this.value)">
+            ${pnlDiv}
           </div>`;
+          return inputRow;
         })()}
 
         <!-- Action hints -->
