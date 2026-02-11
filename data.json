@@ -98,6 +98,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "MTB",
+      "sector": "Технологии",
+      "cap": "",
+      "beta": "",
+      "earningsDate": "",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1770803987845
+    },
+    {
       "ticker": "PYPL",
       "sector": "Технологии",
       "cap": "",
@@ -151,7 +161,9 @@
       "MPC_r7": 90.38,
       "MPC_r14": 77.93,
       "CARR_r7": 88.96,
-      "CARR_r14": 81.07
+      "CARR_r14": 81.07,
+      "PYPL_r7": 18.56,
+      "PYPL_r14": 19.34
     }
   }
 }
