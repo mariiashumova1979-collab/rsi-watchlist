@@ -96,7 +96,18 @@
       "notes": ""
     }
   ],
-  "watchlist": [],
+  "watchlist": [
+    {
+      "ticker": "BA",
+      "sector": "Технологии",
+      "cap": "",
+      "beta": "",
+      "earningsDate": "",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1770803451095
+    }
+  ],
   "quarterly": {},
   "checklist": {},
   "settings": {
