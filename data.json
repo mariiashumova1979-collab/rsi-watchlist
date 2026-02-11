@@ -109,6 +109,9 @@
     "target2": 8,
     "maxDays": 5
   },
-  "regime": {},
+  "regime": {
+    "spyRsi14": 52.84,
+    "savedAt": "2026-02-11T09:50:27.415Z"
+  },
   "rsiScans": {}
 }
