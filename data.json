@@ -98,6 +98,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "PPG",
+      "sector": "Технологии",
+      "cap": "",
+      "beta": "",
+      "earningsDate": "",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1770804151105
+    },
+    {
       "ticker": "DOV",
       "sector": "Технологии",
       "cap": "",
@@ -175,7 +185,9 @@
       "PYPL_r7": 18.56,
       "PYPL_r14": 19.34,
       "MTB_r7": 81.19,
-      "MTB_r14": 77.13
+      "MTB_r14": 77.13,
+      "DOV_r7": 82.12,
+      "DOV_r14": 75.38
     }
   }
 }
