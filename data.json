@@ -1,6 +1,25 @@
 {
   "trades": [
     {
+      "id": "1770803009916",
+      "createdAt": 1770803009916,
+      "ticker": "ACN",
+      "type": "LONG",
+      "entryDate": "2026-02-09",
+      "entry": 233.76,
+      "shares": 4,
+      "stop": "224.41",
+      "target1": "243.11",
+      "target2": "252.46",
+      "rsi7": "",
+      "rsi14": "",
+      "spyRsi": "",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "notes": ""
+    },
+    {
       "id": "1770800006232",
       "createdAt": 1770800006232,
       "ticker": "TXN",
