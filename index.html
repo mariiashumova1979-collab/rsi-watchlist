@@ -1130,6 +1130,24 @@ function toast(msg, err=false) {
   toastTimer = setTimeout(()=>el.className='', 2600);
 }
 
+// Заменяет confirm() — работает внутри iframe где confirm() заблокирован
+function confirmDialog(msg, onYes) {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  overlay.innerHTML = `
+    <div style="background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:24px 20px;max-width:340px;width:100%;text-align:center">
+      <div style="font-size:13px;color:var(--text);margin-bottom:20px;line-height:1.5">${msg}</div>
+      <div style="display:flex;gap:10px;justify-content:center">
+        <button id="cdYes" style="background:var(--acc2);color:#fff;border:none;border-radius:8px;padding:10px 24px;font-family:var(--mono);font-size:12px;font-weight:700;cursor:pointer">ДА</button>
+        <button id="cdNo"  style="background:var(--bg4);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:10px 24px;font-family:var(--mono);font-size:12px;cursor:pointer">ОТМЕНА</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.querySelector('#cdYes').onclick = () => { overlay.remove(); onYes(); };
+  overlay.querySelector('#cdNo').onclick  = () => overlay.remove();
+  overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+}
+
 // ═══════════════════════════════════════════════════════════
 // SYNC BANNER
 // ═══════════════════════════════════════════════════════════
@@ -1212,11 +1230,12 @@ async function saveSets() {
   if(ok) toast('Настройки сохранены ✓');
 }
 
-async function defSets() {
-  if(!confirm('Сбросить к значениям по умолчанию?')) return;
-  cache.settings = {...DEF_SETS};
-  await saveCloud(KEYS.settings, cache.settings);
-  loadSetsUI(); toast('Сброшено ✓');
+function defSets() {
+  confirmDialog('Сбросить настройки к значениям по умолчанию?', () => {
+    cache.settings = {...DEF_SETS};
+    scheduleSave();
+    loadSetsUI(); toast('Сброшено ✓');
+  });
 }
 
 function getSets() { return {...DEF_SETS,...cache.settings}; }
@@ -1551,10 +1570,11 @@ async function saveTrade() {
 }
 
 async function delTrade(id) {
-  if(!confirm('Удалить сделку?')) return;
-  cache.trades = cache.trades.filter(t=>t.id!==id);
-  const ok = await saveCloud(KEYS.trades, cache.trades);
-  if(ok) { renderTrades(); renderDash(); toast('Удалено'); }
+  confirmDialog('Удалить сделку?', async () => {
+    cache.trades = cache.trades.filter(t=>t.id!==id);
+    scheduleSave();
+    renderTrades(); renderDash(); toast('Удалено');
+  });
 }
 
 function tradingDay(entryDate) {
@@ -1828,12 +1848,13 @@ function updClProg() {
   document.getElementById('clProgBar').style.width = (all?done/all*100:0)+'%';
 }
 
-async function resetCl() {
-  if(!confirm('Сбросить чеклист на сегодня?')) return;
-  const td = today();
-  cache.checklist[td] = {};
-  await saveCloud(KEYS.checklist, cache.checklist);
-  initChecklist(); toast('Чеклист сброшен');
+function resetCl() {
+  confirmDialog('Сбросить чеклист на сегодня?', () => {
+    const td = today();
+    cache.checklist[td] = {};
+    scheduleSave();
+    initChecklist(); toast('Чеклист сброшен');
+  });
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -1920,11 +1941,12 @@ async function saveWL() {
   }
 }
 
-async function delWL(ticker) {
-  if (!confirm(`Удалить ${ticker}?`)) return;
-  cache.watchlist = cache.watchlist.filter(w => w.ticker !== ticker);
-  const ok = await saveCloud(KEYS.watchlist, cache.watchlist);
-  if (ok) { renderWL(); toast(`${ticker} удалён`); }
+function delWL(ticker) {
+  confirmDialog(`Удалить ${ticker} из вотчлиста?`, () => {
+    cache.watchlist = cache.watchlist.filter(w => w.ticker !== ticker);
+    scheduleSave();
+    renderWL(); toast(`${ticker} удалён`);
+  });
 }
 
 function renderWL() {
@@ -2363,32 +2385,33 @@ function exportJSON() {
 function importJSON(e) {
   const file = e.target.files[0]; if(!file) return;
   const r = new FileReader();
-  r.onload = async ev => {
+  r.onload = ev => {
     try {
       const data = JSON.parse(ev.target.result);
-      if(!confirm('Импорт заменит все данные в облаке. Продолжить?')) return;
-      if(data.trades)    cache.trades    = data.trades;
-      if(data.watchlist) cache.watchlist = data.watchlist;
-      if(data.quarterly) cache.quarterly = data.quarterly;
-      if(data.checklist) cache.checklist = data.checklist;
-      if(data.settings)  cache.settings  = data.settings;
-      if(data.regime)    cache.regime    = data.regime;
-      await persistToCloud();
-      renderDash(); renderTrades(); renderWL(); renderQ(); initChecklist(); loadSetsUI();
-      toast('Импорт завершён ✓');
-    } catch { toast('Ошибка импорта!',true); }
+      confirmDialog('Импорт заменит все текущие данные. Продолжить?', async () => {
+        if(data.trades)    cache.trades    = data.trades;
+        if(data.watchlist) cache.watchlist = data.watchlist;
+        if(data.quarterly) cache.quarterly = data.quarterly;
+        if(data.checklist) cache.checklist = data.checklist;
+        if(data.settings)  cache.settings  = data.settings;
+        if(data.regime)    cache.regime    = data.regime;
+        await persistToCloud();
+        renderDash(); renderTrades(); renderWL(); renderQ(); initChecklist(); loadSetsUI();
+        toast('Импорт завершён ✓');
+      });
+    } catch { toast('Ошибка импорта!', true); }
   };
   r.readAsText(file);
 }
 
-async function clearCloud() {
-  if(!confirm('Удалить ВСЕ данные из облака? Это необратимо!')) return;
-  if(!confirm('Подтвердите ещё раз: удалить всё?')) return;
-  await cloudDel();
-  Object.assign(cache,{trades:[],watchlist:[],quarterly:{},checklist:{},settings:{...DEF_SETS},regime:{}});
-  renderDash(); renderTrades(); renderWL(); renderQ(); initChecklist(); loadSetsUI();
-  setSyncState('synced','ОЧИЩЕНО');
-  toast('Данные удалены');
+function clearCloud() {
+  confirmDialog('Удалить ВСЕ данные? Это необратимо!', async () => {
+    await cloudDel();
+    Object.assign(cache,{trades:[],watchlist:[],quarterly:{},checklist:{},settings:{...DEF_SETS},regime:{}});
+    renderDash(); renderTrades(); renderWL(); renderQ(); initChecklist(); loadSetsUI();
+    setSyncState('synced','ОЧИЩЕНО');
+    toast('Данные удалены');
+  });
 }
 
 // ═══════════════════════════════════════════════════════════
