@@ -872,6 +872,12 @@ const LS_TOKEN = 'gh_token_v1';
 let ghFileSha   = null;
 let storageMode = 'local';
 
+// Default settings
+const DEF_SETS = {
+  portfolio: 100000, riskPct: 1.5, maxPosPct: 40,
+  stopPct: 4, target1: 4, target2: 8, maxDays: 5
+};
+
 // In-memory cache
 const cache = { trades:[], watchlist:[], quarterly:{}, checklist:{}, settings:{}, regime:{}, rsiScans:{} };
 
