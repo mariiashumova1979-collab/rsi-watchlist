@@ -98,6 +98,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "DOV",
+      "sector": "Технологии",
+      "cap": "",
+      "beta": "",
+      "earningsDate": "",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1770804095536
+    },
+    {
       "ticker": "MTB",
       "sector": "Технологии",
       "cap": "",
@@ -163,7 +173,9 @@
       "CARR_r7": 88.96,
       "CARR_r14": 81.07,
       "PYPL_r7": 18.56,
-      "PYPL_r14": 19.34
+      "PYPL_r14": 19.34,
+      "MTB_r7": 81.19,
+      "MTB_r14": 77.13
     }
   }
 }
