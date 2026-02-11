@@ -98,6 +98,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "MPC",
+      "sector": "Технологии",
+      "cap": "",
+      "beta": "",
+      "earningsDate": "",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1770803602667
+    },
+    {
       "ticker": "BA",
       "sector": "Технологии",
       "cap": "",
@@ -125,6 +135,9 @@
     "savedAt": "2026-02-11T09:50:27.415Z"
   },
   "rsiScans": {
-    "2026-02-11": {}
+    "2026-02-11": {
+      "BA_r7": 58.53,
+      "BA_r14": 59.79
+    }
   }
 }
