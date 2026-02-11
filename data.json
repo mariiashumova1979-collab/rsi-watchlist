@@ -78,7 +78,7 @@
     },
     {
       "id": "1770800006232",
-      "createdAt": 1770800006232,
+      "createdAt": 1770846050679,
       "ticker": "TXN",
       "type": "SHORT",
       "entryDate": "2026-02-06",
@@ -90,10 +90,14 @@
       "rsi7": "",
       "rsi14": "",
       "spyRsi": "",
-      "status": "OPEN",
-      "exitPrice": 0,
-      "exitReason": "",
-      "notes": ""
+      "status": "CLOSED",
+      "exitPrice": 230.88,
+      "exitReason": "STOP",
+      "commission": 4.2,
+      "notes": "",
+      "pnlPct": -4.98,
+      "pnlNet": -44.04,
+      "result": "LOSS"
     }
   ],
   "watchlist": [
