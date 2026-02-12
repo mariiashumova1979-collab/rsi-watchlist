@@ -1,6 +1,25 @@
 {
   "trades": [
     {
+      "id": "1770907976444",
+      "createdAt": 1770907976444,
+      "ticker": "MTB",
+      "type": "SHORT",
+      "entryDate": "2026-02-12",
+      "entry": 237,
+      "shares": 4,
+      "stop": "246.48",
+      "target1": "227.52",
+      "target2": "218.04",
+      "rsi7": "73.07",
+      "rsi14": "73.37",
+      "spyRsi": "52.69",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "notes": ""
+    },
+    {
       "id": "1770846083889",
       "createdAt": 1770846083889,
       "ticker": "TFC",
