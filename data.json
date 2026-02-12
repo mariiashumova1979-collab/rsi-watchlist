@@ -41,7 +41,7 @@
     },
     {
       "id": "1770803316220",
-      "createdAt": 1770908665645,
+      "createdAt": 1770917810268,
       "ticker": "SE",
       "type": "LONG",
       "entryDate": "2026-02-10",
@@ -56,8 +56,10 @@
       "status": "CLOSED",
       "exitPrice": 110.07,
       "exitReason": "",
+      "commission": 4.9,
       "notes": "",
-      "pnlPct": 1.86,
+      "pnlPct": 1.36,
+      "pnlNet": 13.19,
       "result": "WIN"
     },
     {
