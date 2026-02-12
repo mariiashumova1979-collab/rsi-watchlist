@@ -41,7 +41,7 @@
     },
     {
       "id": "1770803244882",
-      "createdAt": 1770891234507,
+      "createdAt": 1770907578246,
       "ticker": "PNC",
       "type": "SHORT",
       "entryDate": "2026-02-10",
@@ -53,10 +53,12 @@
       "rsi7": "63.28",
       "rsi14": "57.51",
       "spyRsi": "52.8",
-      "status": "OPEN",
-      "exitPrice": 0,
+      "status": "CLOSED",
+      "exitPrice": 238,
       "exitReason": "",
-      "notes": ""
+      "notes": "",
+      "pnlPct": 1.41,
+      "result": "WIN"
     },
     {
       "id": "1770803148736",
