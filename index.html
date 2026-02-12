@@ -709,6 +709,25 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
       </div>
 
       <div class="card">
+        <div class="sh">📅 Праздники NYSE/NASDAQ</div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--t2);margin-bottom:12px;line-height:1.7">
+          Рынок закрыт в эти дни. Учитывается при подсчёте торговых дней.
+        </div>
+        <div id="holidayWarning" style="display:none;padding:10px 14px;background:rgba(255,200,90,.1);border:1px solid var(--acc3);border-radius:8px;margin-bottom:12px;font-family:var(--mono);font-size:11px;color:var(--acc3)"></div>
+        <div id="holidaysList" style="max-height:200px;overflow-y:auto;background:var(--bg3);border-radius:8px;padding:10px;margin-bottom:12px"></div>
+        <div style="display:flex;gap:8px;align-items:flex-end">
+          <div class="fg" style="flex:1;margin:0">
+            <label>Добавить дату</label>
+            <input type="date" id="newHolidayDate">
+          </div>
+          <button class="btn btn-p btn-s" onclick="addHoliday()">+ ДОБАВИТЬ</button>
+        </div>
+        <div style="margin-top:10px">
+          <button class="btn btn-g btn-s" onclick="resetHolidays()">↺ СБРОСИТЬ К СТАНДАРТНЫМ</button>
+        </div>
+      </div>
+
+      <div class="card">
         <div class="sh">Резервные копии</div>
         <div style="display:flex;flex-direction:column;gap:10px">
           <button class="btn btn-g" onclick="exportJSON()">📥 ЭКСПОРТ JSON</button>
@@ -877,6 +896,69 @@ const DEF_SETS = {
   portfolio: 100000, riskPct: 1.5, maxPosPct: 40,
   stopPct: 4, target1: 4, target2: 8, maxDays: 5
 };
+
+// ═══════════════════════════════════════════════════════════
+// US MARKET HOLIDAYS 2025-2026 (NYSE/NASDAQ closed)
+// ═══════════════════════════════════════════════════════════
+const US_HOLIDAYS_DEFAULT = [
+  // 2025
+  '2025-01-01', // New Year's Day
+  '2025-01-20', // MLK Day
+  '2025-02-17', // Presidents Day
+  '2025-04-18', // Good Friday
+  '2025-05-26', // Memorial Day
+  '2025-06-19', // Juneteenth
+  '2025-07-04', // Independence Day
+  '2025-09-01', // Labor Day
+  '2025-11-27', // Thanksgiving
+  '2025-12-25', // Christmas
+  // 2026
+  '2026-01-01', // New Year's Day
+  '2026-01-19', // MLK Day
+  '2026-02-16', // Presidents Day
+  '2026-04-03', // Good Friday
+  '2026-05-25', // Memorial Day
+  '2026-06-19', // Juneteenth
+  '2026-07-03', // Independence Day (observed)
+  '2026-09-07', // Labor Day
+  '2026-11-26', // Thanksgiving
+  '2026-12-25', // Christmas
+];
+
+// Early close days (13:00 EST) — informational
+const US_EARLY_CLOSE = [
+  '2025-07-03', // Day before Independence Day
+  '2025-11-28', // Day after Thanksgiving
+  '2025-12-24', // Christmas Eve
+  '2026-11-27', // Day after Thanksgiving
+  '2026-12-24', // Christmas Eve
+];
+
+// Get holidays list (user custom + defaults)
+function getHolidays() {
+  const custom = cache.settings?.holidays || [];
+  // Merge: custom overrides or adds to defaults
+  const all = new Set([...US_HOLIDAYS_DEFAULT, ...custom]);
+  // Remove any dates marked for deletion (prefixed with -)
+  custom.filter(d => d.startsWith('-')).forEach(d => all.delete(d.slice(1)));
+  return Array.from(all).sort();
+}
+
+function isHoliday(dateStr) {
+  return getHolidays().includes(dateStr);
+}
+
+function isEarlyClose(dateStr) {
+  return US_EARLY_CLOSE.includes(dateStr);
+}
+
+function isTradingDay(dateStr) {
+  const d = new Date(dateStr);
+  const dow = d.getDay();
+  if (dow === 0 || dow === 6) return false; // weekend
+  if (isHoliday(dateStr)) return false;
+  return true;
+}
 
 // In-memory cache
 const cache = { trades:[], watchlist:[], quarterly:{}, checklist:{}, settings:{}, regime:{}, rsiScans:{} };
@@ -1260,6 +1342,138 @@ function calcPos() {
 }
 
 // ═══════════════════════════════════════════════════════════
+// HOLIDAYS MANAGEMENT
+// ═══════════════════════════════════════════════════════════
+function renderHolidays() {
+  const holidays = getHolidays();
+  const todayStr = today();
+  const container = document.getElementById('holidaysList');
+  if (!container) return;
+
+  // Filter to show only current year and next year
+  const currentYear = new Date().getFullYear();
+  const relevantHolidays = holidays.filter(d => {
+    const year = parseInt(d.slice(0, 4));
+    return year >= currentYear && year <= currentYear + 1;
+  });
+
+  if (!relevantHolidays.length) {
+    container.innerHTML = '<div style="color:var(--t3);font-size:11px;text-align:center;padding:10px">Нет праздников</div>';
+    return;
+  }
+
+  container.innerHTML = relevantHolidays.map(d => {
+    const isPast = d < todayStr;
+    const isCustom = (cache.settings?.holidays || []).includes(d);
+    const name = getHolidayName(d);
+    const dateObj = new Date(d);
+    const dayName = dateObj.toLocaleDateString('ru-RU', { weekday: 'short', day: 'numeric', month: 'short' });
+    
+    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 8px;border-radius:6px;margin-bottom:4px;background:${isPast ? 'transparent' : 'rgba(255,200,90,.05)'};opacity:${isPast ? '0.5' : '1'}">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-family:var(--mono);font-size:11px;color:${isPast ? 'var(--t3)' : 'var(--acc3)'}">${d}</span>
+        <span style="font-size:11px;color:var(--t2)">${dayName}</span>
+        <span style="font-size:11px;color:var(--text)">${name}</span>
+        ${isCustom ? '<span style="font-size:9px;color:var(--acc4);background:rgba(91,156,246,.15);padding:2px 6px;border-radius:10px">CUSTOM</span>' : ''}
+      </div>
+      ${isCustom ? `<button onclick="removeHoliday('${d}')" style="background:none;border:none;color:var(--acc2);cursor:pointer;font-size:14px;padding:2px 6px" title="Удалить">✕</button>` : ''}
+    </div>`;
+  }).join('');
+
+  // Show warning if upcoming holiday
+  checkHolidayWarning();
+}
+
+function checkHolidayWarning() {
+  const warningEl = document.getElementById('holidayWarning');
+  if (!warningEl) return;
+
+  const todayStr = today();
+  const holidays = getHolidays();
+  
+  // Check next 5 calendar days for holidays
+  const warnings = [];
+  for (let i = 1; i <= 5; i++) {
+    const d = new Date();
+    d.setDate(d.getDate() + i);
+    const dateStr = d.toISOString().split('T')[0];
+    if (holidays.includes(dateStr)) {
+      const name = getHolidayName(dateStr);
+      const dayName = d.toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'short' });
+      if (i === 1) {
+        warnings.push(`⚠️ ЗАВТРА праздник: ${name} (${dayName}) — рынок закрыт`);
+      } else {
+        warnings.push(`📅 Через ${i} дн.: ${name} (${dayName})`);
+      }
+    }
+  }
+
+  // Check if today is early close
+  if (isEarlyClose(todayStr)) {
+    warnings.unshift('⏰ СЕГОДНЯ ранний close в 13:00 EST');
+  }
+
+  if (warnings.length) {
+    warningEl.style.display = '';
+    warningEl.innerHTML = warnings.join('<br>');
+  } else {
+    warningEl.style.display = 'none';
+  }
+}
+
+function addHoliday() {
+  const input = document.getElementById('newHolidayDate');
+  const dateStr = input?.value;
+  if (!dateStr) {
+    toast('Выберите дату!', true);
+    return;
+  }
+
+  if (!cache.settings) cache.settings = {...DEF_SETS};
+  if (!cache.settings.holidays) cache.settings.holidays = [];
+
+  if (getHolidays().includes(dateStr)) {
+    toast('Эта дата уже в списке', true);
+    return;
+  }
+
+  cache.settings.holidays.push(dateStr);
+  scheduleSave();
+  renderHolidays();
+  input.value = '';
+  toast(`Праздник ${dateStr} добавлен ✓`);
+}
+
+function removeHoliday(dateStr) {
+  if (!cache.settings?.holidays) return;
+  
+  // If it's a default holiday, mark for deletion with '-'
+  if (US_HOLIDAYS_DEFAULT.includes(dateStr)) {
+    if (!cache.settings.holidays.includes('-' + dateStr)) {
+      cache.settings.holidays.push('-' + dateStr);
+    }
+  } else {
+    // Remove custom holiday
+    cache.settings.holidays = cache.settings.holidays.filter(d => d !== dateStr);
+  }
+  
+  scheduleSave();
+  renderHolidays();
+  toast(`Праздник ${dateStr} удалён`);
+}
+
+function resetHolidays() {
+  confirmDialog('Сбросить список праздников к стандартным?', () => {
+    if (cache.settings) {
+      cache.settings.holidays = [];
+    }
+    scheduleSave();
+    renderHolidays();
+    toast('Праздники сброшены ✓');
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
 // PRICE ENGINE — Claude API с web_search (работает в sandbox)
 // ═══════════════════════════════════════════════════════════
 const FINNHUB_KEY = 'd65uv7pr01qiish15ra0d65uv7pr01qiish15rag';
@@ -1583,10 +1797,17 @@ async function delTrade(id) {
 
 function tradingDay(entryDate) {
   if(!entryDate) return 1;
-  const entry = new Date(entryDate); const now = new Date();
-  let days=0; const d=new Date(entry);
-  while(d<=now){ d.setDate(d.getDate()+1); const dow=d.getDay(); if(dow!==0&&dow!==6) days++; }
-  return Math.max(1,days);
+  const entry = new Date(entryDate); 
+  const now = new Date();
+  let days = 0; 
+  const d = new Date(entry);
+  while(d <= now) { 
+    d.setDate(d.getDate() + 1); 
+    const dateStr = d.toISOString().split('T')[0];
+    // Skip weekends AND holidays
+    if (isTradingDay(dateStr)) days++; 
+  }
+  return Math.max(1, days);
 }
 
 function renderTrades() {
@@ -1601,7 +1822,13 @@ function renderTrades() {
   tb.innerHTML = fl.map(t => {
     const day = t.status==='OPEN' ? tradingDay(t.entryDate) : '—';
     const db = t.status==='OPEN' ? `<span class="db d${Math.min(5,day)}">${day}</span>` : '—';
-    const pnl = t.pnlPct!==undefined ? `<span class="${t.pnlPct>=0?'g':'r'}">${t.pnlPct>0?'+':''}${t.pnlPct}%</span>` : '<span style="color:var(--t2)">—</span>';
+    // P&L: процент + абсолютное значение
+    let pnl = '<span style="color:var(--t2)">—</span>';
+    if (t.pnlPct !== undefined) {
+      const pctStr = `${t.pnlPct>0?'+':''}${t.pnlPct}%`;
+      const netStr = t.pnlNet !== undefined ? `<span style="font-size:9px;color:var(--t2)"> ($${t.pnlNet>0?'+':''}${t.pnlNet.toFixed(0)})</span>` : '';
+      pnl = `<span class="${t.pnlPct>=0?'g':'r'}">${pctStr}</span>${netStr}`;
+    }
     const stBadge = t.status==='OPEN' ? '<span class="b b-open">ОТКРЫТА</span>' : t.result==='WIN' ? '<span class="b b-win">ВЫИГРЫШ</span>' : '<span class="b b-loss">УБЫТОК</span>';
     return `<tr>
       <td>${t.entryDate||'—'}</td>
@@ -1632,12 +1859,36 @@ function renderDash() {
   const aw = wins.length ? (wins.reduce((a,t)=>a+t.pnlPct,0)/wins.length).toFixed(2) : 0;
   const al = loss.length ? (loss.reduce((a,t)=>a+t.pnlPct,0)/loss.length).toFixed(2) : 0;
   const tot = cl.reduce((a,t)=>a+(t.pnlPct||0),0).toFixed(2);
+  
+  // Абсолютный P&L в долларах
+  const totNet = cl.reduce((a,t)=>a+(t.pnlNet||0),0);
+  const awNet = wins.length ? (wins.reduce((a,t)=>a+(t.pnlNet||0),0)/wins.length) : 0;
+  const alNet = loss.length ? (loss.reduce((a,t)=>a+(t.pnlNet||0),0)/loss.length) : 0;
 
-  document.getElementById('statsGrid').innerHTML = `
+  // Holiday warning for dashboard
+  let holidayAlert = '';
+  const todayStr = today();
+  if (isHoliday(todayStr)) {
+    holidayAlert = `<div style="grid-column:1/-1;padding:14px 18px;background:rgba(255,107,138,.1);border:1px solid var(--acc2);border-radius:10px;font-family:var(--mono);font-size:12px;color:var(--acc2);display:flex;align-items:center;gap:10px">
+      <span style="font-size:18px">🚫</span> СЕГОДНЯ ПРАЗДНИК — ${getHolidayName(todayStr)} — РЫНОК ЗАКРЫТ
+    </div>`;
+  } else if (isEarlyClose(todayStr)) {
+    holidayAlert = `<div style="grid-column:1/-1;padding:14px 18px;background:rgba(255,200,90,.1);border:1px solid var(--acc3);border-radius:10px;font-family:var(--mono);font-size:12px;color:var(--acc3);display:flex;align-items:center;gap:10px">
+      <span style="font-size:18px">⏰</span> СЕГОДНЯ РАННИЙ CLOSE — 13:00 EST
+    </div>`;
+  } else if (isTomorrowHoliday()) {
+    const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
+    const tomorrowStr = tomorrow.toISOString().split('T')[0];
+    holidayAlert = `<div style="grid-column:1/-1;padding:12px 16px;background:rgba(255,200,90,.08);border:1px solid var(--acc3);border-radius:10px;font-family:var(--mono);font-size:11px;color:var(--acc3);display:flex;align-items:center;gap:10px">
+      <span style="font-size:16px">📅</span> ЗАВТРА ПРАЗДНИК — ${getHolidayName(tomorrowStr)} — учитывайте при планировании выхода
+    </div>`;
+  }
+
+  document.getElementById('statsGrid').innerHTML = holidayAlert + `
     <div class="stat" style="--sc:var(--acc4)"><div class="stat-l">Всего сделок</div><div class="stat-v">${tr.length}</div><div class="stat-s">${op.length} открытых</div></div>
     <div class="stat" style="--sc:var(--acc)"><div class="stat-l">% выигрышей</div><div class="stat-v g">${wr}%</div><div class="stat-s">${wins.length}W / ${loss.length}L</div></div>
-    <div class="stat" style="--sc:var(--acc3)"><div class="stat-l">Средний выигрыш</div><div class="stat-v g">+${aw}%</div><div class="stat-s">Убыток: ${al}%</div></div>
-    <div class="stat" style="--sc:${parseFloat(tot)>=0?'var(--acc)':'var(--acc2)'}"><div class="stat-l">Суммарный P&L</div><div class="stat-v ${parseFloat(tot)>=0?'g':'r'}">${parseFloat(tot)>0?'+':''}${tot}%</div><div class="stat-s">по закрытым</div></div>`;
+    <div class="stat" style="--sc:var(--acc3)"><div class="stat-l">Средний выигрыш</div><div class="stat-v g">+${aw}%</div><div class="stat-s">$${awNet>=0?'+':''}${awNet.toFixed(0)} · Убыток: ${al}% ($${alNet.toFixed(0)})</div></div>
+    <div class="stat" style="--sc:${parseFloat(tot)>=0?'var(--acc)':'var(--acc2)'}"><div class="stat-l">Суммарный P&L</div><div class="stat-v ${parseFloat(tot)>=0?'g':'r'}">${parseFloat(tot)>0?'+':''}${tot}%</div><div class="stat-s">${totNet>=0?'+':''}$${totNet.toFixed(0)} по закрытым</div></div>`;
 
   const opEl = document.getElementById('openPos');
   if (!op.length) {
@@ -2308,9 +2559,45 @@ function renderDashSignals() {
 
 function getPrevDate(dateStr) {
   const d = new Date(dateStr);
-  // Step back skipping weekends
-  do { d.setDate(d.getDate() - 1); } while (d.getDay() === 0 || d.getDay() === 6);
+  // Step back skipping weekends AND holidays
+  do { 
+    d.setDate(d.getDate() - 1); 
+  } while (!isTradingDay(d.toISOString().split('T')[0]));
   return d.toISOString().split('T')[0];
+}
+
+// Get next trading day
+function getNextTradingDay(dateStr) {
+  const d = new Date(dateStr);
+  do { 
+    d.setDate(d.getDate() + 1); 
+  } while (!isTradingDay(d.toISOString().split('T')[0]));
+  return d.toISOString().split('T')[0];
+}
+
+// Check if tomorrow is a holiday (for warnings)
+function isTomorrowHoliday() {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const dateStr = tomorrow.toISOString().split('T')[0];
+  return isHoliday(dateStr);
+}
+
+// Get holiday name
+function getHolidayName(dateStr) {
+  const names = {
+    '01-01': 'Новый год', '01-19': 'День MLK', '01-20': 'День MLK',
+    '02-16': 'День президентов', '02-17': 'День президентов',
+    '04-03': 'Страстная пятница', '04-18': 'Страстная пятница',
+    '05-25': 'День памяти', '05-26': 'День памяти',
+    '06-19': 'Juneteenth',
+    '07-03': 'День независимости', '07-04': 'День независимости',
+    '09-01': 'День труда', '09-07': 'День труда',
+    '11-26': 'День благодарения', '11-27': 'День благодарения',
+    '12-24': 'Рождество', '12-25': 'Рождество'
+  };
+  const md = dateStr.slice(5); // MM-DD
+  return names[md] || 'Праздник';
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -2398,7 +2685,7 @@ function importJSON(e) {
         if(data.settings)  cache.settings  = data.settings;
         if(data.regime)    cache.regime    = data.regime;
         await persistToCloud();
-        renderDash(); renderTrades(); renderWL(); renderQ(); initChecklist(); loadSetsUI();
+        renderDash(); renderTrades(); renderWL(); renderQ(); initChecklist(); loadSetsUI(); renderHolidays();
         toast('Импорт завершён ✓');
       });
     } catch { toast('Ошибка импорта!', true); }
@@ -2410,7 +2697,7 @@ function clearCloud() {
   confirmDialog('Удалить ВСЕ данные? Это необратимо!', async () => {
     await cloudDel();
     Object.assign(cache,{trades:[],watchlist:[],quarterly:{},checklist:{},settings:{...DEF_SETS},regime:{}});
-    renderDash(); renderTrades(); renderWL(); renderQ(); initChecklist(); loadSetsUI();
+    renderDash(); renderTrades(); renderWL(); renderQ(); initChecklist(); loadSetsUI(); renderHolidays();
     setSyncState('synced','ОЧИЩЕНО');
     toast('Данные удалены');
   });
@@ -2455,7 +2742,7 @@ async function init() {
 
   try { document.getElementById('hdrDate').textContent = today(); } catch {}
 
-  loadSetsUI(); loadGhUI(); loadFhKeyUI(); initChecklist();
+  loadSetsUI(); loadGhUI(); loadFhKeyUI(); initChecklist(); renderHolidays();
   renderDash(); renderTrades(); renderWL(); renderQ(); renderRsiScan();
 
   const rsi = cache.regime?.spyRsi14;
@@ -2482,7 +2769,7 @@ async function init() {
           applyData(data);
           storageMode = 'github';
           try { localStorage.setItem(LS_KEY, trimmed); } catch {}
-          loadSetsUI(); loadGhUI(); loadFhKeyUI(); initChecklist();
+          loadSetsUI(); loadGhUI(); loadFhKeyUI(); initChecklist(); renderHolidays();
           renderDash(); renderTrades(); renderWL(); renderQ(); renderRsiScan();
           fetchGhSha(token);
         }
