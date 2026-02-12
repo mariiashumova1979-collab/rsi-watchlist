@@ -41,7 +41,7 @@
     },
     {
       "id": "1770803244882",
-      "createdAt": 1770803244882,
+      "createdAt": 1770891234507,
       "ticker": "PNC",
       "type": "SHORT",
       "entryDate": "2026-02-10",
@@ -50,9 +50,9 @@
       "stop": "251.07",
       "target1": "231.75",
       "target2": "222.10",
-      "rsi7": "",
-      "rsi14": "",
-      "spyRsi": "",
+      "rsi7": "63.28",
+      "rsi14": "57.51",
+      "spyRsi": "52.8",
       "status": "OPEN",
       "exitPrice": 0,
       "exitReason": "",
@@ -121,6 +121,26 @@
     }
   ],
   "watchlist": [
+    {
+      "ticker": "SW",
+      "sector": "Другое",
+      "cap": "26.17",
+      "beta": "1.36",
+      "earningsDate": "2026-04-30",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1770892812765
+    },
+    {
+      "ticker": "RF",
+      "sector": "Финансы",
+      "cap": "27.14",
+      "beta": "1.53",
+      "earningsDate": "2026-04-14",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1770892579968
+    },
     {
       "ticker": "TXN",
       "sector": "Технологии",
@@ -206,8 +226,8 @@
     "finnhubKey": "d65uv7pr01qiish15ra0d65uv7pr01qiish15rag"
   },
   "regime": {
-    "spyRsi14": 52.84,
-    "savedAt": "2026-02-11T09:50:27.415Z"
+    "spyRsi14": 52.69,
+    "savedAt": "2026-02-12T10:57:24.508Z"
   },
   "rsiScans": {
     "2026-02-11": {
@@ -225,6 +245,24 @@
       "DOV_r14": 75.38,
       "PPG_r7": 84.13,
       "PPG_r14": 79.68
+    },
+    "2026-02-12": {
+      "MPC_r7": 92.34,
+      "MPC_r14": 83.34,
+      "CARR_r7": 91.09,
+      "CARR_r14": 83.09,
+      "DOV_r7": 84.67,
+      "DOV_r14": 77.43,
+      "PPG_r7": 86.26,
+      "PPG_r14": 81.22,
+      "RF_r7": 80.64,
+      "RF_r14": 72.39,
+      "SW_r7": 82.48,
+      "SW_r14": 74.92,
+      "PYPL_r7": 16.46,
+      "PYPL_r14": 18.15,
+      "MTB_r7": 73.07,
+      "MTB_r14": 73.37
     }
   }
 }
