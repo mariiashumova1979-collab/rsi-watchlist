@@ -157,6 +157,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "ACN",
+      "sector": "Технологии",
+      "cap": "",
+      "beta": "",
+      "earningsDate": "",
+      "cooldownDate": "2026-03-12",
+      "notes": "",
+      "addedAt": 1770974492319
+    },
+    {
       "ticker": "SW",
       "sector": "Другое",
       "cap": "26.17",
