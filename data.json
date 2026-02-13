@@ -157,6 +157,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "ADSK",
+      "sector": "Технологии",
+      "cap": "49.31",
+      "beta": "1.2",
+      "earningsDate": "2026-02-26",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1770974797806
+    },
+    {
       "ticker": "ACN",
       "sector": "Технологии",
       "cap": "",
