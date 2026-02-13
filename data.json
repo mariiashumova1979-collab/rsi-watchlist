@@ -1,6 +1,26 @@
 {
   "trades": [
     {
+      "id": "1770993435675",
+      "createdAt": 1770993435675,
+      "ticker": "CARR",
+      "type": "SHORT",
+      "entryDate": "2026-02-13",
+      "entry": 65.5,
+      "shares": 16,
+      "stop": "68.12",
+      "target1": "62.88",
+      "target2": "60.26",
+      "rsi7": "65.64",
+      "rsi14": "69.35",
+      "spyRsi": "43.3",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "commission": 0,
+      "notes": ""
+    },
+    {
       "id": "1770907976444",
       "createdAt": 1770907976444,
       "ticker": "MTB",
@@ -370,7 +390,11 @@
       "IRM_r7": 85.14,
       "IRM_r14": 76.25,
       "SW_r7": 84.4,
-      "SW_r14": 76.68
+      "SW_r14": 76.68,
+      "CARR_r7": 65.64,
+      "CARR_r14": 69.35,
+      "DOV_r7": 72.87,
+      "DOV_r14": 75.89
     }
   }
 }
