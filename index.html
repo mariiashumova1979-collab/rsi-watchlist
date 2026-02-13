@@ -441,7 +441,7 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
     <div class="sh">Последние 8 сделок</div>
     <div class="tw">
       <table><thead><tr>
-        <th>Дата</th><th>Тикер</th><th>Тип</th><th>Вход</th><th>Выход</th><th>P&L%</th><th>День</th><th>Статус</th>
+        <th>Дата</th><th>Тикер</th><th>Тип</th><th>Вход</th><th>Выход</th><th>P&L%</th><th>T</th><th>Статус</th>
       </tr></thead>
       <tbody id="recentTb"><tr><td colspan="8" style="text-align:center;color:var(--t2);padding:36px">Сделок нет</td></tr></tbody>
       </table>
@@ -500,7 +500,7 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
     <table><thead><tr>
       <th>Дата</th><th>Тикер</th><th>Тип</th><th>Вход $</th><th>Стоп $</th>
       <th>Ц1 $</th><th>Ц2 $</th><th>RSI7</th><th>RSI14</th><th>SPY</th>
-      <th>День</th><th>P&L%</th><th>Статус</th><th></th>
+      <th>T</th><th>P&L%</th><th>Статус</th><th></th>
     </tr></thead>
     <tbody id="tradesTb"></tbody>
     </table>
@@ -1980,19 +1980,74 @@ async function delTrade(id) {
   });
 }
 
-function tradingDay(entryDate) {
-  if(!entryDate) return 1;
-  const entry = new Date(entryDate); 
-  const now = new Date();
-  let days = 0; 
-  const d = new Date(entry);
-  while(d <= now) { 
-    d.setDate(d.getDate() + 1); 
+// ═══════════════════════════════════════════════════════════
+// TRADING DAY LOGIC: T0 = entry day, T4 = exit day
+// ═══════════════════════════════════════════════════════════
+function getTradingDayNumber(entryDate) {
+  // T0 = день открытия позиции
+  // T1, T2, T3 = следующие торговые дни
+  // T4 = день закрытия (максимум)
+  if (!entryDate) return 0;
+  
+  const entryStr = typeof entryDate === 'string' ? entryDate : entryDate.toISOString().split('T')[0];
+  const todayStr = today();
+  
+  // Если дата входа = сегодня → T0
+  if (entryStr === todayStr) return 0;
+  
+  // Считаем торговые дни между entry и today
+  let count = 0;
+  const d = new Date(entryStr);
+  
+  while (true) {
+    d.setDate(d.getDate() + 1);
     const dateStr = d.toISOString().split('T')[0];
-    // Skip weekends AND holidays
-    if (isTradingDay(dateStr)) days++; 
+    
+    if (dateStr > todayStr) break;
+    
+    if (isTradingDay(dateStr)) {
+      count++;
+    }
   }
-  return Math.max(1, days);
+  
+  return count;
+}
+
+// Legacy alias for compatibility
+function tradingDay(entryDate) {
+  return getTradingDayNumber(entryDate);
+}
+
+// Get T-label for display
+function getTLabel(entryDate) {
+  const t = getTradingDayNumber(entryDate);
+  return `T${t}`;
+}
+
+// Check if position should be closed (T4)
+function isExitDay(entryDate) {
+  return getTradingDayNumber(entryDate) >= 4;
+}
+
+// Get date for specific T-day from entry
+function getDateForT(entryDate, targetT) {
+  if (!entryDate) return null;
+  const entryStr = typeof entryDate === 'string' ? entryDate : entryDate.toISOString().split('T')[0];
+  
+  if (targetT === 0) return entryStr;
+  
+  let count = 0;
+  const d = new Date(entryStr);
+  
+  while (count < targetT) {
+    d.setDate(d.getDate() + 1);
+    const dateStr = d.toISOString().split('T')[0];
+    if (isTradingDay(dateStr)) {
+      count++;
+    }
+  }
+  
+  return d.toISOString().split('T')[0];
 }
 
 function renderTrades() {
@@ -2005,8 +2060,13 @@ function renderTrades() {
   const tb = document.getElementById('tradesTb');
   if(!fl.length){ tb.innerHTML='<tr><td colspan="14" style="text-align:center;color:var(--t2);padding:36px">Сделок нет</td></tr>'; return; }
   tb.innerHTML = fl.map(t => {
-    const day = (t.status==='OPEN' || t.status==='PARTIAL') ? tradingDay(t.entryDate) : '—';
-    const db = (t.status==='OPEN' || t.status==='PARTIAL') ? `<span class="db d${Math.min(5,day)}">${day}</span>` : '—';
+    // T-day logic: T0=entry, T4=exit
+    const tDay = (t.status==='OPEN' || t.status==='PARTIAL') ? getTradingDayNumber(t.entryDate) : null;
+    const tLabel = tDay !== null ? `T${tDay}` : '—';
+    // Color: T0-T2 blue, T3 yellow, T4+ red
+    const tColor = tDay === null ? '' : tDay <= 2 ? 'd1' : tDay === 3 ? 'd3' : 'd5';
+    const db = tDay !== null ? `<span class="db ${tColor}">${tLabel}</span>` : '—';
+    
     // P&L: процент + абсолютное значение
     let pnl = '<span style="color:var(--t2)">—</span>';
     if (t.pnlPct !== undefined) {
@@ -2093,7 +2153,7 @@ function renderDash() {
     opEl.innerHTML = '<div class="empty"><div class="empty-i">📭</div><div class="empty-t">Нет открытых позиций</div></div>';
   } else {
     opEl.innerHTML = op.map(t => {
-      const day    = tradingDay(t.entryDate);
+      const tDay   = getTradingDayNumber(t.entryDate);
       const entry  = parseFloat(t.entry)  || 0;
       const stop   = parseFloat(t.stop)   || 0;
       const t1     = parseFloat(t.target1)|| 0;
@@ -2106,19 +2166,34 @@ function renderDash() {
       const pnlVsT2  = t2 && entry ? ((t2 - entry) / entry * 100 * dir).toFixed(1) : null;
       const stopPct  = stop && entry ? Math.abs((stop - entry) / entry * 100).toFixed(1) : null;
 
-      // ── Smart action hints ──────────────────────────────
+      // ── Smart action hints (T0-T4 logic) ──────────────────
       const hints = [];
 
-      // Day 1–2: monitor only
-      if (day <= 2) {
-        hints.push({ icon:'👁', text:'Мониторинг — ждём движения', color:'var(--acc4)', urgency:0 });
+      // T0: entry day
+      if (tDay === 0) {
+        hints.push({ icon:'🚀', text:'T0 — день входа. Стоп-лосс должен быть выставлен!', color:'var(--acc4)', urgency:1 });
       }
 
-      // Day 3: if profit < +1.5% → close 50%
-      if (day === 3) {
+      // T1: first day after entry
+      if (tDay === 1) {
+        hints.push({ icon:'👁', text:'T1 — мониторинг, ждём движения', color:'var(--acc4)', urgency:0 });
+      }
+
+      // T2: second day
+      if (tDay === 2) {
+        hints.push({ icon:'👁', text:'T2 — мониторинг. Проверить достижение Цели 1', color:'var(--acc4)', urgency:0 });
+        if (t1) hints.push({
+          icon:'🎯',
+          text:`Цель 1 = $${t1.toFixed(2)} (+${pnlVsT1}%) → закрыть 50%, стоп → breakeven`,
+          color:'var(--acc)', urgency:0
+        });
+      }
+
+      // T3: decision day
+      if (tDay === 3) {
         hints.push({
           icon:'⚠️',
-          text:`День 3: если прибыль < +1.5% → закрыть 50% на ЗАКРЫТИИ (16:00 EST)`,
+          text:`T3 — если прибыль < +1.5% → закрыть 50% на ЗАКРЫТИИ (16:00 EST)`,
           color:'var(--acc3)', urgency:1
         });
         if (t1) hints.push({
@@ -2126,32 +2201,28 @@ function renderDash() {
           text:`Если прибыль ≥ +4% (≥ $${t1.toFixed(2)}) → закрыть 50% по рынку`,
           color:'var(--acc)', urgency:1
         });
-      }
-
-      // Day 3+: Target 1 hit rule
-      if (day >= 2 && t1) {
         hints.push({
-          icon:'🎯',
-          text:`Цель 1 = $${t1.toFixed(2)} (+${pnlVsT1}%) → закрыть 50%, стоп → breakeven`,
-          color:'var(--acc)', urgency:0
+          icon:'📅',
+          text:`ЗАВТРА T4 — последний день! Готовьтесь к выходу`,
+          color:'var(--acc3)', urgency:1
         });
       }
 
-      // Day 4: must close if not profitable
-      if (day === 4) {
-        hints.push({
-          icon:'🔴',
-          text:`День 4: ОБЯЗАТЕЛЬНО закрыть сегодня на закрытии (16:00 EST) если нет +4%`,
-          color:'var(--acc2)', urgency:2
-        });
-      }
-
-      // Day 5: mandatory exit
-      if (day >= 5) {
+      // T4: mandatory exit day
+      if (tDay >= 4) {
         hints.push({
           icon:'🚨',
-          text:`ДЕНЬ 5 — ВЫХОД ОБЯЗАТЕЛЕН сегодня на закрытии (16:00 EST) по любой цене`,
+          text:`T4 — ВЫХОД ОБЯЗАТЕЛЕН сегодня на закрытии (16:00 EST) по любой цене`,
           color:'var(--acc2)', urgency:3
+        });
+      }
+
+      // Target 1 reminder (T1+)
+      if (tDay >= 1 && tDay < 4 && t1) {
+        hints.push({
+          icon:'🎯',
+          text:`Цель 1: $${t1.toFixed(2)} (+${pnlVsT1}%) → 50% выход, стоп → breakeven`,
+          color:'var(--acc)', urgency:0
         });
       }
 
@@ -2165,7 +2236,7 @@ function renderDash() {
       }
 
       // Target 2 reminder
-      if (t2) {
+      if (t2 && tDay >= 1) {
         hints.push({
           icon:'🏆',
           text:`Цель 2: $${t2.toFixed(2)} (+${pnlVsT2}%) → закрыть оставшиеся 50%`,
@@ -2178,6 +2249,10 @@ function renderDash() {
 
       const urgency = hints[0]?.urgency || 0;
       const borderCol = urgency >= 3 ? 'var(--acc2)' : urgency >= 2 ? 'rgba(255,107,138,.5)' : urgency >= 1 ? 'rgba(255,200,90,.4)' : 'var(--line)';
+      
+      // T-day color: T0-T2 blue, T3 yellow, T4+ red
+      const tColor = tDay <= 2 ? 'd1' : tDay === 3 ? 'd3' : 'd5';
+      const tLabel = `T${tDay}`;
 
       return `<div class="opc" style="border-color:${borderCol};margin-bottom:12px">
         <!-- Header row -->
@@ -2185,8 +2260,9 @@ function renderDash() {
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
             <span style="font-size:17px;font-weight:800">${t.ticker}</span>
             <span class="b ${t.type==='LONG'?'b-long':'b-short'}">${t.type}</span>
-            <span class="db d${Math.min(5,day)}">Д${day}</span>
+            <span class="db ${tColor}">${tLabel}</span>
             <span style="font-family:var(--mono);font-size:9px;color:var(--t2)">${t.entryDate||''}</span>
+            ${tDay >= 4 ? '<span style="font-family:var(--mono);font-size:9px;color:var(--acc2);font-weight:700;background:rgba(255,107,138,.15);padding:2px 6px;border-radius:4px">⚠ ВЫХОД СЕГОДНЯ</span>' : ''}
           </div>
           <button class="btn btn-g btn-s" onclick="openTrade('${t.id}')">✏ ОБНОВИТЬ</button>
         </div>
@@ -2240,7 +2316,11 @@ function renderDash() {
   const rec = tr.slice(0,8);
   if(!rec.length){ rb.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--t2);padding:36px">Сделок нет</td></tr>'; return; }
   rb.innerHTML = rec.map(t => {
-    const day = (t.status==='OPEN' || t.status==='PARTIAL') ? tradingDay(t.entryDate) : '—';
+    // T-day logic
+    const tDay = (t.status==='OPEN' || t.status==='PARTIAL') ? getTradingDayNumber(t.entryDate) : null;
+    const tLabel = tDay !== null ? `T${tDay}` : '—';
+    const tColor = tDay === null ? '' : tDay <= 2 ? 'd1' : tDay === 3 ? 'd3' : 'd5';
+    
     // P&L: процент + абсолютное значение
     let pnl = '—';
     if (t.pnlPct !== undefined) {
@@ -2266,7 +2346,7 @@ function renderDash() {
       <td><span class="b ${t.type==='LONG'?'b-long':'b-short'}">${t.type}</span></td>
       <td>$${t.entry||'—'}</td><td>${t.exitPrice?'$'+t.exitPrice:'—'}</td>
       <td>${pnl}</td>
-      <td>${(t.status==='OPEN' || t.status==='PARTIAL')?`<span class="db d${Math.min(5,day)}">${day}</span>`:'—'}</td>
+      <td>${tDay !== null ? `<span class="db ${tColor}">${tLabel}</span>` : '—'}</td>
       <td>${stBadge}</td>
     </tr>`;
   }).join('');
@@ -2503,33 +2583,37 @@ function getRsiColor(val) {
 }
 
 function computeSignal(w, scan) {
-  // scan = { rsi7, rsi7prev, rsi14 }
+  // T0 = сегодня (день входа если сигнал)
+  // T-1 = вчера (предыдущий торговый день)
+  // scan = { rsi7: T0 value, rsi7prev: T-1 value, rsi14: T0 value }
   const { rsi7, rsi7prev, rsi14 } = scan;
   if (rsi7 === '' || rsi14 === '') return 'none';
 
-  const r7  = parseFloat(rsi7);
-  const r7p = parseFloat(rsi7prev);
-  const r14 = parseFloat(rsi14);
+  const r7  = parseFloat(rsi7);     // RSI(7) на T0
+  const r7p = parseFloat(rsi7prev); // RSI(7) на T-1
+  const r14 = parseFloat(rsi14);    // RSI(14) на T0
   if (isNaN(r7) || isNaN(r14)) return 'none';
 
-  // LONG: RSI7 crossed above 20 (prev <20, now >20) AND RSI14 < 40
+  // LONG SIGNAL: RSI(7) пересёк 20 снизу вверх (T-1 < 20, T0 > 20) И RSI(14) < 40
+  // → Открываем позицию СЕГОДНЯ (T0)
   if (!isNaN(r7p) && r7p < 20 && r7 > 20 && r14 < 40) return 'LONG_SIGNAL';
 
-  // SHORT: RSI7 crossed below 80 (prev >80, now <80) AND RSI14 > 60
+  // SHORT SIGNAL: RSI(7) пересёк 80 сверху вниз (T-1 > 80, T0 < 80) И RSI(14) > 60
+  // → Открываем позицию СЕГОДНЯ (T0)
   if (!isNaN(r7p) && r7p > 80 && r7 < 80 && r14 > 60) return 'SHORT_SIGNAL';
 
-  // WATCH LONG: RSI7 < 25 (approaching signal)
+  // WATCH LONG: RSI(7) < 25 — приближается к зоне сигнала
   if (r7 < 25) return 'WATCH_LONG';
 
-  // WATCH SHORT: RSI7 > 75 (approaching signal)
+  // WATCH SHORT: RSI(7) > 75 — приближается к зоне сигнала
   if (r7 > 75) return 'WATCH_SHORT';
 
   return 'none';
 }
 
 function renderRsiScan() {
-  const td = today();
-  document.getElementById('scanDateLabel').textContent = new Date().toLocaleDateString('ru-RU',{weekday:'short',day:'2-digit',month:'short'});
+  const t0 = today(); // T0 = сегодня
+  document.getElementById('scanDateLabel').textContent = 'T0: ' + new Date().toLocaleDateString('ru-RU',{weekday:'short',day:'2-digit',month:'short'});
 
   const wl = cache.watchlist;
   if (!wl.length) {
@@ -2539,13 +2623,13 @@ function renderRsiScan() {
   }
 
   const scans = cache.rsiScans || {};
-  const todayScan  = scans[td]     || {};
-  const yesterday  = getPrevDate(td);
-  const yesterScan = scans[yesterday] || {};
+  const t0Scan = scans[t0] || {};           // T0 = сегодня
+  const tMinus1 = getPrevDate(t0);          // T-1 = вчера
+  const tMinus1Scan = scans[tMinus1] || {};
 
-  // Build last 5 trading days (excluding today)
+  // Build last 5 trading days history (T-1 to T-5)
   const histDates = [];
-  let d = td;
+  let d = t0;
   for (let i = 0; i < 5; i++) { d = getPrevDate(d); histDates.push(d); }
 
   document.getElementById('rsiScanTbody').innerHTML = wl.map(w => {
@@ -2553,16 +2637,16 @@ function renderRsiScan() {
     const cdBool = isCooldown(w);
     const inactive = boBool || cdBool;
 
-    const r7cur  = todayScan[w.ticker + '_r7']  ?? '';
-    const r14cur = todayScan[w.ticker + '_r14'] ?? '';
-    const r7prev = yesterScan[w.ticker + '_r7'] ?? '';
+    const r7cur  = t0Scan[w.ticker + '_r7']  ?? '';      // RSI(7) на T0
+    const r14cur = t0Scan[w.ticker + '_r14'] ?? '';      // RSI(14) на T0
+    const r7prev = tMinus1Scan[w.ticker + '_r7'] ?? '';  // RSI(7) на T-1
 
     const sig = inactive ? 'blocked' : computeSignal(w, { rsi7: r7cur, rsi7prev: r7prev, rsi14: r14cur });
 
     let sigHtml;
     switch(sig) {
-      case 'LONG_SIGNAL':  sigHtml = '<span class="sig-long">🟢 ЛОНГ СИГНАЛ</span>'; break;
-      case 'SHORT_SIGNAL': sigHtml = '<span class="sig-short">🔴 ШОРТ СИГНАЛ</span>'; break;
+      case 'LONG_SIGNAL':  sigHtml = '<span class="sig-long">🟢 ЛОНГ → ВХОД T0</span>'; break;
+      case 'SHORT_SIGNAL': sigHtml = '<span class="sig-short">🔴 ШОРТ → ВХОД T0</span>'; break;
       case 'WATCH_LONG':   sigHtml = '<span class="sig-watch">👀 СЛЕДИМ ЛОНГ</span>'; break;
       case 'WATCH_SHORT':  sigHtml = '<span class="sig-watch">👀 СЛЕДИМ ШОРТ</span>'; break;
       case 'blocked':      sigHtml = `<span class="sig-none">${boBool ? '🚫 БЛЭКАУТ' : '⏳ КУЛДАУН'}</span>`; break;
@@ -2639,10 +2723,10 @@ function renderRsiScan() {
 }
 
 function updateRsiScan(ticker, field, value) {
-  const td = today();
+  const t0 = today(); // T0 = сегодня
   if (!cache.rsiScans) cache.rsiScans = {};
-  if (!cache.rsiScans[td]) cache.rsiScans[td] = {};
-  cache.rsiScans[td][ticker + '_' + field] = value === '' ? '' : parseFloat(value);
+  if (!cache.rsiScans[t0]) cache.rsiScans[t0] = {};
+  cache.rsiScans[t0][ticker + '_' + field] = value === '' ? '' : parseFloat(value);
   // Update signal cell in this row live
   const rows = document.querySelectorAll('#rsiScanTbody tr');
   const wl = cache.watchlist;
@@ -2651,13 +2735,13 @@ function updateRsiScan(ticker, field, value) {
     if (wl[i].ticker !== ticker && !row.querySelector(`[onchange*="'${ticker}'"]`)) return;
     // find by ticker in first cell
     if (row.cells[0]?.textContent?.trim() !== ticker) return;
-    const scans     = cache.rsiScans || {};
-    const todayScan = scans[td] || {};
-    const yesterday = getPrevDate(td);
-    const yesterScan= scans[yesterday] || {};
-    const r7cur  = todayScan[ticker + '_r7']  ?? '';
-    const r7prev = yesterScan[ticker + '_r7'] ?? '';
-    const r14cur = todayScan[ticker + '_r14'] ?? '';
+    const scans = cache.rsiScans || {};
+    const t0Scan = scans[t0] || {};
+    const tMinus1 = getPrevDate(t0);
+    const tMinus1Scan = scans[tMinus1] || {};
+    const r7cur  = t0Scan[ticker + '_r7']  ?? '';
+    const r7prev = tMinus1Scan[ticker + '_r7'] ?? '';
+    const r14cur = t0Scan[ticker + '_r14'] ?? '';
     const sig = computeSignal(wl[i], { rsi7: r7cur, rsi7prev: r7prev, rsi14: r14cur });
     // Update signal cell (index 5)
     const sigCell = row.cells[5];
