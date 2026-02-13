@@ -1,6 +1,26 @@
 {
   "trades": [
     {
+      "id": "1770993844517",
+      "createdAt": 1770993844517,
+      "ticker": "DOV",
+      "type": "SHORT",
+      "entryDate": "2026-02-13",
+      "entry": 228.84,
+      "shares": 4,
+      "stop": "237.99",
+      "target1": "219.69",
+      "target2": "210.53",
+      "rsi7": "72.87",
+      "rsi14": "75.89",
+      "spyRsi": "43.3",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "commission": 0,
+      "notes": ""
+    },
+    {
       "id": "1770993435675",
       "createdAt": 1770993435675,
       "ticker": "CARR",
