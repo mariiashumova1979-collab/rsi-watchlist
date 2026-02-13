@@ -4,28 +4,28 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RSI Swing Journal</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;0,9..40,800;1,9..40,300&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg:    #070710;
-  --bg2:   #0e0e1c;
-  --bg3:   #151525;
-  --bg4:   #1c1c30;
-  --line:  #232338;
+  --bg:    #0a0a12;
+  --bg2:   #12121e;
+  --bg3:   #1a1a2a;
+  --bg4:   #222236;
+  --line:  #2a2a42;
   --acc:   #7ee8a2;
   --acc2:  #ff6b8a;
   --acc3:  #ffc85a;
   --acc4:  #5b9cf6;
   --acc5:  #c084fc;
-  --text:  #eeeef8;
-  --t2:    #7777a0;
-  --t3:    #3a3a58;
-  --mono:  'IBM Plex Mono', monospace;
-  --sans:  'DM Sans', sans-serif;
+  --text:  #f0f0f8;
+  --t2:    #9090b0;
+  --t3:    #505070;
+  --mono:  'JetBrains Mono', monospace;
+  --sans:  'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;font-size:14px;line-height:1.5}
 
 /* NOISE TEXTURE */
 body::after{
@@ -492,7 +492,7 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
   </div>
   <div class="fb">
     <select id="fType" onchange="renderTrades()"><option value="">Все типы</option><option>LONG</option><option>SHORT</option></select>
-    <select id="fStatus" onchange="renderTrades()"><option value="">Все статусы</option><option value="OPEN">Открытые</option><option value="CLOSED">Закрытые</option></select>
+    <select id="fStatus" onchange="renderTrades()"><option value="">Все статусы</option><option value="OPEN">Открытые</option><option value="PARTIAL">Частичн. выход</option><option value="CLOSED">Закрытые</option></select>
     <select id="fResult" onchange="renderTrades()"><option value="">Результат</option><option value="WIN">Выигрыш</option><option value="LOSS">Убыток</option></select>
     <input id="fTicker" placeholder="Тикер..." oninput="renderTrades()" style="max-width:120px">
   </div>
@@ -810,13 +810,66 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
       <div class="fg"><label>RSI(7)</label><input type="number" id="te_r7" step=".1" placeholder="18.5"></div>
       <div class="fg"><label>RSI(14)</label><input type="number" id="te_r14" step=".1" placeholder="32.0"></div>
       <div class="fg"><label>SPY RSI(14)</label><input type="number" id="te_spy" step=".1" placeholder="52.0"></div>
-      <div class="fg"><label>Статус</label><select id="te_sta" onchange="toggleExitFields()"><option value="OPEN">Открыта</option><option value="CLOSED">Закрыта</option></select></div>
+      <div class="fg"><label>Статус</label><select id="te_sta" onchange="toggleExitFields()"><option value="OPEN">Открыта</option><option value="PARTIAL">Частичный выход</option><option value="CLOSED">Закрыта</option></select></div>
+    </div>
+
+    <!-- PARTIAL EXIT FIELDS (shown only when PARTIAL) -->
+    <div id="te_partial_section" style="display:none">
+      <hr style="margin:14px 0">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--acc);letter-spacing:1.5px;text-transform:uppercase">🎯 ЧАСТИЧНЫЙ ВЫХОД (TARGET 1)</div>
+      </div>
+      <div style="background:rgba(126,232,162,.08);border:1px solid var(--acc);border-radius:8px;padding:12px;margin-bottom:14px">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--acc);line-height:1.7">
+          ⚠️ <b>ВАЖНО:</b> После частичного выхода переставьте стоп на цену входа (breakeven)!
+        </div>
+      </div>
+      <div class="fgrid">
+        <div class="fg">
+          <label>Дата частичного выхода</label>
+          <input type="date" id="te_p_date">
+        </div>
+        <div class="fg">
+          <label>Цена выхода ($)</label>
+          <input type="number" id="te_p_price" step=".01" placeholder="0.00" oninput="calcPartialPnl()">
+        </div>
+        <div class="fg">
+          <label>Закрыто акций (50%)</label>
+          <input type="number" id="te_p_shares" placeholder="0" oninput="calcPartialPnl()">
+        </div>
+        <div class="fg">
+          <label>Комиссия ($)</label>
+          <input type="number" id="te_p_comm" step=".01" placeholder="0.00" oninput="calcPartialPnl()">
+        </div>
+      </div>
+      <div id="partial_pnl_preview" style="display:none;background:var(--bg3);border:1px solid var(--line);border-radius:8px;padding:12px;margin-top:10px">
+        <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:center">
+          <div>
+            <div style="font-family:var(--mono);font-size:9px;color:var(--t2);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px">P&L частичного</div>
+            <div id="partial_pnl_value" style="font-family:var(--mono);font-size:16px;font-weight:700">—</div>
+          </div>
+          <div>
+            <div style="font-family:var(--mono);font-size:9px;color:var(--t2);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px">Остаток акций</div>
+            <div id="partial_remaining" style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--text)">—</div>
+          </div>
+          <div>
+            <div style="font-family:var(--mono);font-size:9px;color:var(--t2);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px">Новый стоп</div>
+            <div id="partial_new_stop" style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--acc3)">→ BREAKEVEN</div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:10px">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+          <input type="checkbox" id="te_p_be" style="width:16px;height:16px;accent-color:var(--acc)">
+          <span style="font-family:var(--mono);font-size:11px;color:var(--text)">✓ Стоп переставлен на breakeven</span>
+        </label>
+      </div>
     </div>
 
     <!-- EXIT FIELDS (shown only when CLOSED) -->
     <div id="te_exit_section" style="display:none">
       <hr style="margin:14px 0">
-      <div style="font-family:var(--mono);font-size:9px;color:var(--acc2);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px">ДАННЫЕ ВЫХОДА</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--acc2);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px">ДАННЫЕ ВЫХОДА</div>
       <div class="fgrid">
         <div class="fg"><label>Цена выхода ($)</label><input type="number" id="te_ex" step=".01" placeholder="0.00" oninput="tradeAutoCalc()"></div>
         <div class="fg"><label>Комиссии ($) <span style="color:var(--t3);font-size:9px">вход+выход</span></label><input type="number" id="te_comm" step=".01" placeholder="0.00" oninput="tradeAutoCalc()"></div>
@@ -826,6 +879,7 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
             <option value="TARGET1">Цель 1 (+4%)</option>
             <option value="TARGET2">Цель 2 (+8%)</option>
             <option value="STOP">Стоп-лосс (−4%)</option>
+            <option value="BREAKEVEN">Breakeven (после частичн.)</option>
             <option value="TIME">День 5 (время)</option>
             <option value="RSI">RSI сигнал</option>
             <option value="REGIME">Смена режима</option>
@@ -835,6 +889,11 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
           <label>P&L</label>
           <div id="pnl_preview" style="padding:9px 13px;border-radius:8px;font-family:var(--mono);font-size:14px;font-weight:800;background:var(--bg3);border:1px solid var(--line)">—</div>
         </div>
+      </div>
+      <!-- Show partial exit summary if exists -->
+      <div id="te_partial_summary" style="display:none;background:rgba(126,232,162,.05);border:1px solid var(--line);border-radius:8px;padding:12px;margin-top:12px">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--acc);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">РАНЕЕ: ЧАСТИЧНЫЙ ВЫХОД</div>
+        <div id="te_partial_summary_content" style="font-family:var(--mono);font-size:11px;color:var(--t2)"></div>
       </div>
     </div>
 
@@ -1646,9 +1705,76 @@ function resetShares() {
 }
 
 function toggleExitFields() {
-  const closed = document.getElementById('te_sta').value === 'CLOSED';
-  document.getElementById('te_exit_section').style.display = closed ? '' : 'none';
-  if (closed) tradeAutoCalc();
+  const status = document.getElementById('te_sta').value;
+  const partialSection = document.getElementById('te_partial_section');
+  const exitSection = document.getElementById('te_exit_section');
+  const partialSummary = document.getElementById('te_partial_summary');
+  
+  // Hide all first
+  partialSection.style.display = 'none';
+  exitSection.style.display = 'none';
+  
+  if (status === 'PARTIAL') {
+    partialSection.style.display = '';
+    // Auto-fill 50% shares if we have total shares
+    const totalShares = parseInt(document.getElementById('te_sh').value) || 0;
+    const partialSharesEl = document.getElementById('te_p_shares');
+    if (totalShares && !partialSharesEl.value) {
+      partialSharesEl.value = Math.floor(totalShares / 2);
+    }
+    // Auto-fill date
+    const partialDateEl = document.getElementById('te_p_date');
+    if (!partialDateEl.value) {
+      partialDateEl.value = today();
+    }
+    calcPartialPnl();
+  } else if (status === 'CLOSED') {
+    exitSection.style.display = '';
+    // Show partial summary if exists
+    const entry = parseFloat(document.getElementById('te_en').value) || 0;
+    const partialPrice = parseFloat(document.getElementById('te_p_price').value) || 0;
+    const partialShares = parseInt(document.getElementById('te_p_shares').value) || 0;
+    if (partialPrice && partialShares && entry) {
+      const type = document.getElementById('te_tp').value;
+      const dir = type === 'LONG' ? 1 : -1;
+      const partialPnl = dir * (partialPrice - entry) * partialShares;
+      const partialPct = (dir * (partialPrice - entry) / entry * 100).toFixed(2);
+      partialSummary.style.display = '';
+      document.getElementById('te_partial_summary_content').innerHTML = 
+        `${partialShares} акций по $${partialPrice.toFixed(2)} = <span class="${partialPnl>=0?'g':'r'}">${partialPnl>=0?'+':''}$${partialPnl.toFixed(0)} (${partialPct}%)</span>`;
+    } else {
+      partialSummary.style.display = 'none';
+    }
+    tradeAutoCalc();
+  }
+}
+
+function calcPartialPnl() {
+  const entry = parseFloat(document.getElementById('te_en').value) || 0;
+  const type = document.getElementById('te_tp').value;
+  const totalShares = parseInt(document.getElementById('te_sh').value) || 0;
+  const partialPrice = parseFloat(document.getElementById('te_p_price').value) || 0;
+  const partialShares = parseInt(document.getElementById('te_p_shares').value) || 0;
+  const partialComm = parseFloat(document.getElementById('te_p_comm').value) || 0;
+  
+  const preview = document.getElementById('partial_pnl_preview');
+  
+  if (!entry || !partialPrice || !partialShares) {
+    preview.style.display = 'none';
+    return;
+  }
+  
+  const dir = type === 'LONG' ? 1 : -1;
+  const grossPnl = dir * (partialPrice - entry) * partialShares;
+  const netPnl = grossPnl - partialComm;
+  const pnlPct = (netPnl / (entry * partialShares) * 100).toFixed(2);
+  const remaining = totalShares - partialShares;
+  
+  preview.style.display = '';
+  document.getElementById('partial_pnl_value').innerHTML = 
+    `<span class="${netPnl>=0?'g':'r'}">${netPnl>=0?'+':''}$${netPnl.toFixed(0)} (${pnlPct}%)</span>`;
+  document.getElementById('partial_remaining').textContent = `${remaining} акций`;
+  document.getElementById('partial_new_stop').innerHTML = `$${entry.toFixed(2)} <span style="color:var(--t2);font-size:10px">(breakeven)</span>`;
 }
 
 function tradeAutoCalc() {
@@ -1730,6 +1856,13 @@ function openTrade(id=null) {
   document.getElementById('moTradeTitle').textContent = id ? 'Редактировать сделку' : 'Новая сделка';
   document.getElementById('te_id').value = id || '';
 
+  // Reset partial exit fields
+  ['p_date','p_price','p_shares','p_comm'].forEach(f => {
+    const el = document.getElementById('te_'+f); if(el) el.value = '';
+  });
+  const beCheckbox = document.getElementById('te_p_be');
+  if (beCheckbox) beCheckbox.checked = false;
+
   if (id) {
     const t = cache.trades.find(x => x.id === id);
     if (t) {
@@ -1737,6 +1870,14 @@ function openTrade(id=null) {
       Object.entries(map).forEach(([elId,key]) => {
         const el = document.getElementById('te_'+elId); if(el) el.value = t[key] || '';
       });
+      // Load partial exit data
+      if (t.partialExit) {
+        document.getElementById('te_p_date').value = t.partialExit.date || '';
+        document.getElementById('te_p_price').value = t.partialExit.price || '';
+        document.getElementById('te_p_shares').value = t.partialExit.shares || '';
+        document.getElementById('te_p_comm').value = t.partialExit.commission || '';
+        if (beCheckbox) beCheckbox.checked = t.partialExit.breakevenSet || false;
+      }
       // Mark existing prices as manually set (don't overwrite)
       if (t.stop)    manualFields.add('st');
       if (t.target1) manualFields.add('t1');
@@ -1771,16 +1912,60 @@ async function saveTrade() {
   t.exitPrice  = parseFloat(t.exitPrice)  || 0;
   t.shares     = parseInt(t.shares)       || 0;
   t.commission = parseFloat(t.commission) || 0;
-  if(t.exitPrice && t.entry) {
-    const grossPnl = t.type==='LONG'
-      ? (t.exitPrice - t.entry) * t.shares
-      : (t.entry - t.exitPrice) * t.shares;
-    const netPnl = grossPnl - t.commission;
-    const basis  = t.entry * t.shares || 1;
-    t.pnlPct  = parseFloat((netPnl / basis * 100).toFixed(2));
-    t.pnlNet  = parseFloat(netPnl.toFixed(2));
-    t.result  = netPnl >= 0 ? 'WIN' : 'LOSS';
+  
+  // Save partial exit data
+  const partialPrice = parseFloat(document.getElementById('te_p_price').value) || 0;
+  const partialShares = parseInt(document.getElementById('te_p_shares').value) || 0;
+  const partialComm = parseFloat(document.getElementById('te_p_comm').value) || 0;
+  const partialDate = document.getElementById('te_p_date').value;
+  const breakevenSet = document.getElementById('te_p_be')?.checked || false;
+  
+  if (partialPrice && partialShares) {
+    t.partialExit = {
+      date: partialDate,
+      price: partialPrice,
+      shares: partialShares,
+      commission: partialComm,
+      breakevenSet: breakevenSet
+    };
   }
+  
+  // Calculate P&L based on status
+  const dir = t.type === 'LONG' ? 1 : -1;
+  
+  if (t.status === 'PARTIAL' && t.partialExit) {
+    // Only partial exit P&L
+    const grossPnl = dir * (t.partialExit.price - t.entry) * t.partialExit.shares;
+    const netPnl = grossPnl - t.partialExit.commission;
+    t.partialExit.pnlNet = parseFloat(netPnl.toFixed(2));
+    t.partialExit.pnlPct = parseFloat((netPnl / (t.entry * t.partialExit.shares) * 100).toFixed(2));
+    // Position still open, no final result yet
+    delete t.pnlPct;
+    delete t.pnlNet;
+    delete t.result;
+  } else if (t.status === 'CLOSED' && t.exitPrice && t.entry) {
+    // Full exit - calculate remaining shares after partial
+    const remainingShares = t.partialExit ? (t.shares - t.partialExit.shares) : t.shares;
+    
+    // P&L from final exit
+    const finalGrossPnl = dir * (t.exitPrice - t.entry) * remainingShares;
+    const finalNetPnl = finalGrossPnl - t.commission;
+    
+    // Combined P&L if partial exit exists
+    if (t.partialExit && t.partialExit.pnlNet !== undefined) {
+      const totalNetPnl = t.partialExit.pnlNet + finalNetPnl;
+      const totalBasis = t.entry * t.shares;
+      t.pnlNet = parseFloat(totalNetPnl.toFixed(2));
+      t.pnlPct = parseFloat((totalNetPnl / totalBasis * 100).toFixed(2));
+    } else {
+      // No partial exit
+      const basis = t.entry * t.shares || 1;
+      t.pnlNet = parseFloat(finalNetPnl.toFixed(2));
+      t.pnlPct = parseFloat((finalNetPnl / basis * 100).toFixed(2));
+    }
+    t.result = t.pnlNet >= 0 ? 'WIN' : 'LOSS';
+  }
+  
   if(id) { const i=cache.trades.findIndex(x=>x.id===id); if(i>=0) cache.trades[i]=t; else cache.trades.unshift(t); }
   else cache.trades.unshift(t);
   scheduleSave(); const ok = true;
@@ -1820,19 +2005,32 @@ function renderTrades() {
   const tb = document.getElementById('tradesTb');
   if(!fl.length){ tb.innerHTML='<tr><td colspan="14" style="text-align:center;color:var(--t2);padding:36px">Сделок нет</td></tr>'; return; }
   tb.innerHTML = fl.map(t => {
-    const day = t.status==='OPEN' ? tradingDay(t.entryDate) : '—';
-    const db = t.status==='OPEN' ? `<span class="db d${Math.min(5,day)}">${day}</span>` : '—';
+    const day = (t.status==='OPEN' || t.status==='PARTIAL') ? tradingDay(t.entryDate) : '—';
+    const db = (t.status==='OPEN' || t.status==='PARTIAL') ? `<span class="db d${Math.min(5,day)}">${day}</span>` : '—';
     // P&L: процент + абсолютное значение
     let pnl = '<span style="color:var(--t2)">—</span>';
     if (t.pnlPct !== undefined) {
       const pctStr = `${t.pnlPct>0?'+':''}${t.pnlPct}%`;
       const netStr = t.pnlNet !== undefined ? `<span style="font-size:9px;color:var(--t2)"> ($${t.pnlNet>0?'+':''}${t.pnlNet.toFixed(0)})</span>` : '';
       pnl = `<span class="${t.pnlPct>=0?'g':'r'}">${pctStr}</span>${netStr}`;
+    } else if (t.status === 'PARTIAL' && t.partialExit?.pnlNet !== undefined) {
+      // Show partial P&L for PARTIAL status
+      const pctStr = `${t.partialExit.pnlPct>0?'+':''}${t.partialExit.pnlPct}%`;
+      const netStr = `<span style="font-size:9px;color:var(--t2)"> ($${t.partialExit.pnlNet>0?'+':''}${t.partialExit.pnlNet.toFixed(0)})</span>`;
+      pnl = `<span class="${t.partialExit.pnlPct>=0?'g':'r'}">${pctStr}</span>${netStr}<div style="font-size:8px;color:var(--acc3);margin-top:2px">50% закрыто</div>`;
     }
-    const stBadge = t.status==='OPEN' ? '<span class="b b-open">ОТКРЫТА</span>' : t.result==='WIN' ? '<span class="b b-win">ВЫИГРЫШ</span>' : '<span class="b b-loss">УБЫТОК</span>';
+    // Status badge
+    let stBadge;
+    if (t.status === 'OPEN') {
+      stBadge = '<span class="b b-open">ОТКРЫТА</span>';
+    } else if (t.status === 'PARTIAL') {
+      stBadge = '<span class="b b-warn">ЧАСТИЧН.</span>';
+    } else {
+      stBadge = t.result === 'WIN' ? '<span class="b b-win">ВЫИГРЫШ</span>' : '<span class="b b-loss">УБЫТОК</span>';
+    }
     return `<tr>
       <td>${t.entryDate||'—'}</td>
-      <td style="font-weight:800">${t.ticker}</td>
+      <td style="font-weight:700">${t.ticker}</td>
       <td><span class="b ${t.type==='LONG'?'b-long':'b-short'}">${t.type}</span></td>
       <td>$${t.entry||'—'}</td><td class="r">$${t.stop||'—'}</td>
       <td class="g">$${t.target1||'—'}</td><td class="g">$${t.target2||'—'}</td>
@@ -1852,7 +2050,7 @@ function renderTrades() {
 function renderDash() {
   const tr = cache.trades;
   const cl = tr.filter(t=>t.status==='CLOSED'&&t.pnlPct!==undefined);
-  const op = tr.filter(t=>t.status==='OPEN');
+  const op = tr.filter(t=>t.status==='OPEN' || t.status==='PARTIAL');
   const wins = cl.filter(t=>t.result==='WIN');
   const loss = cl.filter(t=>t.result==='LOSS');
   const wr = cl.length ? ((wins.length/cl.length)*100).toFixed(1) : 0;
@@ -2042,15 +2240,34 @@ function renderDash() {
   const rec = tr.slice(0,8);
   if(!rec.length){ rb.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--t2);padding:36px">Сделок нет</td></tr>'; return; }
   rb.innerHTML = rec.map(t => {
-    const day = t.status==='OPEN'?tradingDay(t.entryDate):'—';
-    const pnl = t.pnlPct!==undefined?`<span class="${t.pnlPct>=0?'g':'r'}">${t.pnlPct>0?'+':''}${t.pnlPct}%</span>`:'—';
+    const day = (t.status==='OPEN' || t.status==='PARTIAL') ? tradingDay(t.entryDate) : '—';
+    // P&L: процент + абсолютное значение
+    let pnl = '—';
+    if (t.pnlPct !== undefined) {
+      const pctStr = `${t.pnlPct>0?'+':''}${t.pnlPct}%`;
+      const netStr = t.pnlNet !== undefined ? `<div style="font-size:10px;color:var(--t2);margin-top:1px">$${t.pnlNet>0?'+':''}${t.pnlNet.toFixed(0)}</div>` : '';
+      pnl = `<span class="${t.pnlPct>=0?'g':'r'}">${pctStr}</span>${netStr}`;
+    } else if (t.status === 'PARTIAL' && t.partialExit?.pnlNet !== undefined) {
+      const pctStr = `${t.partialExit.pnlPct>0?'+':''}${t.partialExit.pnlPct}%`;
+      const netStr = `<div style="font-size:10px;color:var(--t2);margin-top:1px">$${t.partialExit.pnlNet>0?'+':''}${t.partialExit.pnlNet.toFixed(0)}</div>`;
+      pnl = `<span class="${t.partialExit.pnlPct>=0?'g':'r'}">${pctStr}</span>${netStr}<div style="font-size:8px;color:var(--acc3)">50%</div>`;
+    }
+    // Status badge
+    let stBadge;
+    if (t.status === 'OPEN') {
+      stBadge = '<span class="b b-open">ОТКРЫТА</span>';
+    } else if (t.status === 'PARTIAL') {
+      stBadge = '<span class="b b-warn">ЧАСТИЧН.</span>';
+    } else {
+      stBadge = t.result === 'WIN' ? '<span class="b b-win">ВЫИГРЫШ</span>' : '<span class="b b-loss">УБЫТОК</span>';
+    }
     return `<tr>
-      <td>${t.entryDate||'—'}</td><td style="font-weight:800">${t.ticker}</td>
+      <td>${t.entryDate||'—'}</td><td style="font-weight:700">${t.ticker}</td>
       <td><span class="b ${t.type==='LONG'?'b-long':'b-short'}">${t.type}</span></td>
       <td>$${t.entry||'—'}</td><td>${t.exitPrice?'$'+t.exitPrice:'—'}</td>
       <td>${pnl}</td>
-      <td>${t.status==='OPEN'?`<span class="db d${Math.min(5,day)}">${day}</span>`:'—'}</td>
-      <td>${t.status==='OPEN'?'<span class="b b-open">ОТКРЫТА</span>':t.result==='WIN'?'<span class="b b-win">ВЫИГРЫШ</span>':'<span class="b b-loss">УБЫТОК</span>'}</td>
+      <td>${(t.status==='OPEN' || t.status==='PARTIAL')?`<span class="db d${Math.min(5,day)}">${day}</span>`:'—'}</td>
+      <td>${stBadge}</td>
     </tr>`;
   }).join('');
 }
