@@ -241,6 +241,7 @@ tr:hover td{background:rgba(126,232,162,.02)}
 .wi:hover{border-color:rgba(126,232,162,.4)}
 .wi.bo{opacity:.55;border-color:rgba(255,107,138,.4)}
 .wi.cd{border-color:rgba(255,200,90,.3)}
+.wi.op{border-color:var(--acc4);background:rgba(91,156,246,.08)}
 .wt{font-size:15px;font-weight:800;margin-bottom:3px}
 .wm{font-family:var(--mono);font-size:9px;color:var(--t2);margin-bottom:6px}
 .wr{position:absolute;top:8px;right:8px;background:none;border:none;cursor:pointer;color:var(--t3);font-size:13px;transition:color .2s}
@@ -522,6 +523,7 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
 
   <div class="g4" style="max-width:600px;margin-bottom:22px">
     <div class="stat" style="--sc:var(--acc)"><div class="stat-l">Всего</div><div class="stat-v" id="wlTot">0</div></div>
+    <div class="stat" style="--sc:var(--acc4)"><div class="stat-l">Открыта поз.</div><div class="stat-v bl" id="wlOp">0</div></div>
     <div class="stat" style="--sc:var(--acc2)"><div class="stat-l">Блэкаут</div><div class="stat-v r" id="wlBo">0</div></div>
     <div class="stat" style="--sc:var(--acc3)"><div class="stat-l">Ожидание</div><div class="stat-v y" id="wlCd">0</div></div>
     <div class="stat" style="--sc:var(--acc)"><div class="stat-l">Активных</div><div class="stat-v g" id="wlAct">0</div></div>
@@ -561,6 +563,7 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
     </select>
     <select id="wlStat" onchange="renderWL()">
       <option value="">Все статусы</option>
+      <option value="position">Открыта позиция</option>
       <option value="active">Активные</option>
       <option value="blackout">Блэкаут</option>
       <option value="cooldown">Ожидание</option>
@@ -2505,22 +2508,32 @@ function renderWL() {
   const sect = document.getElementById('wlSect')?.value   || '';
   const stat = document.getElementById('wlStat')?.value   || '';
 
+  // Get tickers with open positions
+  const openPositionTickers = new Set(
+    cache.trades
+      .filter(t => t.status === 'OPEN' || t.status === 'PARTIAL')
+      .map(t => t.ticker.toUpperCase())
+  );
+
   // Count stats on full list before filtering
-  let bo = 0, cd = 0;
+  let bo = 0, cd = 0, op = 0;
   wl.forEach(w => {
-    if (isBlackout(w))       bo++;
+    if (openPositionTickers.has(w.ticker.toUpperCase())) op++;
+    else if (isBlackout(w))  bo++;
     else if (isCooldown(w))  cd++;
   });
 
   document.getElementById('wlTot').textContent = wl.length;
+  document.getElementById('wlOp').textContent  = op;
   document.getElementById('wlBo').textContent  = bo;
   document.getElementById('wlCd').textContent  = cd;
-  document.getElementById('wlAct').textContent = wl.length - bo - cd;
+  document.getElementById('wlAct').textContent = wl.length - bo - cd - op;
 
   const fl = wl.filter(w => {
+    const hasPosition = openPositionTickers.has(w.ticker.toUpperCase());
     const boBool = isBlackout(w);
     const cdBool = isCooldown(w);
-    const st = boBool ? 'blackout' : cdBool ? 'cooldown' : 'active';
+    const st = hasPosition ? 'position' : boBool ? 'blackout' : cdBool ? 'cooldown' : 'active';
     return (!srch || w.ticker.includes(srch))
         && (!sect || w.sector === sect)
         && (!stat || stat === st);
@@ -2533,11 +2546,23 @@ function renderWL() {
   }
 
   grid.innerHTML = fl.map(w => {
+    const hasPosition = openPositionTickers.has(w.ticker.toUpperCase());
     const boBool = isBlackout(w);
     const cdBool = isCooldown(w);
-    const cls  = boBool ? 'bo' : cdBool ? 'cd' : '';
+    const cls  = hasPosition ? 'op' : boBool ? 'bo' : cdBool ? 'cd' : '';
     let statusText, statusColor;
-    if (boBool) {
+    
+    if (hasPosition) {
+      // Find the open trade to show T-day
+      const trade = cache.trades.find(t => 
+        t.ticker.toUpperCase() === w.ticker.toUpperCase() && 
+        (t.status === 'OPEN' || t.status === 'PARTIAL')
+      );
+      const tDay = trade ? getTradingDayNumber(trade.entryDate) : '?';
+      const isPartial = trade?.status === 'PARTIAL';
+      statusText  = `📈 ОТКРЫТА ПОЗИЦИЯ · T${tDay}${isPartial ? ' · 50% закрыто' : ''}`;
+      statusColor = 'var(--acc4)';
+    } else if (boBool) {
       // Show how many days until earnings
       const ear  = new Date(w.earningsDate);
       const diff = Math.round((ear - new Date(today())) / 86400000);
@@ -2561,7 +2586,7 @@ function renderWL() {
         <button class="wr" style="position:static;font-size:12px" onclick="openWL('${w.ticker}')">✏</button>
         <button class="wr" style="position:static" onclick="delWL('${w.ticker}')">✕</button>
       </div>
-      <div class="wt">${w.ticker}</div>
+      <div class="wt">${w.ticker}${hasPosition ? ' <span style="font-size:10px;color:var(--acc4);font-weight:600">● OPEN</span>' : ''}</div>
       <div class="wm">${w.sector||'—'} · β${w.beta||'—'}${w.cap ? ' · $'+w.cap+'B' : ''}</div>
       <div style="font-family:var(--mono);font-size:9px;color:${statusColor};line-height:1.5">${statusText}</div>
       ${w.notes ? `<div style="font-family:var(--mono);font-size:9px;color:var(--t3);margin-top:4px">${w.notes}</div>` : ''}
@@ -2837,8 +2862,8 @@ function renderDashSignals() {
     const isLong   = sig.includes('LONG');
     const cls      = isSignal ? (isLong ? 'long' : 'short') : 'watch';
 
-    const label = sig === 'LONG_SIGNAL'  ? '🟢 ЛОНГ СИГНАЛ — ВХОД ЗАВТРА'
-                : sig === 'SHORT_SIGNAL' ? '🔴 ШОРТ СИГНАЛ — ВХОД ЗАВТРА'
+    const label = sig === 'LONG_SIGNAL'  ? '🟢 ЛОНГ → ВХОД T0 (сегодня)'
+                : sig === 'SHORT_SIGNAL' ? '🔴 ШОРТ → ВХОД T0 (сегодня)'
                 : sig === 'WATCH_LONG'   ? '👀 НАБЛЮДАЕМ ЛОНГ'
                 :                          '👀 НАБЛЮДАЕМ ШОРТ';
 
@@ -2851,9 +2876,9 @@ function renderDashSignals() {
       <div style="display:flex;gap:14px;font-family:var(--mono);font-size:10px;color:var(--t2)">
         <span>RSI7: <span style="color:${getRsiColor(parseFloat(r7))};font-weight:700">${r7||'—'}</span></span>
         <span>RSI14: <span style="color:${getRsiColor(parseFloat(r14))};font-weight:700">${r14||'—'}</span></span>
-        <span>RSI7вч: <span style="color:var(--text)">${r7prev||'—'}</span></span>
+        <span>RSI7 T-1: <span style="color:var(--text)">${r7prev||'—'}</span></span>
       </div>
-      ${isSignal ? `<button class="btn btn-p btn-s" onclick="openTrade();setTimeout(()=>{document.getElementById('te_tk').value='${w.ticker}';document.getElementById('te_r7').value='${r7}';document.getElementById('te_r14').value='${r14}';},50)">+ СДЕЛКА</button>` : ''}
+      ${isSignal ? `<button class="btn btn-p btn-s" onclick="openTrade();setTimeout(()=>{document.getElementById('te_tk').value='${w.ticker}';document.getElementById('te_r7').value='${r7}';document.getElementById('te_r14').value='${r14}';},50)">+ СДЕЛКА T0</button>` : ''}
     </div>`;
   }).join('');
 }
