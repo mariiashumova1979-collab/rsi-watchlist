@@ -278,6 +278,7 @@ tr:hover td{background:rgba(126,232,162,.02)}
 .sig-long{background:rgba(126,232,162,.2);color:var(--acc);border:1px solid rgba(126,232,162,.4);padding:3px 10px;border-radius:20px;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.5px}
 .sig-short{background:rgba(255,107,138,.2);color:var(--acc2);border:1px solid rgba(255,107,138,.4);padding:3px 10px;border-radius:20px;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.5px}
 .sig-watch{background:rgba(255,200,90,.15);color:var(--acc3);border:1px solid rgba(255,200,90,.3);padding:3px 10px;border-radius:20px;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.5px}
+.sig-position{background:rgba(91,156,246,.2);color:var(--acc4);border:1px solid rgba(91,156,246,.4);padding:3px 10px;border-radius:20px;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.5px}
 .sig-none{color:var(--t3);font-family:var(--mono);font-size:10px}
 
 /* SIGNAL CARD ON DASHBOARD */
@@ -936,6 +937,36 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
 </div>
 
 <div id="toast"></div>
+
+<!-- HISTORICAL RSI MODAL -->
+<div class="mo" id="moHistRsi">
+  <div class="md" style="max-width:380px">
+    <div class="mh">
+      <span>Редактировать RSI</span>
+      <span class="mclose" onclick="closeMo('moHistRsi')">✕</span>
+    </div>
+    <div style="font-family:var(--mono);font-size:12px;color:var(--acc4);margin-bottom:14px">
+      <span id="histRsiTicker" style="font-weight:700"></span> · <span id="histRsiDate"></span>
+    </div>
+    <input type="hidden" id="histRsi_ticker">
+    <input type="hidden" id="histRsi_date">
+    <div class="fgrid">
+      <div class="fg">
+        <label>RSI(7)</label>
+        <input type="number" id="histRsi_r7" min="0" max="100" step="0.1" placeholder="—">
+      </div>
+      <div class="fg">
+        <label>RSI(14)</label>
+        <input type="number" id="histRsi_r14" min="0" max="100" step="0.1" placeholder="—">
+      </div>
+    </div>
+    <div class="ar" style="margin-top:14px">
+      <button class="btn btn-p" onclick="saveHistRsi()">СОХРАНИТЬ</button>
+      <button class="btn btn-d btn-s" onclick="clearHistRsi()">ОЧИСТИТЬ</button>
+      <button class="btn btn-g" onclick="closeMo('moHistRsi')">ОТМЕНА</button>
+    </div>
+  </div>
+</div>
 
 <script>
 // ═══════════════════════════════════════════════════════════
@@ -2657,16 +2688,24 @@ function renderRsiScan() {
   let d = t0;
   for (let i = 0; i < 5; i++) { d = getPrevDate(d); histDates.push(d); }
 
+  // Get tickers with open positions
+  const openPositionTickers = new Set(
+    cache.trades
+      .filter(t => t.status === 'OPEN' || t.status === 'PARTIAL')
+      .map(t => t.ticker.toUpperCase())
+  );
+
   document.getElementById('rsiScanTbody').innerHTML = wl.map(w => {
     const boBool = isBlackout(w);
     const cdBool = isCooldown(w);
+    const hasPosition = openPositionTickers.has(w.ticker.toUpperCase());
     const inactive = boBool || cdBool;
 
     const r7cur  = t0Scan[w.ticker + '_r7']  ?? '';      // RSI(7) на T0
     const r14cur = t0Scan[w.ticker + '_r14'] ?? '';      // RSI(14) на T0
     const r7prev = tMinus1Scan[w.ticker + '_r7'] ?? '';  // RSI(7) на T-1
 
-    const sig = inactive ? 'blocked' : computeSignal(w, { rsi7: r7cur, rsi7prev: r7prev, rsi14: r14cur });
+    const sig = inactive ? 'blocked' : hasPosition ? 'position' : computeSignal(w, { rsi7: r7cur, rsi7prev: r7prev, rsi14: r14cur });
 
     let sigHtml;
     switch(sig) {
@@ -2675,21 +2714,28 @@ function renderRsiScan() {
       case 'WATCH_LONG':   sigHtml = '<span class="sig-watch">👀 СЛЕДИМ ЛОНГ</span>'; break;
       case 'WATCH_SHORT':  sigHtml = '<span class="sig-watch">👀 СЛЕДИМ ШОРТ</span>'; break;
       case 'blocked':      sigHtml = `<span class="sig-none">${boBool ? '🚫 БЛЭКАУТ' : '⏳ КУЛДАУН'}</span>`; break;
+      case 'position':     
+        const trade = cache.trades.find(t => t.ticker.toUpperCase() === w.ticker.toUpperCase() && (t.status === 'OPEN' || t.status === 'PARTIAL'));
+        const tDay = trade ? getTradingDayNumber(trade.entryDate) : '?';
+        sigHtml = `<span class="sig-position">📈 ПОЗИЦИЯ T${tDay}</span>`; 
+        break;
       default:             sigHtml = '<span class="sig-none">—</span>';
     }
 
-    const stText = boBool ? `<span class="r" style="font-size:9px;font-family:var(--mono)">БЛЭКАУТ</span>`
+    const stText = hasPosition ? `<span class="bl" style="font-size:9px;font-family:var(--mono)">ПОЗИЦИЯ</span>`
+                 : boBool ? `<span class="r" style="font-size:9px;font-family:var(--mono)">БЛЭКАУТ</span>`
                  : cdBool ? `<span class="y" style="font-size:9px;font-family:var(--mono)">КУЛДАУН</span>`
                  : `<span class="g" style="font-size:9px;font-family:var(--mono)">АКТИВНА</span>`;
 
     const r7color  = getRsiColor(r7cur  !== '' ? parseFloat(r7cur)  : NaN);
     const r14color = getRsiColor(r14cur !== '' ? parseFloat(r14cur) : NaN);
 
-    const rowBg = sig === 'LONG_SIGNAL'  ? 'background:rgba(126,232,162,.04)' :
+    const rowBg = hasPosition ? 'background:rgba(91,156,246,.06)' :
+                  sig === 'LONG_SIGNAL'  ? 'background:rgba(126,232,162,.04)' :
                   sig === 'SHORT_SIGNAL' ? 'background:rgba(255,107,138,.04)' :
                   sig === 'WATCH_LONG' || sig === 'WATCH_SHORT' ? 'background:rgba(255,200,90,.03)' : '';
 
-    // Build 5-day history sparkline for RSI(7)
+    // Build 5-day history sparkline for RSI(7) - with editable inputs
     const histVals = histDates.map(dt => {
       const v = (scans[dt] || {})[w.ticker + '_r7'];
       return v !== undefined && v !== '' ? parseFloat(v) : null;
@@ -2697,15 +2743,26 @@ function renderRsiScan() {
 
     const histHtml = `<div style="display:flex;align-items:center;gap:4px">
       ${histVals.map((v, i) => {
-        if (v === null) return `<div title="${histDates[i]}" style="display:flex;flex-direction:column;align-items:center;gap:2px"><div style="width:22px;height:28px;background:var(--bg4);border-radius:3px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:2px"><span style="font-family:var(--mono);font-size:7px;color:var(--t3)">—</span></div><span style="font-family:var(--mono);font-size:7px;color:var(--t3)">${histDates[i].slice(5)}</span></div>`;
+        const dateStr = histDates[i];
+        const tLabel = `T-${i+1}`;
+        if (v === null) {
+          // Editable empty cell - click to add historical RSI
+          return `<div style="display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer" onclick="editHistRsi('${w.ticker}','${dateStr}')" title="Добавить RSI за ${dateStr}">
+            <div style="width:22px;height:28px;background:var(--bg4);border-radius:3px;display:flex;align-items:center;justify-content:center;border:1px dashed var(--line)">
+              <span style="font-family:var(--mono);font-size:10px;color:var(--t3)">+</span>
+            </div>
+            <span style="font-family:var(--mono);font-size:7px;color:var(--t3)">${tLabel}</span>
+            <span style="font-family:var(--mono);font-size:6px;color:var(--t3)">${dateStr.slice(5)}</span>
+          </div>`;
+        }
         const barH = Math.round((v / 100) * 28);
         const col  = getRsiColor(v);
-        return `<div title="${histDates[i]}: RSI7=${v.toFixed(1)}" style="display:flex;flex-direction:column;align-items:center;gap:2px">
+        return `<div title="${dateStr}: RSI7=${v.toFixed(1)} — клик для редактирования" style="display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer" onclick="editHistRsi('${w.ticker}','${dateStr}')">
           <div style="width:22px;height:28px;background:var(--bg4);border-radius:3px;display:flex;align-items:flex-end;overflow:hidden">
             <div style="width:100%;height:${barH}px;background:${col};border-radius:2px;transition:height .3s"></div>
           </div>
           <span style="font-family:var(--mono);font-size:7px;color:${col};font-weight:700">${v.toFixed(0)}</span>
-          <span style="font-family:var(--mono);font-size:6px;color:var(--t3)">${histDates[i].slice(5)}</span>
+          <span style="font-family:var(--mono);font-size:6px;color:var(--t3)">${tLabel}</span>
         </div>`;
       }).join('')}
       ${r7cur !== '' ? `<div style="display:flex;flex-direction:column;align-items:center;gap:2px;margin-left:2px;border-left:1px solid var(--line);padding-left:4px">
@@ -2713,12 +2770,12 @@ function renderRsiScan() {
           <div style="width:100%;height:${Math.round((parseFloat(r7cur)/100)*28)}px;background:${r7color};border-radius:2px"></div>
         </div>
         <span style="font-family:var(--mono);font-size:7px;color:${r7color};font-weight:700">${parseFloat(r7cur).toFixed(0)}</span>
-        <span style="font-family:var(--mono);font-size:6px;color:var(--acc)">сег.</span>
+        <span style="font-family:var(--mono);font-size:6px;color:var(--acc)">T0</span>
       </div>` : ''}
     </div>`;
 
     return `<tr style="${rowBg}">
-      <td style="font-weight:800">${w.ticker}</td>
+      <td style="font-weight:700">${w.ticker}${hasPosition ? ' <span style="color:var(--acc4);font-size:9px">●</span>' : ''}</td>
       <td style="color:var(--t2)">${w.sector||'—'}</td>
       <td>
         <div class="rsi-bar-wrap">
@@ -2804,6 +2861,66 @@ function updateRsiScan(ticker, field, value) {
     }
   });
   renderDashSignals();
+}
+
+// ═══════════════════════════════════════════════════════════
+// HISTORICAL RSI EDITING
+// ═══════════════════════════════════════════════════════════
+function editHistRsi(ticker, dateStr) {
+  document.getElementById('histRsi_ticker').value = ticker;
+  document.getElementById('histRsi_date').value = dateStr;
+  document.getElementById('histRsiTicker').textContent = ticker;
+  document.getElementById('histRsiDate').textContent = dateStr;
+  
+  // Load existing values
+  const scans = cache.rsiScans || {};
+  const dayScan = scans[dateStr] || {};
+  document.getElementById('histRsi_r7').value = dayScan[ticker + '_r7'] ?? '';
+  document.getElementById('histRsi_r14').value = dayScan[ticker + '_r14'] ?? '';
+  
+  openMo('moHistRsi');
+}
+
+function saveHistRsi() {
+  const ticker = document.getElementById('histRsi_ticker').value;
+  const dateStr = document.getElementById('histRsi_date').value;
+  const r7 = document.getElementById('histRsi_r7').value;
+  const r14 = document.getElementById('histRsi_r14').value;
+  
+  if (!cache.rsiScans) cache.rsiScans = {};
+  if (!cache.rsiScans[dateStr]) cache.rsiScans[dateStr] = {};
+  
+  if (r7 !== '') {
+    cache.rsiScans[dateStr][ticker + '_r7'] = parseFloat(r7);
+  } else {
+    delete cache.rsiScans[dateStr][ticker + '_r7'];
+  }
+  
+  if (r14 !== '') {
+    cache.rsiScans[dateStr][ticker + '_r14'] = parseFloat(r14);
+  } else {
+    delete cache.rsiScans[dateStr][ticker + '_r14'];
+  }
+  
+  scheduleSave();
+  closeMo('moHistRsi');
+  renderRsiScan();
+  toast(`RSI за ${dateStr} сохранён ✓`);
+}
+
+function clearHistRsi() {
+  const ticker = document.getElementById('histRsi_ticker').value;
+  const dateStr = document.getElementById('histRsi_date').value;
+  
+  if (cache.rsiScans && cache.rsiScans[dateStr]) {
+    delete cache.rsiScans[dateStr][ticker + '_r7'];
+    delete cache.rsiScans[dateStr][ticker + '_r14'];
+  }
+  
+  scheduleSave();
+  closeMo('moHistRsi');
+  renderRsiScan();
+  toast(`RSI за ${dateStr} очищен`);
 }
 
 async function saveRsiScan() {
