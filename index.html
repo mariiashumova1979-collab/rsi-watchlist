@@ -1061,10 +1061,18 @@ function scheduleSave() { clearTimeout(saveTimer); saveTimer = setTimeout(doSave
 
 // Token: stored ONLY in localStorage, never in source code
 function getToken() {
-  try { return localStorage.getItem(LS_TOKEN) || ''; } catch { return ''; }
+  try { 
+    const raw = localStorage.getItem(LS_TOKEN) || '';
+    // Clean token: remove any non-ASCII characters that could break fetch headers
+    return raw.replace(/[^\x00-\x7F]/g, '').trim();
+  } catch { return ''; }
 }
 function saveToken(t) {
-  try { localStorage.setItem(LS_TOKEN, t); } catch {}
+  try { 
+    // Clean token before saving
+    const clean = (t || '').replace(/[^\x00-\x7F]/g, '').trim();
+    localStorage.setItem(LS_TOKEN, clean); 
+  } catch {}
 }
 
 function ghAPI()  { return `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`; }
@@ -3107,7 +3115,16 @@ document.addEventListener('click',e=>{ if(e.target.classList.contains('mo')) e.t
 // EXPORT / IMPORT / CLEAR
 // ═══════════════════════════════════════════════════════════
 function exportJSON() {
-  const data = { trades:cache.trades, watchlist:cache.watchlist, quarterly:cache.quarterly, checklist:cache.checklist, settings:cache.settings, regime:cache.regime, exportedAt:new Date().toISOString() };
+  const data = { 
+    trades: cache.trades, 
+    watchlist: cache.watchlist, 
+    quarterly: cache.quarterly, 
+    checklist: cache.checklist, 
+    settings: cache.settings, 
+    regime: cache.regime, 
+    rsiScans: cache.rsiScans,
+    exportedAt: new Date().toISOString() 
+  };
   const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a'); a.href=url; a.download=`rsi-journal-backup-${today()}.json`; a.click();
@@ -3127,8 +3144,9 @@ function importJSON(e) {
         if(data.checklist) cache.checklist = data.checklist;
         if(data.settings)  cache.settings  = data.settings;
         if(data.regime)    cache.regime    = data.regime;
+        if(data.rsiScans)  cache.rsiScans  = data.rsiScans;
         await persistToCloud();
-        renderDash(); renderTrades(); renderWL(); renderQ(); initChecklist(); loadSetsUI(); renderHolidays();
+        renderDash(); renderTrades(); renderWL(); renderQ(); initChecklist(); loadSetsUI(); renderHolidays(); renderRsiScan();
         toast('Импорт завершён ✓');
       });
     } catch { toast('Ошибка импорта!', true); }
