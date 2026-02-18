@@ -184,7 +184,7 @@
     },
     {
       "id": "1770846083889",
-      "createdAt": 1770993205080,
+      "createdAt": 1771434614557,
       "ticker": "TFC",
       "type": "SHORT",
       "entryDate": "2026-02-11",
@@ -196,20 +196,21 @@
       "rsi7": "",
       "rsi14": "",
       "spyRsi": "52.84",
-      "status": "PARTIAL",
-      "exitPrice": 0,
-      "exitReason": "",
-      "commission": 0,
+      "status": "CLOSED",
+      "exitPrice": 52.558,
+      "exitReason": "TIME",
+      "commission": 6.8,
       "notes": "",
       "partialExit": {
         "date": "2026-02-13",
         "price": 51.66,
         "shares": 10,
         "commission": 3.2,
-        "breakevenSet": true,
-        "pnlNet": 28,
-        "pnlPct": 5.11
-      }
+        "breakevenSet": true
+      },
+      "pnlNet": 15.42,
+      "pnlPct": 1.41,
+      "result": "WIN"
     },
     {
       "id": "1770803316220",
