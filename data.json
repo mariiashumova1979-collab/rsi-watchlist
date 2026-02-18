@@ -1,6 +1,26 @@
 {
   "trades": [
     {
+      "id": "1771425486400",
+      "createdAt": 1771425486400,
+      "ticker": "SW",
+      "type": "SHORT",
+      "entryDate": "2026-02-18",
+      "entry": 50.5,
+      "shares": 0,
+      "stop": "52.52",
+      "target1": "48.48",
+      "target2": "46.46",
+      "rsi7": "77.27",
+      "rsi14": "73.06",
+      "spyRsi": "44.95",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "commission": 0,
+      "notes": ""
+    },
+    {
       "id": "1771340787192",
       "createdAt": 1771340787192,
       "ticker": "PYPL",
