@@ -1,6 +1,26 @@
 {
   "trades": [
     {
+      "id": "1771425524241",
+      "createdAt": 1771425524241,
+      "ticker": "ES",
+      "type": "SHORT",
+      "entryDate": "2026-02-18",
+      "entry": 72.79,
+      "shares": 15,
+      "stop": "75.70",
+      "target1": "69.88",
+      "target2": "66.97",
+      "rsi7": "76.7",
+      "rsi14": "66.89",
+      "spyRsi": "44.95",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "commission": 0,
+      "notes": ""
+    },
+    {
       "id": "1771425486400",
       "createdAt": 1771425486400,
       "ticker": "SW",
