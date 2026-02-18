@@ -1,6 +1,26 @@
 {
   "trades": [
     {
+      "id": "1771425654604",
+      "createdAt": 1771425654604,
+      "ticker": "PPG",
+      "type": "SHORT",
+      "entryDate": "2026-02-18",
+      "entry": 129.55,
+      "shares": 8,
+      "stop": "134.73",
+      "target1": "124.37",
+      "target2": "119.19",
+      "rsi7": "69.28",
+      "rsi14": "73.19",
+      "spyRsi": "44.95",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "commission": 0,
+      "notes": ""
+    },
+    {
       "id": "1771425524241",
       "createdAt": 1771425524241,
       "ticker": "ES",
