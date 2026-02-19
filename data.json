@@ -1,6 +1,26 @@
 {
   "trades": [
     {
+      "id": "1771514449001",
+      "createdAt": 1771514449001,
+      "ticker": "IQV",
+      "type": "LONG",
+      "entryDate": "2026-02-19",
+      "entry": 164.99,
+      "shares": 6,
+      "stop": "158.39",
+      "target1": "171.59",
+      "target2": "178.19",
+      "rsi7": "28.21",
+      "rsi14": "27.63",
+      "spyRsi": "48.25",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "commission": 0,
+      "notes": ""
+    },
+    {
       "id": "1771514140657",
       "createdAt": 1771514140657,
       "ticker": "IRM",
