@@ -315,7 +315,7 @@
     },
     {
       "id": "1770803148736",
-      "createdAt": 1770910558252,
+      "createdAt": 1771520949034,
       "ticker": "USB",
       "type": "SHORT",
       "entryDate": "2026-02-10",
@@ -332,8 +332,8 @@
       "exitReason": "",
       "commission": 4.72,
       "notes": "",
-      "pnlPct": 1.18,
       "pnlNet": 12.92,
+      "pnlPct": 1.18,
       "result": "WIN"
     },
     {
