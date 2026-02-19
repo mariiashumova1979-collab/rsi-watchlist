@@ -237,7 +237,7 @@
     },
     {
       "id": "1770846083889",
-      "createdAt": 1771434614557,
+      "createdAt": 1771520932297,
       "ticker": "TFC",
       "type": "SHORT",
       "entryDate": "2026-02-11",
@@ -259,10 +259,12 @@
         "price": 51.66,
         "shares": 10,
         "commission": 3.2,
-        "breakevenSet": true
+        "breakevenSet": true,
+        "pnlNet": 31.2,
+        "pnlPct": 5.7
       },
-      "pnlNet": 15.42,
-      "pnlPct": 1.41,
+      "pnlNet": 43.42,
+      "pnlPct": 3.96,
       "result": "WIN"
     },
     {
