@@ -1962,7 +1962,8 @@ async function saveTrade() {
   const partialDate = document.getElementById('te_p_date').value;
   const breakevenSet = document.getElementById('te_p_be')?.checked || false;
   
-  if (partialPrice && partialShares) {
+  // Only save partialExit if there are actual values
+  if (partialPrice > 0 && partialShares > 0) {
     t.partialExit = {
       date: partialDate,
       price: partialPrice,
@@ -1970,6 +1971,8 @@ async function saveTrade() {
       commission: partialComm,
       breakevenSet: breakevenSet
     };
+  } else {
+    delete t.partialExit;
   }
   
   // Calculate P&L based on status
@@ -1985,27 +1988,41 @@ async function saveTrade() {
     delete t.pnlPct;
     delete t.pnlNet;
     delete t.result;
-  } else if (t.status === 'CLOSED' && t.exitPrice && t.entry) {
-    // Full exit - calculate remaining shares after partial
-    const remainingShares = t.partialExit ? (t.shares - t.partialExit.shares) : t.shares;
+  } else if (t.status === 'CLOSED' && t.exitPrice && t.entry && t.shares) {
+    // Check if we have a valid partial exit
+    const hasPartial = t.partialExit && t.partialExit.price > 0 && t.partialExit.shares > 0;
     
-    // P&L from final exit
-    const finalGrossPnl = dir * (t.exitPrice - t.entry) * remainingShares;
-    const finalNetPnl = finalGrossPnl - t.commission;
-    
-    // Combined P&L if partial exit exists
-    if (t.partialExit && t.partialExit.pnlNet !== undefined) {
-      const totalNetPnl = t.partialExit.pnlNet + finalNetPnl;
+    if (hasPartial) {
+      // Calculate partial exit P&L first
+      const partialGrossPnl = dir * (t.partialExit.price - t.entry) * t.partialExit.shares;
+      const partialNetPnl = partialGrossPnl - (t.partialExit.commission || 0);
+      t.partialExit.pnlNet = parseFloat(partialNetPnl.toFixed(2));
+      t.partialExit.pnlPct = parseFloat((partialNetPnl / (t.entry * t.partialExit.shares) * 100).toFixed(2));
+      
+      // Final exit with remaining shares
+      const remainingShares = t.shares - t.partialExit.shares;
+      const finalGrossPnl = dir * (t.exitPrice - t.entry) * remainingShares;
+      const finalNetPnl = finalGrossPnl - t.commission;
+      
+      // Combined P&L
+      const totalNetPnl = partialNetPnl + finalNetPnl;
       const totalBasis = t.entry * t.shares;
       t.pnlNet = parseFloat(totalNetPnl.toFixed(2));
       t.pnlPct = parseFloat((totalNetPnl / totalBasis * 100).toFixed(2));
     } else {
-      // No partial exit
-      const basis = t.entry * t.shares || 1;
-      t.pnlNet = parseFloat(finalNetPnl.toFixed(2));
-      t.pnlPct = parseFloat((finalNetPnl / basis * 100).toFixed(2));
+      // No partial exit - simple calculation
+      const grossPnl = dir * (t.exitPrice - t.entry) * t.shares;
+      const netPnl = grossPnl - t.commission;
+      const basis = t.entry * t.shares;
+      t.pnlNet = parseFloat(netPnl.toFixed(2));
+      t.pnlPct = parseFloat((netPnl / basis * 100).toFixed(2));
     }
     t.result = t.pnlNet >= 0 ? 'WIN' : 'LOSS';
+  } else if (t.status === 'OPEN') {
+    // Open position - clear P&L
+    delete t.pnlPct;
+    delete t.pnlNet;
+    delete t.result;
   }
   
   if(id) { const i=cache.trades.findIndex(x=>x.id===id); if(i>=0) cache.trades[i]=t; else cache.trades.unshift(t); }
