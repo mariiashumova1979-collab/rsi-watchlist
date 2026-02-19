@@ -42,7 +42,7 @@
     },
     {
       "id": "1771425654604",
-      "createdAt": 1771425654604,
+      "createdAt": 1771525868120,
       "ticker": "PPG",
       "type": "SHORT",
       "entryDate": "2026-02-18",
@@ -54,11 +54,20 @@
       "rsi7": "69.28",
       "rsi14": "73.19",
       "spyRsi": "44.95",
-      "status": "OPEN",
+      "status": "PARTIAL",
       "exitPrice": 0,
       "exitReason": "",
       "commission": 0,
-      "notes": ""
+      "notes": "",
+      "partialExit": {
+        "date": "2026-02-19",
+        "price": 124.18,
+        "shares": 4,
+        "commission": 0,
+        "breakevenSet": true,
+        "pnlNet": 21.48,
+        "pnlPct": 4.15
+      }
     },
     {
       "id": "1771425524241",
