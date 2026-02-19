@@ -269,7 +269,7 @@
     },
     {
       "id": "1770803316220",
-      "createdAt": 1770917810268,
+      "createdAt": 1771520941369,
       "ticker": "SE",
       "type": "LONG",
       "entryDate": "2026-02-10",
@@ -286,8 +286,8 @@
       "exitReason": "",
       "commission": 4.9,
       "notes": "",
-      "pnlPct": 1.36,
       "pnlNet": 13.19,
+      "pnlPct": 1.36,
       "result": "WIN"
     },
     {
