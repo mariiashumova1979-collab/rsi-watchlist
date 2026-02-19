@@ -82,7 +82,7 @@
     },
     {
       "id": "1771340669382",
-      "createdAt": 1771488933510,
+      "createdAt": 1771407710457,
       "ticker": "TPG",
       "type": "LONG",
       "entryDate": "2026-02-17",
@@ -98,7 +98,10 @@
       "exitPrice": 47.11,
       "exitReason": "STOP",
       "commission": 0.01,
-      "notes": ""
+      "notes": "",
+      "pnlNet": -0.01,
+      "pnlPct": -1,
+      "result": "LOSS"
     },
     {
       "id": "1771338901626",
@@ -491,8 +494,8 @@
     "finnhubKey": "d65uv7pr01qiish15ra0d65uv7pr01qiish15rag"
   },
   "regime": {
-    "spyRsi14": 44.95,
-    "savedAt": "2026-02-18T08:33:49.772Z"
+    "spyRsi14": 48.25,
+    "savedAt": "2026-02-19T08:18:36.819Z"
   },
   "rsiScans": {
     "2026-02-11": {
