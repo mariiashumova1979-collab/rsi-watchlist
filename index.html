@@ -1979,11 +1979,10 @@ async function saveTrade() {
   const dir = t.type === 'LONG' ? 1 : -1;
   
   if (t.status === 'PARTIAL' && t.partialExit) {
-    // Only partial exit P&L
+    // Only partial exit P&L (no commission deducted yet - will be on final close)
     const grossPnl = dir * (t.partialExit.price - t.entry) * t.partialExit.shares;
-    const netPnl = grossPnl - t.partialExit.commission;
-    t.partialExit.pnlNet = parseFloat(netPnl.toFixed(2));
-    t.partialExit.pnlPct = parseFloat((netPnl / (t.entry * t.partialExit.shares) * 100).toFixed(2));
+    t.partialExit.pnlNet = parseFloat(grossPnl.toFixed(2));
+    t.partialExit.pnlPct = parseFloat((grossPnl / (t.entry * t.partialExit.shares) * 100).toFixed(2));
     // Position still open, no final result yet
     delete t.pnlPct;
     delete t.pnlNet;
@@ -1993,19 +1992,19 @@ async function saveTrade() {
     const hasPartial = t.partialExit && t.partialExit.price > 0 && t.partialExit.shares > 0;
     
     if (hasPartial) {
-      // Calculate partial exit P&L first
+      // Partial exit P&L (gross - no commission)
       const partialGrossPnl = dir * (t.partialExit.price - t.entry) * t.partialExit.shares;
-      const partialNetPnl = partialGrossPnl - (t.partialExit.commission || 0);
-      t.partialExit.pnlNet = parseFloat(partialNetPnl.toFixed(2));
-      t.partialExit.pnlPct = parseFloat((partialNetPnl / (t.entry * t.partialExit.shares) * 100).toFixed(2));
+      t.partialExit.pnlNet = parseFloat(partialGrossPnl.toFixed(2));
+      t.partialExit.pnlPct = parseFloat((partialGrossPnl / (t.entry * t.partialExit.shares) * 100).toFixed(2));
       
       // Final exit with remaining shares
       const remainingShares = t.shares - t.partialExit.shares;
       const finalGrossPnl = dir * (t.exitPrice - t.entry) * remainingShares;
-      const finalNetPnl = finalGrossPnl - t.commission;
       
-      // Combined P&L
-      const totalNetPnl = partialNetPnl + finalNetPnl;
+      // Total P&L = partial + final - ALL commissions
+      const totalCommission = (t.partialExit.commission || 0) + (t.commission || 0);
+      const totalGrossPnl = partialGrossPnl + finalGrossPnl;
+      const totalNetPnl = totalGrossPnl - totalCommission;
       const totalBasis = t.entry * t.shares;
       t.pnlNet = parseFloat(totalNetPnl.toFixed(2));
       t.pnlPct = parseFloat((totalNetPnl / totalBasis * 100).toFixed(2));
