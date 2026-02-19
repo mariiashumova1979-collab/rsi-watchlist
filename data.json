@@ -185,7 +185,7 @@
     },
     {
       "id": "1770993435675",
-      "createdAt": 1771514717271,
+      "createdAt": 1771514723400,
       "ticker": "CARR",
       "type": "SHORT",
       "entryDate": "2026-02-13",
@@ -207,7 +207,7 @@
         "price": 62.79,
         "shares": 8,
         "commission": 0,
-        "breakevenSet": false,
+        "breakevenSet": true,
         "pnlNet": 21.68,
         "pnlPct": 4.14
       }
