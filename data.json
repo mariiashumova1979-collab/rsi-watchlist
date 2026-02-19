@@ -292,7 +292,7 @@
     },
     {
       "id": "1770803244882",
-      "createdAt": 1770917793115,
+      "createdAt": 1771520945313,
       "ticker": "PNC",
       "type": "SHORT",
       "entryDate": "2026-02-10",
@@ -309,8 +309,8 @@
       "exitReason": "",
       "commission": 4.08,
       "notes": "",
-      "pnlPct": 0.99,
       "pnlNet": 9.56,
+      "pnlPct": 0.99,
       "result": "WIN"
     },
     {
