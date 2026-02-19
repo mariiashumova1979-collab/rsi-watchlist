@@ -214,7 +214,7 @@
     },
     {
       "id": "1770907976444",
-      "createdAt": 1770907976444,
+      "createdAt": 1771520872776,
       "ticker": "MTB",
       "type": "SHORT",
       "entryDate": "2026-02-12",
@@ -226,10 +226,14 @@
       "rsi7": "73.07",
       "rsi14": "73.37",
       "spyRsi": "52.69",
-      "status": "OPEN",
-      "exitPrice": 0,
-      "exitReason": "",
-      "notes": ""
+      "status": "CLOSED",
+      "exitPrice": 228.14,
+      "exitReason": "TIME",
+      "commission": 4.08,
+      "notes": "",
+      "pnlNet": 31.36,
+      "pnlPct": 3.31,
+      "result": "WIN"
     },
     {
       "id": "1770846083889",
