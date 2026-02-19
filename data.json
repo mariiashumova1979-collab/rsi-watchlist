@@ -82,12 +82,12 @@
     },
     {
       "id": "1771340669382",
-      "createdAt": 1771407710457,
+      "createdAt": 1771510761774,
       "ticker": "TPG",
       "type": "LONG",
       "entryDate": "2026-02-17",
       "entry": 49.16,
-      "shares": 0,
+      "shares": 22,
       "stop": "47.19",
       "target1": "51.13",
       "target2": "53.09",
@@ -99,8 +99,8 @@
       "exitReason": "STOP",
       "commission": 0.01,
       "notes": "",
-      "pnlNet": -0.01,
-      "pnlPct": -1,
+      "pnlNet": -45.11,
+      "pnlPct": -4.17,
       "result": "LOSS"
     },
     {
