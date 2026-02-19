@@ -1,6 +1,26 @@
 {
   "trades": [
     {
+      "id": "1771514140657",
+      "createdAt": 1771514140657,
+      "ticker": "IRM",
+      "type": "SHORT",
+      "entryDate": "2026-02-19",
+      "entry": 105.53,
+      "shares": 10,
+      "stop": "109.75",
+      "target1": "101.31",
+      "target2": "97.09",
+      "rsi7": "68.52",
+      "rsi14": "68.51",
+      "spyRsi": "48.25",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "commission": 0,
+      "notes": ""
+    },
+    {
       "id": "1771425654604",
       "createdAt": 1771425654604,
       "ticker": "PPG",
