@@ -330,6 +330,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "GRMN",
+      "sector": "Технологии",
+      "cap": "41.3",
+      "beta": "1.1",
+      "earningsDate": "",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1771489393266
+    },
+    {
       "ticker": "ES",
       "sector": "Потребительский",
       "cap": "27.52",
