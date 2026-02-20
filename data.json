@@ -183,7 +183,7 @@
     },
     {
       "id": "1770993844517",
-      "createdAt": 1770993844517,
+      "createdAt": 1771607829334,
       "ticker": "DOV",
       "type": "SHORT",
       "entryDate": "2026-02-13",
@@ -195,11 +195,14 @@
       "rsi7": "72.87",
       "rsi14": "75.89",
       "spyRsi": "43.3",
-      "status": "OPEN",
-      "exitPrice": 0,
-      "exitReason": "",
-      "commission": 0,
-      "notes": ""
+      "status": "CLOSED",
+      "exitPrice": 232.16,
+      "exitReason": "TIME",
+      "commission": 6,
+      "notes": "",
+      "pnlNet": -19.28,
+      "pnlPct": -2.11,
+      "result": "LOSS"
     },
     {
       "id": "1770993435675",
