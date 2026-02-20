@@ -203,7 +203,7 @@
     },
     {
       "id": "1770993435675",
-      "createdAt": 1771520918841,
+      "createdAt": 1771607636497,
       "ticker": "CARR",
       "type": "SHORT",
       "entryDate": "2026-02-13",
@@ -215,10 +215,10 @@
       "rsi7": "65.64",
       "rsi14": "69.35",
       "spyRsi": "43.3",
-      "status": "PARTIAL",
-      "exitPrice": 0,
-      "exitReason": "",
-      "commission": 0,
+      "status": "CLOSED",
+      "exitPrice": 63.18,
+      "exitReason": "TIME",
+      "commission": 6,
       "notes": "",
       "partialExit": {
         "date": "2026-02-19",
@@ -228,7 +228,10 @@
         "breakevenSet": true,
         "pnlNet": 21.68,
         "pnlPct": 4.14
-      }
+      },
+      "pnlNet": 34.24,
+      "pnlPct": 3.27,
+      "result": "WIN"
     },
     {
       "id": "1770907976444",
