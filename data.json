@@ -94,12 +94,12 @@
     },
     {
       "id": "1771425486400",
-      "createdAt": 1771626778375,
+      "createdAt": 1771626830608,
       "ticker": "SW",
       "type": "SHORT",
       "entryDate": "2026-02-18",
       "entry": 50.5,
-      "shares": 0,
+      "shares": 21,
       "stop": "52.52",
       "target1": "48.48",
       "target2": "46.46",
@@ -110,7 +110,10 @@
       "exitPrice": 44.84,
       "exitReason": "TARGET2",
       "commission": 5,
-      "notes": ""
+      "notes": "",
+      "pnlNet": 113.86,
+      "pnlPct": 10.74,
+      "result": "WIN"
     },
     {
       "id": "1771340787192",
