@@ -94,7 +94,7 @@
     },
     {
       "id": "1771425486400",
-      "createdAt": 1771425486400,
+      "createdAt": 1771626778375,
       "ticker": "SW",
       "type": "SHORT",
       "entryDate": "2026-02-18",
@@ -106,10 +106,10 @@
       "rsi7": "77.27",
       "rsi14": "73.06",
       "spyRsi": "44.95",
-      "status": "OPEN",
-      "exitPrice": 0,
-      "exitReason": "",
-      "commission": 0,
+      "status": "CLOSED",
+      "exitPrice": 44.84,
+      "exitReason": "TARGET2",
+      "commission": 5,
       "notes": ""
     },
     {
