@@ -22,7 +22,7 @@
     },
     {
       "id": "1771514140657",
-      "createdAt": 1771514140657,
+      "createdAt": 1771626686271,
       "ticker": "IRM",
       "type": "SHORT",
       "entryDate": "2026-02-19",
@@ -34,11 +34,14 @@
       "rsi7": "68.52",
       "rsi14": "68.51",
       "spyRsi": "48.25",
-      "status": "OPEN",
-      "exitPrice": 0,
-      "exitReason": "",
-      "commission": 0,
-      "notes": ""
+      "status": "CLOSED",
+      "exitPrice": 109.75,
+      "exitReason": "STOP",
+      "commission": 4,
+      "notes": "",
+      "pnlNet": -46.2,
+      "pnlPct": -4.38,
+      "result": "LOSS"
     },
     {
       "id": "1771425654604",
