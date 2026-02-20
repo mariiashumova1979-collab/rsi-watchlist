@@ -382,7 +382,7 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
 
 <nav>
   <div class="ntab active" onclick="goTab('dashboard')">📊 Дашборд</div>
-  <div class="ntab" onclick="goTab('checklist')">✅ Чеклист</div>
+  <div class="ntab" onclick="goTab('instruments')">📈 Инструменты</div>
   <div class="ntab" onclick="goTab('trades')">📋 Сделки</div>
   <div class="ntab" onclick="goTab('watchlist')">👁 Список</div>
   <div class="ntab" onclick="goTab('quarterly')">📅 Квартал</div>
@@ -451,38 +451,39 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
   </div>
 </div>
 
-<!-- ═══════════════════════ CHECKLIST ═══════════════════════ -->
-<div class="tab" id="tab-checklist">
+<!-- ═══════════════════════ INSTRUMENTS ═══════════════════════ -->
+<div class="tab" id="tab-instruments">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;flex-wrap:wrap;gap:12px">
     <div>
-      <div style="font-size:22px;font-weight:800">Ежедневный чеклист</div>
-      <div style="font-family:var(--mono);font-size:11px;color:var(--t2);margin-top:3px" id="clDate"></div>
+      <div style="font-size:22px;font-weight:800">Статистика по инструментам</div>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--t2);margin-top:3px">Сводка по всем тикерам из сделок</div>
     </div>
     <div style="display:flex;gap:10px;align-items:center">
-      <span style="font-family:var(--mono);font-size:12px;color:var(--acc)" id="clProg">0/0</span>
-      <div id="clProgWrap" style="width:120px"><div class="pbw"><div class="pb" id="clProgBar" style="width:0%"></div></div></div>
-      <button class="btn btn-g btn-s" onclick="resetCl()">СБРОС</button>
+      <select id="instrSort" onchange="renderInstruments()" style="font-size:12px">
+        <option value="trades">По кол-ву сделок</option>
+        <option value="pnl">По P&L</option>
+        <option value="ticker">По тикеру</option>
+        <option value="lastTrade">По последней сделке</option>
+      </select>
     </div>
   </div>
-  <div class="g2">
-    <div>
-      <div class="csec">🌅 УТРО — РЫНОЧНЫЙ ФИЛЬТР</div>
-      <div class="cl" id="cl-mf"></div>
-      <div class="csec">🔍 СКАНИРОВАНИЕ СПИСКА</div>
-      <div class="cl" id="cl-ms"></div>
-      <div class="csec">⚖️ ПРОВЕРКА ЛИМИТОВ</div>
-      <div class="cl" id="cl-ml"></div>
-    </div>
-    <div>
-      <div class="csec">📈 ТОРГОВАЯ СЕССИЯ — ОТКРЫТИЕ</div>
-      <div class="cl" id="cl-en"></div>
-      <div class="csec">🔄 УПРАВЛЕНИЕ ПОЗИЦИЯМИ</div>
-      <div class="cl" id="cl-mg"></div>
-      <div class="csec">🌆 КОНЕЦ ДНЯ</div>
-      <div class="cl" id="cl-ed"></div>
-      <div class="csec">🌙 ПОДГОТОВКА К ЗАВТРАШНЕМУ ДНЮ</div>
-      <div class="cl" id="cl-pr"></div>
-    </div>
+  <div class="tw">
+    <table>
+      <thead>
+        <tr>
+          <th>Тикер</th>
+          <th>Сделок</th>
+          <th>W/L</th>
+          <th>Первый вход</th>
+          <th>Последний вход</th>
+          <th>Последний выход</th>
+          <th>Цена входа (мин/макс)</th>
+          <th>Цена выхода (мин/макс)</th>
+          <th>Валовый P&L</th>
+        </tr>
+      </thead>
+      <tbody id="instrTb"></tbody>
+    </table>
   </div>
 </div>
 
@@ -2247,21 +2248,11 @@ function renderDash() {
         });
       }
 
-      // T3: decision day
+      // T3: warning day
       if (tDay === 3) {
         hints.push({
-          icon:'⚠️',
-          text:`T3 — если прибыль < +1.5% → закрыть 50% на ЗАКРЫТИИ (16:00 EST)`,
-          color:'var(--acc3)', urgency:1
-        });
-        if (t1) hints.push({
-          icon:'✅',
-          text:`Если прибыль ≥ +4% (≥ $${t1.toFixed(2)}) → закрыть 50% по рынку`,
-          color:'var(--acc)', urgency:1
-        });
-        hints.push({
           icon:'📅',
-          text:`ЗАВТРА T4 — последний день! Готовьтесь к выходу`,
+          text:`T3 — ЗАВТРА T4 (последний день). Готовьтесь к выходу`,
           color:'var(--acc3)', urgency:1
         });
       }
@@ -2411,58 +2402,89 @@ function renderDash() {
 }
 
 // ═══════════════════════════════════════════════════════════
-// CHECKLIST
+// INSTRUMENTS STATISTICS
 // ═══════════════════════════════════════════════════════════
-const CL_DATA = {
-  'mf':['Открыть дневной график SPY','Считать SPY RSI(14) → внести в Дашборд','Определить режим: РИСК-ОН / НЕЙТРАЛЬНЫЙ / РИСК-ОФФ','Зафиксировать коэффициент размера позиции (50% или 100%)'],
-  'ms':['Открыть список наблюдения','Для каждой акции записать RSI(7) и RSI(14)','Пометить лонги: RSI(7) пересёк >20 И RSI(14)<40','Пометить шорты: RSI(7) пересёк <80 И RSI(14)>60','Проверить отчётность: нет событий в след. 6 дней','Ранжировать сигналы по дальности RSI(14) от 50'],
-  'ml':['Подсчитать открытые позиции (макс 6)','Проверить экспозицию по секторам (макс 40%)','Проверить кулдауны: нет повторных входов','Убедиться что совокупный риск портфеля < 6%'],
-  'en':['Рассчитать размер позиции по формуле','Выставить рыночный ордер (9:30–9:45 EST)','Зафиксировать цену исполнения в журнале','Выставить стоп-лосс GTC немедленно','Установить алерты Цель 1 (+4%) и Цель 2 (+8%)','Добавить сделку во вкладку Сделки'],
-  'mg':['Проверить достижение Цели 1 (+4%)','Если Цель 1 достигнута: выйти 50%, стоп → +1.5%','Если RSI(7)>70 (лонг) или <30 (шорт): выйти','Если День 5: ВЫЙТИ ИЗ ВСЕХ НА ЗАКРЫТИИ','Если День 3 и прибыль <+1.5%: выйти 50%','Проверить смену режима SPY (выйти если РИСК-ОФФ)'],
-  'ed':['Зафиксировать цены закрытия позиций','Обновить счётчик дней удержания (Д1–Д5)','Обновить P&L открытых позиций','Отметить позиции требующие выхода завтра'],
-  'pr':['Найти акции с RSI(7) 22–28 (лонг-кандидат завтра)','Найти акции с RSI(7) 72–78 (шорт-кандидат завтра)','Установить алерты для этих тикеров','Обновить даты кулдауна в списке наблюдения']
-};
+function renderInstruments() {
+  const trades = cache.trades.filter(t => t.status === 'CLOSED');
+  const sortBy = document.getElementById('instrSort')?.value || 'trades';
+  
+  // Group by ticker
+  const byTicker = {};
+  trades.forEach(t => {
+    const tk = t.ticker.toUpperCase();
+    if (!byTicker[tk]) {
+      byTicker[tk] = {
+        ticker: tk,
+        trades: [],
+        totalPnl: 0,
+        wins: 0,
+        losses: 0
+      };
+    }
+    byTicker[tk].trades.push(t);
+    byTicker[tk].totalPnl += (t.pnlNet || 0);
+    if (t.result === 'WIN') byTicker[tk].wins++;
+    else if (t.result === 'LOSS') byTicker[tk].losses++;
+  });
+  
+  // Calculate stats for each ticker
+  const stats = Object.values(byTicker).map(g => {
+    const sortedByEntry = [...g.trades].sort((a, b) => (a.entryDate || '').localeCompare(b.entryDate || ''));
+    const sortedByExit = [...g.trades].filter(t => t.exitDate || t.exitPrice).sort((a, b) => (b.entryDate || '').localeCompare(a.entryDate || ''));
+    
+    const entryPrices = g.trades.map(t => t.entry).filter(p => p > 0);
+    const exitPrices = g.trades.map(t => t.exitPrice).filter(p => p > 0);
+    
+    return {
+      ticker: g.ticker,
+      count: g.trades.length,
+      wins: g.wins,
+      losses: g.losses,
+      firstEntry: sortedByEntry[0]?.entryDate || '—',
+      lastEntry: sortedByEntry[sortedByEntry.length - 1]?.entryDate || '—',
+      lastExit: sortedByExit[0]?.entryDate || '—', // Using entryDate as proxy for exit
+      minEntry: entryPrices.length ? Math.min(...entryPrices) : 0,
+      maxEntry: entryPrices.length ? Math.max(...entryPrices) : 0,
+      minExit: exitPrices.length ? Math.min(...exitPrices) : 0,
+      maxExit: exitPrices.length ? Math.max(...exitPrices) : 0,
+      totalPnl: g.totalPnl
+    };
+  });
+  
+  // Sort
+  if (sortBy === 'trades') stats.sort((a, b) => b.count - a.count);
+  else if (sortBy === 'pnl') stats.sort((a, b) => b.totalPnl - a.totalPnl);
+  else if (sortBy === 'ticker') stats.sort((a, b) => a.ticker.localeCompare(b.ticker));
+  else if (sortBy === 'lastTrade') stats.sort((a, b) => (b.lastEntry || '').localeCompare(a.lastEntry || ''));
+  
+  const tb = document.getElementById('instrTb');
+  if (!stats.length) {
+    tb.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--t2);padding:36px">Нет закрытых сделок</td></tr>';
+    return;
+  }
+  
+  tb.innerHTML = stats.map(s => {
+    const pnlClass = s.totalPnl >= 0 ? 'g' : 'r';
+    const pnlSign = s.totalPnl >= 0 ? '+' : '';
+    const winRate = s.count > 0 ? ((s.wins / s.count) * 100).toFixed(0) : 0;
+    
+    return `<tr>
+      <td style="font-weight:700">${s.ticker}</td>
+      <td>${s.count}</td>
+      <td><span class="g">${s.wins}W</span> / <span class="r">${s.losses}L</span> <span style="color:var(--t2);font-size:10px">(${winRate}%)</span></td>
+      <td style="font-family:var(--mono);font-size:11px;color:var(--t2)">${s.firstEntry}</td>
+      <td style="font-family:var(--mono);font-size:11px">${s.lastEntry}</td>
+      <td style="font-family:var(--mono);font-size:11px;color:var(--t2)">${s.lastExit}</td>
+      <td style="font-family:var(--mono);font-size:11px">${s.minEntry > 0 ? `$${s.minEntry.toFixed(2)} / $${s.maxEntry.toFixed(2)}` : '—'}</td>
+      <td style="font-family:var(--mono);font-size:11px">${s.minExit > 0 ? `$${s.minExit.toFixed(2)} / $${s.maxExit.toFixed(2)}` : '—'}</td>
+      <td style="font-family:var(--mono);font-weight:700" class="${pnlClass}">${pnlSign}$${s.totalPnl.toFixed(2)}</td>
+    </tr>`;
+  }).join('');
+}
 
+// Legacy function - now empty
 function initChecklist() {
-  const td = today();
-  const saved = cache.checklist[td] || {};
-  Object.entries(CL_DATA).forEach(([sec, items]) => {
-    const el = document.getElementById('cl-'+sec);
-    if(!el) return;
-    el.innerHTML = items.map((txt,i) => {
-      const k = sec+'_'+i;
-      const chk = saved[k]||false;
-      return `<div class="ci ${chk?'chk':''}" onclick="toggleCl('${sec}','${i}',this)">
-        <div class="cbox"></div><div class="cit">${txt}</div>
-      </div>`;
-    }).join('');
-  });
-  updClProg();
-}
-
-async function toggleCl(sec, i, el) {
-  el.classList.toggle('chk');
-  const td = today();
-  if(!cache.checklist[td]) cache.checklist[td] = {};
-  cache.checklist[td][sec+'_'+i] = el.classList.contains('chk');
-  updClProg();
-  scheduleSave();
-}
-
-function updClProg() {
-  const all = document.querySelectorAll('.ci').length;
-  const done = document.querySelectorAll('.ci.chk').length;
-  document.getElementById('clProg').textContent = `${done}/${all}`;
-  document.getElementById('clProgBar').style.width = (all?done/all*100:0)+'%';
-}
-
-function resetCl() {
-  confirmDialog('Сбросить чеклист на сегодня?', () => {
-    const td = today();
-    cache.checklist[td] = {};
-    scheduleSave();
-    initChecklist(); toast('Чеклист сброшен');
-  });
+  renderInstruments();
 }
 
 // ═══════════════════════════════════════════════════════════
