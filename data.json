@@ -117,7 +117,7 @@
     },
     {
       "id": "1771340787192",
-      "createdAt": 1771598393957,
+      "createdAt": 1771858596522,
       "ticker": "PYPL",
       "type": "LONG",
       "entryDate": "2026-02-17",
@@ -129,19 +129,17 @@
       "rsi7": "25.46",
       "rsi14": "22.64",
       "spyRsi": "43.3",
-      "status": "PARTIAL",
-      "exitPrice": 0,
-      "exitReason": "",
-      "commission": 0,
+      "status": "CLOSED",
+      "exitPrice": 40.56,
+      "exitReason": "BREAKEVEN",
+      "commission": 0.01,
       "notes": "",
       "partialExit": {
         "date": "2026-02-20",
         "price": 42.2,
         "shares": 13,
         "commission": 0,
-        "breakevenSet": true,
-        "pnlNet": 21.19,
-        "pnlPct": 4.02
+        "breakevenSet": true
       }
     },
     {
