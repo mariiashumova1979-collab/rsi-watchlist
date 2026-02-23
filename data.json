@@ -169,7 +169,7 @@
     },
     {
       "id": "1771338901626",
-      "createdAt": 1771338901626,
+      "createdAt": 1771858554457,
       "ticker": "ADSK",
       "type": "LONG",
       "entryDate": "2026-02-17",
@@ -181,11 +181,14 @@
       "rsi7": "33.99",
       "rsi14": "32.6",
       "spyRsi": "43.3",
-      "status": "OPEN",
-      "exitPrice": 0,
-      "exitReason": "",
-      "commission": 0,
-      "notes": ""
+      "status": "CLOSED",
+      "exitPrice": 218.94,
+      "exitReason": "STOP",
+      "commission": 4,
+      "notes": "",
+      "pnlNet": -38.2,
+      "pnlPct": -4.2,
+      "result": "LOSS"
     },
     {
       "id": "1770993844517",
