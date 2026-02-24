@@ -416,6 +416,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "BX",
+      "sector": "Финансы",
+      "cap": "139.72",
+      "beta": "1.76",
+      "earningsDate": "2026-04-16",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1771921502609
+    },
+    {
       "ticker": "GRMN",
       "sector": "Технологии",
       "cap": "41.3",
