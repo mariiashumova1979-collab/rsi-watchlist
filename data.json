@@ -74,7 +74,7 @@
     },
     {
       "id": "1771425524241",
-      "createdAt": 1771425524241,
+      "createdAt": 1771952814678,
       "ticker": "ES",
       "type": "SHORT",
       "entryDate": "2026-02-18",
@@ -86,11 +86,14 @@
       "rsi7": "76.7",
       "rsi14": "66.89",
       "spyRsi": "44.95",
-      "status": "OPEN",
-      "exitPrice": 0,
-      "exitReason": "",
-      "commission": 0,
-      "notes": ""
+      "status": "CLOSED",
+      "exitPrice": 74.76,
+      "exitReason": "TIME",
+      "commission": 5,
+      "notes": "",
+      "pnlNet": -34.55,
+      "pnlPct": -3.16,
+      "result": "LOSS"
     },
     {
       "id": "1771425486400",
