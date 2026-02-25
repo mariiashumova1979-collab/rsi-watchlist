@@ -477,9 +477,11 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
           <th>Первый вход</th>
           <th>Последний вход</th>
           <th>Последний выход</th>
-          <th>Цена входа (мин/макс)</th>
-          <th>Цена выхода (мин/макс)</th>
-          <th>Валовый P&L</th>
+          <th>Цена входа</th>
+          <th>Цена выхода</th>
+          <th>SPY RSI</th>
+          <th>SMA50</th>
+          <th>P&L</th>
         </tr>
       </thead>
       <tbody id="instrTb"></tbody>
@@ -502,7 +504,7 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
   <div class="tw">
     <table><thead><tr>
       <th>Дата</th><th>Тикер</th><th>Тип</th><th>Вход $</th><th>Стоп $</th>
-      <th>Ц1 $</th><th>Ц2 $</th><th>RSI7</th><th>RSI14</th><th>SPY</th>
+      <th>Ц1 $</th><th>Ц2 $</th><th>RSI7</th><th>RSI14</th><th>SPY</th><th>SMA50</th>
       <th>T</th><th>P&L%</th><th>Статус</th><th></th>
     </tr></thead>
     <tbody id="tradesTb"></tbody>
@@ -810,11 +812,18 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
 
     <hr style="margin:14px 0">
 
-    <!-- ROW 3: RSI + status -->
+    <!-- ROW 3: RSI + SMA + status -->
     <div class="fgrid">
       <div class="fg"><label>RSI(7)</label><input type="number" id="te_r7" step=".1" placeholder="18.5"></div>
       <div class="fg"><label>RSI(14)</label><input type="number" id="te_r14" step=".1" placeholder="32.0"></div>
       <div class="fg"><label>SPY RSI(14)</label><input type="number" id="te_spy" step=".1" placeholder="52.0"></div>
+      <div class="fg"><label>Price vs SMA50</label>
+        <select id="te_sma50">
+          <option value="">—</option>
+          <option value="ABOVE">Выше SMA50</option>
+          <option value="BELOW">Ниже SMA50</option>
+        </select>
+      </div>
       <div class="fg"><label>Статус</label><select id="te_sta" onchange="toggleExitFields()"><option value="OPEN">Открыта</option><option value="PARTIAL">Частичный выход</option><option value="CLOSED">Закрыта</option></select></div>
     </div>
 
@@ -1909,7 +1918,7 @@ function openTrade(id=null) {
   if (id) {
     const t = cache.trades.find(x => x.id === id);
     if (t) {
-      const map = {tk:'ticker',tp:'type',dt:'entryDate',en:'entry',sh:'shares',st:'stop',t1:'target1',t2:'target2',r7:'rsi7',r14:'rsi14',spy:'spyRsi',sta:'status',ex:'exitPrice',er:'exitReason',comm:'commission',nt:'notes'};
+      const map = {tk:'ticker',tp:'type',dt:'entryDate',en:'entry',sh:'shares',st:'stop',t1:'target1',t2:'target2',r7:'rsi7',r14:'rsi14',spy:'spyRsi',sma50:'sma50',sta:'status',ex:'exitPrice',er:'exitReason',comm:'commission',nt:'notes'};
       Object.entries(map).forEach(([elId,key]) => {
         const el = document.getElementById('te_'+elId); if(el) el.value = t[key] || '';
       });
@@ -1934,6 +1943,7 @@ function openTrade(id=null) {
     document.getElementById('te_tp').value  = 'LONG';
     document.getElementById('te_sta').value = 'OPEN';
     document.getElementById('te_er').value  = '';
+    document.getElementById('te_sma50').value = '';
     const rsi = document.getElementById('spyRsi').value;
     if (rsi) document.getElementById('te_spy').value = rsi;
   }
@@ -1947,7 +1957,7 @@ async function saveTrade() {
   const ticker = document.getElementById('te_tk').value.trim().toUpperCase();
   if(!ticker) { toast('Введите тикер!',true); return; }
   const id = document.getElementById('te_id').value;
-  const map = {tk:'ticker',tp:'type',dt:'entryDate',en:'entry',sh:'shares',st:'stop',t1:'target1',t2:'target2',r7:'rsi7',r14:'rsi14',spy:'spyRsi',sta:'status',ex:'exitPrice',er:'exitReason',comm:'commission',nt:'notes'};
+  const map = {tk:'ticker',tp:'type',dt:'entryDate',en:'entry',sh:'shares',st:'stop',t1:'target1',t2:'target2',r7:'rsi7',r14:'rsi14',spy:'spyRsi',sma50:'sma50',sta:'status',ex:'exitPrice',er:'exitReason',comm:'commission',nt:'notes'};
   const t = { id: id||Date.now().toString(), createdAt: Date.now() };
   Object.entries(map).forEach(([elId,key]) => { const el=document.getElementById('te_'+elId); if(el) t[key]=el.value; });
   t.ticker = ticker;
@@ -2126,6 +2136,11 @@ function renderTrades() {
     const tColor = tDay === null ? '' : tDay <= 2 ? 'd1' : tDay === 3 ? 'd3' : 'd5';
     const db = tDay !== null ? `<span class="db ${tColor}">${tLabel}</span>` : '—';
     
+    // SMA50 badge
+    const sma50Badge = t.sma50 === 'ABOVE' ? '<span class="g" style="font-size:9px">▲</span>' 
+                     : t.sma50 === 'BELOW' ? '<span class="r" style="font-size:9px">▼</span>' 
+                     : '—';
+    
     // P&L: процент + абсолютное значение
     let pnl = '<span style="color:var(--t2)">—</span>';
     if (t.pnlPct !== undefined) {
@@ -2153,7 +2168,7 @@ function renderTrades() {
       <td><span class="b ${t.type==='LONG'?'b-long':'b-short'}">${t.type}</span></td>
       <td>$${t.entry||'—'}</td><td class="r">$${t.stop||'—'}</td>
       <td class="g">$${t.target1||'—'}</td><td class="g">$${t.target2||'—'}</td>
-      <td>${t.rsi7||'—'}</td><td>${t.rsi14||'—'}</td><td>${t.spyRsi||'—'}</td>
+      <td>${t.rsi7||'—'}</td><td>${t.rsi14||'—'}</td><td>${t.spyRsi||'—'}</td><td>${sma50Badge}</td>
       <td>${db}</td><td>${pnl}</td><td>${stBadge}</td>
       <td><div style="display:flex;gap:5px">
         <button class="btn btn-g btn-s" onclick="openTrade('${t.id}')">✏</button>
@@ -2435,6 +2450,14 @@ function renderInstruments() {
     const entryPrices = g.trades.map(t => t.entry).filter(p => p > 0);
     const exitPrices = g.trades.map(t => t.exitPrice).filter(p => p > 0);
     
+    // SPY RSI stats
+    const spyValues = g.trades.map(t => parseFloat(t.spyRsi)).filter(v => !isNaN(v));
+    const avgSpyRsi = spyValues.length ? (spyValues.reduce((a,b) => a+b, 0) / spyValues.length).toFixed(1) : null;
+    
+    // SMA50 stats
+    const sma50Above = g.trades.filter(t => t.sma50 === 'ABOVE').length;
+    const sma50Below = g.trades.filter(t => t.sma50 === 'BELOW').length;
+    
     return {
       ticker: g.ticker,
       count: g.trades.length,
@@ -2442,12 +2465,15 @@ function renderInstruments() {
       losses: g.losses,
       firstEntry: sortedByEntry[0]?.entryDate || '—',
       lastEntry: sortedByEntry[sortedByEntry.length - 1]?.entryDate || '—',
-      lastExit: sortedByExit[0]?.entryDate || '—', // Using entryDate as proxy for exit
+      lastExit: sortedByExit[0]?.entryDate || '—',
       minEntry: entryPrices.length ? Math.min(...entryPrices) : 0,
       maxEntry: entryPrices.length ? Math.max(...entryPrices) : 0,
       minExit: exitPrices.length ? Math.min(...exitPrices) : 0,
       maxExit: exitPrices.length ? Math.max(...exitPrices) : 0,
-      totalPnl: g.totalPnl
+      totalPnl: g.totalPnl,
+      avgSpyRsi: avgSpyRsi,
+      sma50Above: sma50Above,
+      sma50Below: sma50Below
     };
   });
   
@@ -2459,7 +2485,7 @@ function renderInstruments() {
   
   const tb = document.getElementById('instrTb');
   if (!stats.length) {
-    tb.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--t2);padding:36px">Нет закрытых сделок</td></tr>';
+    tb.innerHTML = '<tr><td colspan="11" style="text-align:center;color:var(--t2);padding:36px">Нет закрытых сделок</td></tr>';
     return;
   }
   
@@ -2467,6 +2493,7 @@ function renderInstruments() {
     const pnlClass = s.totalPnl >= 0 ? 'g' : 'r';
     const pnlSign = s.totalPnl >= 0 ? '+' : '';
     const winRate = s.count > 0 ? ((s.wins / s.count) * 100).toFixed(0) : 0;
+    const sma50Str = (s.sma50Above || s.sma50Below) ? `<span class="g">▲${s.sma50Above}</span>/<span class="r">▼${s.sma50Below}</span>` : '—';
     
     return `<tr>
       <td style="font-weight:700">${s.ticker}</td>
@@ -2477,6 +2504,8 @@ function renderInstruments() {
       <td style="font-family:var(--mono);font-size:11px;color:var(--t2)">${s.lastExit}</td>
       <td style="font-family:var(--mono);font-size:11px">${s.minEntry > 0 ? `$${s.minEntry.toFixed(2)} / $${s.maxEntry.toFixed(2)}` : '—'}</td>
       <td style="font-family:var(--mono);font-size:11px">${s.minExit > 0 ? `$${s.minExit.toFixed(2)} / $${s.maxExit.toFixed(2)}` : '—'}</td>
+      <td style="font-family:var(--mono);font-size:11px">${s.avgSpyRsi || '—'}</td>
+      <td style="font-family:var(--mono);font-size:11px">${sma50Str}</td>
       <td style="font-family:var(--mono);font-weight:700" class="${pnlClass}">${pnlSign}$${s.totalPnl.toFixed(2)}</td>
     </tr>`;
   }).join('');
