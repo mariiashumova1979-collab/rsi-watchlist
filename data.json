@@ -2,7 +2,7 @@
   "trades": [
     {
       "id": "1772039941723",
-      "createdAt": 1772039941723,
+      "createdAt": 1772041206332,
       "ticker": "BX",
       "type": "LONG",
       "entryDate": "2026-02-25",
@@ -14,6 +14,7 @@
       "rsi7": "27.21",
       "rsi14": "24.53",
       "spyRsi": "50.07",
+      "sma50": "BELOW",
       "status": "OPEN",
       "exitPrice": 0,
       "exitReason": "",
