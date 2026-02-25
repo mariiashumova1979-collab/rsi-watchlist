@@ -123,12 +123,12 @@
     },
     {
       "id": "1771340787192",
-      "createdAt": 1771858596522,
+      "createdAt": 1772018993276,
       "ticker": "PYPL",
       "type": "LONG",
       "entryDate": "2026-02-17",
       "entry": 40.57,
-      "shares": 0,
+      "shares": 27,
       "stop": "38.95",
       "target1": "42.19",
       "target2": "43.82",
@@ -145,8 +145,13 @@
         "price": 42.2,
         "shares": 13,
         "commission": 0,
-        "breakevenSet": true
-      }
+        "breakevenSet": true,
+        "pnlNet": 21.19,
+        "pnlPct": 4.02
+      },
+      "pnlNet": 21.04,
+      "pnlPct": 1.92,
+      "result": "WIN"
     },
     {
       "id": "1771340669382",
@@ -719,6 +724,12 @@
       "BX_r14": 22.42,
       "GRMN_r7": 83.3,
       "GRMN_r14": 75.76
+    },
+    "2026-02-25": {
+      "BX_r7": 27.21,
+      "BX_r14": 24.53,
+      "GRMN_r7": 85.21,
+      "GRMN_r14": 77.42
     }
   }
 }
