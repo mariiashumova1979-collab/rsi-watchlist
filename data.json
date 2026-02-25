@@ -1,28 +1,8 @@
 {
   "trades": [
     {
-      "id": "1772032178427",
-      "createdAt": 1772032178427,
-      "ticker": "BX",
-      "type": "LONG",
-      "entryDate": "2026-02-25",
-      "entry": 116.51,
-      "shares": 10,
-      "stop": "111.85",
-      "target1": "121.17",
-      "target2": "125.83",
-      "rsi7": "27.21",
-      "rsi14": "24.53",
-      "spyRsi": "50.07",
-      "status": "OPEN",
-      "exitPrice": 0,
-      "exitReason": "",
-      "commission": 0,
-      "notes": ""
-    },
-    {
       "id": "1771514449001",
-      "createdAt": 1771514449001,
+      "createdAt": 1772039891482,
       "ticker": "IQV",
       "type": "LONG",
       "entryDate": "2026-02-19",
@@ -34,11 +14,14 @@
       "rsi7": "28.21",
       "rsi14": "27.63",
       "spyRsi": "48.25",
-      "status": "OPEN",
-      "exitPrice": 0,
-      "exitReason": "",
-      "commission": 0,
-      "notes": ""
+      "status": "CLOSED",
+      "exitPrice": 164.27,
+      "exitReason": "TIME",
+      "commission": 0.01,
+      "notes": "",
+      "pnlNet": -4.33,
+      "pnlPct": -0.44,
+      "result": "LOSS"
     },
     {
       "id": "1771514140657",
