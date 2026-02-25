@@ -1,6 +1,26 @@
 {
   "trades": [
     {
+      "id": "1772032178427",
+      "createdAt": 1772032178427,
+      "ticker": "BX",
+      "type": "LONG",
+      "entryDate": "2026-02-25",
+      "entry": 116.51,
+      "shares": 10,
+      "stop": "111.85",
+      "target1": "121.17",
+      "target2": "125.83",
+      "rsi7": "27.21",
+      "rsi14": "24.53",
+      "spyRsi": "50.07",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "commission": 0,
+      "notes": ""
+    },
+    {
       "id": "1771514449001",
       "createdAt": 1771514449001,
       "ticker": "IQV",
