@@ -451,6 +451,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "KKR",
+      "sector": "Финансы",
+      "cap": "78.16",
+      "beta": "1.86",
+      "earningsDate": "2026-05-05",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1772397384455
+    },
+    {
       "ticker": "ABNB",
       "sector": "Потребительский",
       "cap": "82.24",
