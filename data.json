@@ -451,6 +451,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "SNOW",
+      "sector": "Технологии",
+      "cap": "57.63",
+      "beta": "1.37",
+      "earningsDate": "2026-05-27",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1772399370680
+    },
+    {
       "ticker": "MPC",
       "sector": "Энергетика",
       "cap": "58.42",
