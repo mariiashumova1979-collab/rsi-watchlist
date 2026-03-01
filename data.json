@@ -451,6 +451,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "LRCX",
+      "sector": "Другое",
+      "cap": "292.08",
+      "beta": "2.12",
+      "earningsDate": "2026-04-29",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1772390661974
+    },
+    {
       "ticker": "AMD",
       "sector": "Технологии",
       "cap": "326.42",
