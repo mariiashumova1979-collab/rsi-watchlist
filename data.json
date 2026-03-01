@@ -451,6 +451,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "COF",
+      "sector": "Финансы",
+      "cap": "121.67",
+      "beta": "1.56",
+      "earningsDate": "2026-04-23",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1772394123129
+    },
+    {
       "ticker": "GLW",
       "sector": "Технологии",
       "cap": "129.02",
