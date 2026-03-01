@@ -451,6 +451,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "TFC",
+      "sector": "Финансы",
+      "cap": "61.6",
+      "beta": "1.28",
+      "earningsDate": "2026-04-17",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1772398410823
+    },
+    {
       "ticker": "SE",
       "sector": "Потребительский",
       "cap": "64.2",
