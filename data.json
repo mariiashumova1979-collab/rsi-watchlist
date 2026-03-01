@@ -451,6 +451,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "ANET",
+      "sector": "Технологии",
+      "cap": "167.75",
+      "beta": "2.17",
+      "earningsDate": "2026-05-04",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1772392951657
+    },
+    {
       "ticker": "BA",
       "sector": "Технологии",
       "cap": "178.69",
