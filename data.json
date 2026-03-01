@@ -451,6 +451,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "BAC",
+      "sector": "Финансы",
+      "cap": "357.61",
+      "beta": "1.44",
+      "earningsDate": "2026-04-15",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1772390346092
+    },
+    {
       "ticker": "ORCL",
       "sector": "Технологии",
       "cap": "417.89",
