@@ -451,6 +451,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "C",
+      "sector": "Финансы",
+      "cap": "192.76",
+      "beta": "1.66",
+      "earningsDate": "2026-04-14",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1772391136876
+    },
+    {
       "ticker": "INTC",
       "sector": "Технологии",
       "cap": "227.82",
