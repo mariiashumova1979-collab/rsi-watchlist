@@ -451,6 +451,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "NET",
+      "sector": "Технологии",
+      "cap": "60.64",
+      "beta": "1.91",
+      "earningsDate": "2026-04-30",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1772398890619
+    },
+    {
       "ticker": "VLO",
       "sector": "Энергетика",
       "cap": "61.19",
