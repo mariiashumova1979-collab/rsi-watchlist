@@ -451,6 +451,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "BN",
+      "sector": "Финансы",
+      "cap": "108.59",
+      "beta": "1.6",
+      "earningsDate": "2026-05-07",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1772394538834
+    },
+    {
       "ticker": "NOW",
       "sector": "Технологии",
       "cap": "112.98",
