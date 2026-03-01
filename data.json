@@ -451,6 +451,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "DIS",
+      "sector": "Потребительский",
+      "cap": "187.85",
+      "beta": "1.1",
+      "earningsDate": "2026-05-13",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1772391296059
+    },
+    {
       "ticker": "C",
       "sector": "Финансы",
       "cap": "192.76",
