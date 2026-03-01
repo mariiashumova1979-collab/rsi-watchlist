@@ -451,6 +451,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "RBLX",
+      "sector": "Технологии",
+      "cap": "48.66",
+      "beta": "1.33",
+      "earningsDate": "2026-05-13",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1772399506823
+    },
+    {
       "ticker": "CARR",
       "sector": "Другое",
       "cap": "53.83",
