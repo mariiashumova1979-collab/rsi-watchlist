@@ -451,6 +451,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "EMR",
+      "sector": "Технологии",
+      "cap": "84.77",
+      "beta": "1.3",
+      "earningsDate": "2026-05-06",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1772397175973
+    },
+    {
       "ticker": "USB",
       "sector": "Финансы",
       "cap": "84.93",
