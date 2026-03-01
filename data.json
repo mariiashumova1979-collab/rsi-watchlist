@@ -451,6 +451,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "PDD",
+      "sector": "Потребительский",
+      "cap": "144.41",
+      "beta": "1.02",
+      "earningsDate": "2026-03-23",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1772393385561
+    },
+    {
       "ticker": "QCOM",
       "sector": "Технологии",
       "cap": "151.9",
