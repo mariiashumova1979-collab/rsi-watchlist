@@ -451,6 +451,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "GLW",
+      "sector": "Технологии",
+      "cap": "129.02",
+      "beta": "1.11",
+      "earningsDate": "2026-05-05",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1772394000054
+    },
+    {
       "ticker": "ARM",
       "sector": "Технологии",
       "cap": "169.82",
