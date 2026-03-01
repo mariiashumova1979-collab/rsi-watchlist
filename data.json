@@ -451,6 +451,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "VLO",
+      "sector": "Энергетика",
+      "cap": "61.19",
+      "beta": "3.11",
+      "earningsDate": "2026-04-23",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1772398856276
+    },
+    {
       "ticker": "TFC",
       "sector": "Финансы",
       "cap": "61.6",
