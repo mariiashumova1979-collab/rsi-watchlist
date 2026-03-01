@@ -451,6 +451,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "WBD",
+      "sector": "Потребительский",
+      "cap": "69.86",
+      "beta": "1.53",
+      "earningsDate": "2026-05-07",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1772397609154
+    },
+    {
       "ticker": "BAM",
       "sector": "Финансы",
       "cap": "76.57",
