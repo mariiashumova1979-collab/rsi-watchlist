@@ -451,6 +451,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "APO",
+      "sector": "Финансы",
+      "cap": "60.48",
+      "beta": "1.83",
+      "earningsDate": "2026-04-30",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1772398984753
+    },
+    {
       "ticker": "NET",
       "sector": "Технологии",
       "cap": "60.64",
