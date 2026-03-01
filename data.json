@@ -451,6 +451,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "PYPL",
+      "sector": "Финансы",
+      "cap": "42.54",
+      "beta": "1.25",
+      "earningsDate": "2026-05-05",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1772400068652
+    },
+    {
       "ticker": "DAL",
       "sector": "Потребительский",
       "cap": "42.91",
