@@ -451,6 +451,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "CRM",
+      "sector": "Технологии",
+      "cap": "182.52",
+      "beta": "1.26",
+      "earningsDate": "2026-06-03",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1772392536697
+    },
+    {
       "ticker": "DIS",
       "sector": "Потребительский",
       "cap": "187.85",
