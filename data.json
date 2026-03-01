@@ -451,6 +451,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "NKE",
+      "sector": "Потребительский",
+      "cap": "92.05",
+      "beta": "1.18",
+      "earningsDate": "2026-04-02",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1772395223490
+    },
+    {
       "ticker": "FCX",
       "sector": "Другое",
       "cap": "97.84",
