@@ -451,6 +451,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "NOW",
+      "sector": "Технологии",
+      "cap": "112.98",
+      "beta": "1.41",
+      "earningsDate": "2026-04-29",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1772394420679
+    },
+    {
       "ticker": "IBKR",
       "sector": "Финансы",
       "cap": "120.75",
