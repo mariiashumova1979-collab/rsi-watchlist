@@ -451,6 +451,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "PNC",
+      "sector": "Финансы",
+      "cap": "85.66",
+      "beta": "1.04",
+      "earningsDate": "2026-04-15",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1772397002657
+    },
+    {
       "ticker": "NKE",
       "sector": "Потребительский",
       "cap": "92.05",
