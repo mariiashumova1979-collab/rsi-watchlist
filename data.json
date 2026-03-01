@@ -899,16 +899,6 @@
       "cooldownDate": "2026-03-11",
       "notes": "",
       "addedAt": 1770846257187
-    },
-    {
-      "ticker": "PPG",
-      "sector": "Технологии",
-      "cap": "",
-      "beta": "",
-      "earningsDate": "",
-      "cooldownDate": "",
-      "notes": "",
-      "addedAt": 1770804151105
     }
   ],
   "quarterly": {},
