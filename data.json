@@ -831,16 +831,6 @@
       "addedAt": 1770976004452
     },
     {
-      "ticker": "IRM",
-      "sector": "Финансы",
-      "cap": "29.62",
-      "beta": "1.33",
-      "earningsDate": "2026-02-12",
-      "cooldownDate": "2026-03-20",
-      "notes": "",
-      "addedAt": 1770975665548
-    },
-    {
       "ticker": "TXN",
       "sector": "Технологии",
       "cap": "",
