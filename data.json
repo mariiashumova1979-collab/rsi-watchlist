@@ -451,6 +451,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "ORCL",
+      "sector": "Технологии",
+      "cap": "417.89",
+      "beta": "1.33",
+      "earningsDate": "2026-03-09",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1772384223659
+    },
+    {
       "ticker": "BX",
       "sector": "Финансы",
       "cap": "139.72",
