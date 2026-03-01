@@ -451,6 +451,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "CCL",
+      "sector": "Потребительский",
+      "cap": "43.62",
+      "beta": "1.69",
+      "earningsDate": "2026-03-20",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1772399887610
+    },
+    {
       "ticker": "BE",
       "sector": "Технологии",
       "cap": "43.67",
