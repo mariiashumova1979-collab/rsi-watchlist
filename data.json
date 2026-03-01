@@ -451,6 +451,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "SCCO",
+      "sector": "Другое",
+      "cap": "180.33",
+      "beta": "1.39",
+      "earningsDate": "2026-04-23",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1772392641228
+    },
+    {
       "ticker": "CRM",
       "sector": "Технологии",
       "cap": "182.52",
