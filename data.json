@@ -451,6 +451,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "USB",
+      "sector": "Финансы",
+      "cap": "84.93",
+      "beta": "1.21",
+      "earningsDate": "2026-04-16",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1772397080544
+    },
+    {
       "ticker": "PNC",
       "sector": "Финансы",
       "cap": "85.66",
