@@ -451,6 +451,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "BAM",
+      "sector": "Финансы",
+      "cap": "76.57",
+      "beta": "1.58",
+      "earningsDate": "2026-05-07",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1772397480619
+    },
+    {
       "ticker": "KKR",
       "sector": "Финансы",
       "cap": "78.16",
