@@ -451,6 +451,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "WFC",
+      "sector": "Финансы",
+      "cap": "251.33",
+      "beta": "1.58",
+      "earningsDate": "2026-04-14",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1772390832674
+    },
+    {
       "ticker": "LRCX",
       "sector": "Другое",
       "cap": "292.08",
