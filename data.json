@@ -929,16 +929,6 @@
       "cooldownDate": "",
       "notes": "",
       "addedAt": 1770803987845
-    },
-    {
-      "ticker": "PYPL",
-      "sector": "Финансы",
-      "cap": "",
-      "beta": "",
-      "earningsDate": "",
-      "cooldownDate": "",
-      "notes": "",
-      "addedAt": 1770803917923
     }
   ],
   "quarterly": {},
