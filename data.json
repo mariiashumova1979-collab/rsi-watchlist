@@ -451,6 +451,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "PANW",
+      "sector": "Технологии",
+      "cap": "121.52",
+      "beta": "1.35",
+      "earningsDate": "2026-05-26",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1772394244411
+    },
+    {
       "ticker": "COF",
       "sector": "Финансы",
       "cap": "121.67",
