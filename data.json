@@ -451,6 +451,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "MCHP",
+      "sector": "Технологии",
+      "cap": "40.39",
+      "beta": "2.14",
+      "earningsDate": "2026-05-11",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1772400142613
+    },
+    {
       "ticker": "PYPL",
       "sector": "Финансы",
       "cap": "42.54",
