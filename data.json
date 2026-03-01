@@ -451,6 +451,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "CARR",
+      "sector": "Другое",
+      "cap": "53.83",
+      "beta": "1.13",
+      "earningsDate": "2026-04-23",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1772399412801
+    },
+    {
       "ticker": "SNOW",
       "sector": "Технологии",
       "cap": "57.63",
