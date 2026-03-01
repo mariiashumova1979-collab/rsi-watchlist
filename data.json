@@ -881,16 +881,6 @@
       "addedAt": 1770892812765
     },
     {
-      "ticker": "RF",
-      "sector": "Финансы",
-      "cap": "27.14",
-      "beta": "1.53",
-      "earningsDate": "2026-04-14",
-      "cooldownDate": "",
-      "notes": "",
-      "addedAt": 1770892579968
-    },
-    {
       "ticker": "TXN",
       "sector": "Технологии",
       "cap": "",
