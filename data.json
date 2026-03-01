@@ -451,6 +451,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "APH",
+      "sector": "Технологии",
+      "cap": "179.54",
+      "beta": "1.49",
+      "earningsDate": "2026-04-29",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1772392759367
+    },
+    {
       "ticker": "SCCO",
       "sector": "Другое",
       "cap": "180.33",
