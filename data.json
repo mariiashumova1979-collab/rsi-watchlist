@@ -451,6 +451,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "FCX",
+      "sector": "Другое",
+      "cap": "97.84",
+      "beta": "1.75",
+      "earningsDate": "2026-04-16",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1772394744711
+    },
+    {
       "ticker": "BN",
       "sector": "Финансы",
       "cap": "108.59",
