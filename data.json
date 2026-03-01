@@ -451,6 +451,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "MPC",
+      "sector": "Энергетика",
+      "cap": "58.42",
+      "beta": "1.14",
+      "earningsDate": "2026-05-05",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1772399206390
+    },
+    {
       "ticker": "APO",
       "sector": "Финансы",
       "cap": "60.48",
