@@ -451,6 +451,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "HOOD",
+      "sector": "Финансы",
+      "cap": "68.34",
+      "beta": "3.06",
+      "earningsDate": "2026-05-13",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1772398034215
+    },
+    {
       "ticker": "WBD",
       "sector": "Потребительский",
       "cap": "69.86",
