@@ -451,6 +451,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "DAL",
+      "sector": "Потребительский",
+      "cap": "42.91",
+      "beta": "1.6",
+      "earningsDate": "2026-04-15",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1772399994386
+    },
+    {
       "ticker": "CCL",
       "sector": "Потребительский",
       "cap": "43.62",
