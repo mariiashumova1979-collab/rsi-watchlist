@@ -451,6 +451,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "COIN",
+      "sector": "Финансы",
+      "cap": "46.44",
+      "beta": "2.44",
+      "earningsDate": "2026-05-07",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1772399616849
+    },
+    {
       "ticker": "RBLX",
       "sector": "Технологии",
       "cap": "48.66",
