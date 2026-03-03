@@ -546,9 +546,10 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
         <thead><tr>
           <th>Тикер</th>
           <th>Сектор</th>
-          <th>RSI(7) сегодня</th>
-          <th>RSI(14) сегодня</th>
-          <th>История RSI(7) ← 5 дней</th>
+          <th>RSI(7)</th>
+          <th>RSI(14)</th>
+          <th>SMA50</th>
+          <th>История RSI(7)</th>
           <th>Сигнал</th>
           <th>Статус</th>
         </tr></thead>
@@ -2714,30 +2715,47 @@ function getRsiColor(val) {
 }
 
 function computeSignal(w, scan) {
-  // T0 = сегодня (день входа если сигнал)
-  // T-1 = вчера (предыдущий торговый день)
-  // scan = { rsi7: T0 value, rsi7prev: T-1 value, rsi14: T0 value }
-  const { rsi7, rsi7prev, rsi14 } = scan;
+  // ═══════════════════════════════════════════════════════════
+  // ОБНОВЛЁННЫЕ ПРАВИЛА ВХОДА (финальная версия)
+  // ═══════════════════════════════════════════════════════════
+  // ЛОНГ:
+  //   • RSI(7) < 30
+  //   • RSI(14) < 40
+  //   • Цена выше SMA50
+  //   • SPY RSI(14) < 45
+  // ШОРТ:
+  //   • RSI(7) > 70
+  //   • RSI(14) > 60
+  //   • Цена выше SMA50
+  //   • SPY RSI — не учитывается
+  // ═══════════════════════════════════════════════════════════
+  
+  const { rsi7, rsi14, sma50, spyRsi } = scan;
   if (rsi7 === '' || rsi14 === '') return 'none';
 
-  const r7  = parseFloat(rsi7);     // RSI(7) на T0
-  const r7p = parseFloat(rsi7prev); // RSI(7) на T-1
-  const r14 = parseFloat(rsi14);    // RSI(14) на T0
+  const r7  = parseFloat(rsi7);
+  const r14 = parseFloat(rsi14);
+  const spy = spyRsi !== '' && spyRsi !== undefined ? parseFloat(spyRsi) : null;
   if (isNaN(r7) || isNaN(r14)) return 'none';
 
-  // LONG SIGNAL: RSI(7) пересёк 20 снизу вверх (T-1 < 20, T0 > 20) И RSI(14) < 40
-  // → Открываем позицию СЕГОДНЯ (T0)
-  if (!isNaN(r7p) && r7p < 20 && r7 > 20 && r14 < 40) return 'LONG_SIGNAL';
+  // LONG SIGNAL: RSI(7) < 30 AND RSI(14) < 40 AND above SMA50 AND SPY RSI < 45
+  const longRsi = r7 < 30 && r14 < 40;
+  const longSma = sma50 === 'ABOVE';
+  const longSpy = spy === null || spy < 45; // если SPY не указан — пропускаем проверку
+  
+  if (longRsi && longSma && longSpy) return 'LONG_SIGNAL';
 
-  // SHORT SIGNAL: RSI(7) пересёк 80 сверху вниз (T-1 > 80, T0 < 80) И RSI(14) > 60
-  // → Открываем позицию СЕГОДНЯ (T0)
-  if (!isNaN(r7p) && r7p > 80 && r7 < 80 && r14 > 60) return 'SHORT_SIGNAL';
+  // SHORT SIGNAL: RSI(7) > 70 AND RSI(14) > 60 AND above SMA50 (SPY не учитывается)
+  const shortRsi = r7 > 70 && r14 > 60;
+  const shortSma = sma50 === 'ABOVE';
+  
+  if (shortRsi && shortSma) return 'SHORT_SIGNAL';
 
-  // WATCH LONG: RSI(7) < 25 — приближается к зоне сигнала
-  if (r7 < 25) return 'WATCH_LONG';
+  // WATCH LONG: RSI(7) < 35 — приближается к зоне сигнала
+  if (r7 < 35 && r14 < 45) return 'WATCH_LONG';
 
-  // WATCH SHORT: RSI(7) > 75 — приближается к зоне сигнала
-  if (r7 > 75) return 'WATCH_SHORT';
+  // WATCH SHORT: RSI(7) > 65 — приближается к зоне сигнала
+  if (r7 > 65 && r14 > 55) return 'WATCH_SHORT';
 
   return 'none';
 }
@@ -2778,9 +2796,17 @@ function renderRsiScan() {
 
     const r7cur  = t0Scan[w.ticker + '_r7']  ?? '';      // RSI(7) на T0
     const r14cur = t0Scan[w.ticker + '_r14'] ?? '';      // RSI(14) на T0
-    const r7prev = tMinus1Scan[w.ticker + '_r7'] ?? '';  // RSI(7) на T-1
+    const sma50cur = t0Scan[w.ticker + '_sma50'] ?? '';  // SMA50 на T0
+    
+    // Get SPY RSI from dashboard
+    const spyRsi = document.getElementById('spyRsi')?.value || '';
 
-    const sig = inactive ? 'blocked' : hasPosition ? 'position' : computeSignal(w, { rsi7: r7cur, rsi7prev: r7prev, rsi14: r14cur });
+    const sig = inactive ? 'blocked' : hasPosition ? 'position' : computeSignal(w, { 
+      rsi7: r7cur, 
+      rsi14: r14cur, 
+      sma50: sma50cur,
+      spyRsi: spyRsi
+    });
 
     let sigHtml;
     switch(sig) {
@@ -2870,6 +2896,15 @@ function renderRsiScan() {
           ${r14cur !== '' ? `<div class="rsi-mini"><div class="rsi-mini-fill" style="width:${Math.min(100,parseFloat(r14cur)||0)}%;background:${r14color}"></div></div><span class="rsi-val" style="color:${r14color}">${parseFloat(r14cur).toFixed(0)}</span>` : ''}
         </div>
       </td>
+      <td>
+        <select class="rsi-inp" style="width:70px;padding:4px 2px;font-size:10px" 
+          onchange="updateRsiScan('${w.ticker}','sma50',this.value)" 
+          ${inactive ? 'disabled style="opacity:.4"' : ''}>
+          <option value="" ${sma50cur === '' ? 'selected' : ''}>—</option>
+          <option value="ABOVE" ${sma50cur === 'ABOVE' ? 'selected' : ''}>▲ Выше</option>
+          <option value="BELOW" ${sma50cur === 'BELOW' ? 'selected' : ''}>▼ Ниже</option>
+        </select>
+      </td>
       <td style="padding:8px 14px">${histHtml}</td>
       <td>${sigHtml}</td>
       <td>${stText}</td>
@@ -2883,10 +2918,19 @@ function updateRsiScan(ticker, field, value) {
   const t0 = today(); // T0 = сегодня
   if (!cache.rsiScans) cache.rsiScans = {};
   if (!cache.rsiScans[t0]) cache.rsiScans[t0] = {};
-  cache.rsiScans[t0][ticker + '_' + field] = value === '' ? '' : parseFloat(value);
+  
+  // SMA50 is string, RSI values are numbers
+  if (field === 'sma50') {
+    cache.rsiScans[t0][ticker + '_' + field] = value;
+  } else {
+    cache.rsiScans[t0][ticker + '_' + field] = value === '' ? '' : parseFloat(value);
+  }
+  
   // Update signal cell in this row live
   const rows = document.querySelectorAll('#rsiScanTbody tr');
   const wl = cache.watchlist;
+  const spyRsi = document.getElementById('spyRsi')?.value || '';
+  
   rows.forEach((row, i) => {
     if (!wl[i]) return;
     if (wl[i].ticker !== ticker && !row.querySelector(`[onchange*="'${ticker}'"]`)) return;
@@ -2894,18 +2938,23 @@ function updateRsiScan(ticker, field, value) {
     if (row.cells[0]?.textContent?.trim() !== ticker) return;
     const scans = cache.rsiScans || {};
     const t0Scan = scans[t0] || {};
-    const tMinus1 = getPrevDate(t0);
-    const tMinus1Scan = scans[tMinus1] || {};
     const r7cur  = t0Scan[ticker + '_r7']  ?? '';
-    const r7prev = tMinus1Scan[ticker + '_r7'] ?? '';
     const r14cur = t0Scan[ticker + '_r14'] ?? '';
-    const sig = computeSignal(wl[i], { rsi7: r7cur, rsi7prev: r7prev, rsi14: r14cur });
-    // Update signal cell (index 5)
-    const sigCell = row.cells[5];
+    const sma50cur = t0Scan[ticker + '_sma50'] ?? '';
+    
+    const sig = computeSignal(wl[i], { 
+      rsi7: r7cur, 
+      rsi14: r14cur, 
+      sma50: sma50cur,
+      spyRsi: spyRsi
+    });
+    
+    // Update signal cell (index 6 now with SMA50 column)
+    const sigCell = row.cells[6];
     if (sigCell) {
       switch(sig) {
-        case 'LONG_SIGNAL':  sigCell.innerHTML = '<span class="sig-long">🟢 ЛОНГ СИГНАЛ</span>'; break;
-        case 'SHORT_SIGNAL': sigCell.innerHTML = '<span class="sig-short">🔴 ШОРТ СИГНАЛ</span>'; break;
+        case 'LONG_SIGNAL':  sigCell.innerHTML = '<span class="sig-long">🟢 ЛОНГ → ВХОД T0</span>'; break;
+        case 'SHORT_SIGNAL': sigCell.innerHTML = '<span class="sig-short">🔴 ШОРТ → ВХОД T0</span>'; break;
         case 'WATCH_LONG':   sigCell.innerHTML = '<span class="sig-watch">👀 СЛЕДИМ ЛОНГ</span>'; break;
         case 'WATCH_SHORT':  sigCell.innerHTML = '<span class="sig-watch">👀 СЛЕДИМ ШОРТ</span>'; break;
         default:             sigCell.innerHTML = '<span class="sig-none">—</span>';
@@ -2913,29 +2962,32 @@ function updateRsiScan(ticker, field, value) {
       // row highlight
       const bg = sig === 'LONG_SIGNAL'  ? 'rgba(126,232,162,.04)' :
                  sig === 'SHORT_SIGNAL' ? 'rgba(255,107,138,.04)' :
-                 (sig.includes('WATCH'))? 'rgba(255,200,90,.03)'  : '';
+                 (sig.includes && sig.includes('WATCH'))? 'rgba(255,200,90,.03)'  : '';
       row.style.background = bg;
     }
-    // Update mini bar in changed cell
-    const colIdx = field === 'r7' ? 2 : 3;
-    const cell = row.cells[colIdx];
-    if (cell && value !== '') {
-      const color = getRsiColor(parseFloat(value));
-      const barWrap = cell.querySelector('.rsi-bar-wrap');
-      if (barWrap) {
-        let mini = barWrap.querySelector('.rsi-mini');
-        let val  = barWrap.querySelector('.rsi-val');
-        if (!mini) {
-          mini = document.createElement('div'); mini.className = 'rsi-mini'; barWrap.appendChild(mini);
-          val  = document.createElement('span'); val.className  = 'rsi-val';  barWrap.appendChild(val);
+    // Update mini bar in changed cell (RSI only, not SMA50)
+    if (field !== 'sma50') {
+      const colIdx = field === 'r7' ? 2 : 3;
+      const cell = row.cells[colIdx];
+      if (cell && value !== '') {
+        const color = getRsiColor(parseFloat(value));
+        const barWrap = cell.querySelector('.rsi-bar-wrap');
+        if (barWrap) {
+          let mini = barWrap.querySelector('.rsi-mini');
+          let val  = barWrap.querySelector('.rsi-val');
+          if (!mini) {
+            mini = document.createElement('div'); mini.className = 'rsi-mini'; barWrap.appendChild(mini);
+            val  = document.createElement('span'); val.className  = 'rsi-val';  barWrap.appendChild(val);
+          }
+          mini.innerHTML = `<div class="rsi-mini-fill" style="width:${Math.min(100,parseFloat(value)||0)}%;background:${color}"></div>`;
+          val.textContent = parseFloat(value).toFixed(0);
+          val.style.color = color;
         }
-        mini.innerHTML = `<div class="rsi-mini-fill" style="width:${Math.min(100,parseFloat(value)||0)}%;background:${color}"></div>`;
-        val.textContent = parseFloat(value).toFixed(0);
-        val.style.color = color;
       }
     }
   });
   renderDashSignals();
+  scheduleSave();
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -3019,19 +3071,31 @@ async function saveRsiScan() {
 function renderDashSignals() {
   const td = today();
   const scans = cache.rsiScans || {};
-  const todayScan  = scans[td]          || {};
-  const yesterday  = getPrevDate(td);
-  const yesterScan = scans[yesterday]   || {};
+  const todayScan = scans[td] || {};
   const wl = cache.watchlist;
+  const spyRsi = document.getElementById('spyRsi')?.value || '';
 
   const signals = [];
   wl.forEach(w => {
     if (isBlackout(w) || isCooldown(w)) return;
+    // Check if has open position
+    const hasPosition = cache.trades.some(t => 
+      t.ticker.toUpperCase() === w.ticker.toUpperCase() && 
+      (t.status === 'OPEN' || t.status === 'PARTIAL')
+    );
+    if (hasPosition) return;
+    
     const r7cur  = todayScan[w.ticker + '_r7']  ?? '';
     const r14cur = todayScan[w.ticker + '_r14'] ?? '';
-    const r7prev = yesterScan[w.ticker + '_r7'] ?? '';
-    const sig = computeSignal(w, { rsi7: r7cur, rsi7prev: r7prev, rsi14: r14cur });
-    if (sig !== 'none') signals.push({ w, sig, r7: r7cur, r14: r14cur, r7prev });
+    const sma50cur = todayScan[w.ticker + '_sma50'] ?? '';
+    
+    const sig = computeSignal(w, { 
+      rsi7: r7cur, 
+      rsi14: r14cur, 
+      sma50: sma50cur,
+      spyRsi: spyRsi
+    });
+    if (sig !== 'none') signals.push({ w, sig, r7: r7cur, r14: r14cur, sma50: sma50cur });
   });
 
   // Sort: SIGNAL first, then WATCH
@@ -3045,11 +3109,11 @@ function renderDashSignals() {
   if (dateEl) dateEl.textContent = new Date().toLocaleDateString('ru-RU',{weekday:'short',day:'2-digit',month:'short'});
 
   if (!signals.length) {
-    el.innerHTML = '<div class="empty" style="padding:20px"><div class="empty-t" style="font-family:var(--mono);font-size:11px">Нет сигналов — заполните RSI в разделе «Список»</div></div>';
+    el.innerHTML = '<div class="empty" style="padding:20px"><div class="empty-t" style="font-family:var(--mono);font-size:11px">Нет сигналов — заполните RSI и SMA50 в разделе «Список»</div></div>';
     return;
   }
 
-  el.innerHTML = signals.map(({ w, sig, r7, r14, r7prev }) => {
+  el.innerHTML = signals.map(({ w, sig, r7, r14, sma50 }) => {
     const isSignal = sig.includes('SIGNAL');
     const isLong   = sig.includes('LONG');
     const cls      = isSignal ? (isLong ? 'long' : 'short') : 'watch';
@@ -3058,6 +3122,10 @@ function renderDashSignals() {
                 : sig === 'SHORT_SIGNAL' ? '🔴 ШОРТ → ВХОД T0 (сегодня)'
                 : sig === 'WATCH_LONG'   ? '👀 НАБЛЮДАЕМ ЛОНГ'
                 :                          '👀 НАБЛЮДАЕМ ШОРТ';
+    
+    const sma50Badge = sma50 === 'ABOVE' ? '<span class="g">▲SMA50</span>' 
+                     : sma50 === 'BELOW' ? '<span class="r">▼SMA50</span>' 
+                     : '<span style="color:var(--t3)">SMA50?</span>';
 
     return `<div class="sig-card ${cls}">
       <div style="display:flex;align-items:center;gap:12px">
@@ -3068,9 +3136,9 @@ function renderDashSignals() {
       <div style="display:flex;gap:14px;font-family:var(--mono);font-size:10px;color:var(--t2)">
         <span>RSI7: <span style="color:${getRsiColor(parseFloat(r7))};font-weight:700">${r7||'—'}</span></span>
         <span>RSI14: <span style="color:${getRsiColor(parseFloat(r14))};font-weight:700">${r14||'—'}</span></span>
-        <span>RSI7 T-1: <span style="color:var(--text)">${r7prev||'—'}</span></span>
+        <span>${sma50Badge}</span>
       </div>
-      ${isSignal ? `<button class="btn btn-p btn-s" onclick="openTrade();setTimeout(()=>{document.getElementById('te_tk').value='${w.ticker}';document.getElementById('te_r7').value='${r7}';document.getElementById('te_r14').value='${r14}';},50)">+ СДЕЛКА T0</button>` : ''}
+      ${isSignal ? `<button class="btn btn-p btn-s" onclick="openTrade();setTimeout(()=>{document.getElementById('te_tk').value='${w.ticker}';document.getElementById('te_r7').value='${r7}';document.getElementById('te_r14').value='${r14}';document.getElementById('te_sma50').value='${sma50}';},50)">+ СДЕЛКА T0</button>` : ''}
     </div>`;
   }).join('');
 }
