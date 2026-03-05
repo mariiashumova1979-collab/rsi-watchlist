@@ -454,6 +454,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "PBF",
+      "sector": "Энергетика",
+      "cap": "5.13",
+      "beta": "1.42",
+      "earningsDate": "2026-04-30",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1772698852214
+    },
+    {
       "ticker": "AROC",
       "sector": "Другое",
       "cap": "6.47",
