@@ -462,16 +462,6 @@
       "cooldownDate": "",
       "notes": "",
       "addedAt": 1772398856276
-    },
-    {
-      "ticker": "DAL",
-      "sector": "Потребительский",
-      "cap": "42.91",
-      "beta": "2.14",
-      "earningsDate": "2026-04-15",
-      "cooldownDate": "",
-      "notes": "",
-      "addedAt": 1770846257187
     }
   ],
   "quarterly": {},
