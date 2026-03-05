@@ -454,6 +454,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "FIGS",
+      "sector": "Потребительский",
+      "cap": "2.85",
+      "beta": "1.04",
+      "earningsDate": "2026-05-07",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1772698638344
+    },
+    {
       "ticker": "VLO",
       "sector": "Энергетика",
       "cap": "61.19",
