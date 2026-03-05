@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RSI Swing Journal</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📈</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -394,6 +395,35 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
 <!-- ═══════════════════════ DASHBOARD ═══════════════════════ -->
 <div class="tab active" id="tab-dashboard">
   <div class="g4" id="statsGrid" style="margin-bottom:24px"></div>
+  
+  <!-- MORNING CHECKLIST -->
+  <div class="card" style="padding:18px;margin-bottom:24px;border:1px solid var(--acc4);background:rgba(91,156,246,.03)">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div style="font-family:var(--mono);font-size:11px;color:var(--acc4);letter-spacing:1.5px;text-transform:uppercase">🌅 УТРЕННИЙ ЧЕКЛИСТ (до открытия)</div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--t2)" id="morningDate"></div>
+    </div>
+    <div class="fgrid" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px">
+      <div class="fg">
+        <label>$SPXA50R (%)</label>
+        <input type="number" id="spxa50r" min="0" max="100" step="0.1" placeholder="55.0" oninput="updMorning()">
+        <div id="spxa50rHint" style="font-family:var(--mono);font-size:9px;margin-top:4px;min-height:14px"></div>
+      </div>
+      <div class="fg">
+        <label>$TRIN</label>
+        <input type="number" id="trin" min="0" max="5" step="0.01" placeholder="1.00" oninput="updMorning()">
+        <div id="trinHint" style="font-family:var(--mono);font-size:9px;margin-top:4px;min-height:14px"></div>
+      </div>
+      <div class="fg">
+        <label>Топ секторы (месяц)</label>
+        <input type="text" id="topSectors" placeholder="XLK, XLF, XLV" style="text-transform:uppercase">
+      </div>
+    </div>
+    <div id="morningVerdict" style="font-family:var(--mono);font-size:12px;font-weight:700;padding:10px 14px;border-radius:8px;margin-top:12px;background:var(--bg4);text-align:center"></div>
+    <div class="ar" style="margin-top:12px">
+      <button class="btn btn-p btn-s" onclick="saveMorning()">СОХРАНИТЬ</button>
+    </div>
+  </div>
+  
   <div class="g2">
     <div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
@@ -1065,7 +1095,7 @@ function isTradingDay(dateStr) {
 }
 
 // In-memory cache
-const cache = { trades:[], watchlist:[], quarterly:{}, checklist:{}, settings:{}, regime:{}, rsiScans:{} };
+const cache = { trades:[], watchlist:[], quarterly:{}, checklist:{}, settings:{}, regime:{}, rsiScans:{}, morning:{} };
 
 let saveTimer = null;
 function scheduleSave() { clearTimeout(saveTimer); saveTimer = setTimeout(doSave, 800); }
@@ -1240,7 +1270,7 @@ async function syncFromGithub() {
   setSyncState('syncing', 'ЗАГРУЗКА...');
   try {
     const data = await loadFromStorage();
-    if (data) { applyData(data); loadSetsUI(); loadGhUI(); loadFhKeyUI(); initChecklist(); renderDash(); renderTrades(); renderWL(); renderQ(); renderRsiScan(); const rsi = cache.regime?.spyRsi14; if (rsi) { document.getElementById('spyRsi').value = rsi; updRegime(false); } }
+    if (data) { applyData(data); loadSetsUI(); loadGhUI(); loadFhKeyUI(); initChecklist(); loadMorning(); renderDash(); renderTrades(); renderWL(); renderQ(); renderRsiScan(); const rsi = cache.regime?.spyRsi14; if (rsi) { document.getElementById('spyRsi').value = rsi; updRegime(false); } }
     setSyncState('synced', storageModeLabel());
     updateStorageInfo();
     toast('Синхронизировано ✓');
@@ -1258,6 +1288,7 @@ function applyData(data) {
   if (data.settings)  { cache.settings = data.settings; if (!cache.settings.finnhubKey) cache.settings.finnhubKey = FINNHUB_KEY; }
   if (data.regime)    cache.regime    = data.regime;
   if (data.rsiScans)  cache.rsiScans  = data.rsiScans;
+  if (data.morning)   cache.morning   = data.morning;
 }
 
 function updateStorageInfo() {
@@ -1402,6 +1433,100 @@ async function saveRegime() {
   cache.regime = { spyRsi14: val, savedAt: new Date().toISOString() };
   scheduleSave(); const ok = true;
   if (ok) toast('Режим сохранён ✓');
+}
+
+// ═══════════════════════════════════════════════════════════
+// MORNING CHECKLIST
+// ═══════════════════════════════════════════════════════════
+function updMorning() {
+  const spxa = parseFloat(document.getElementById('spxa50r').value);
+  const trin = parseFloat(document.getElementById('trin').value);
+  
+  const spxaHint = document.getElementById('spxa50rHint');
+  const trinHint = document.getElementById('trinHint');
+  const verdict = document.getElementById('morningVerdict');
+  
+  // $SPXA50R hints
+  if (!isNaN(spxa)) {
+    if (spxa > 60) {
+      spxaHint.innerHTML = '<span class="g">▲ ЛОНГ режим (>60%)</span>';
+    } else if (spxa < 40) {
+      spxaHint.innerHTML = '<span class="r">▼ ШОРТ режим (<40%)</span>';
+    } else {
+      spxaHint.innerHTML = '<span class="y">⚖ Нейтрально (40-60%)</span>';
+    }
+  } else {
+    spxaHint.innerHTML = '';
+  }
+  
+  // $TRIN hints
+  if (!isNaN(trin)) {
+    if (trin < 0.8) {
+      trinHint.innerHTML = '<span class="g">🐂 Бычий (<0.8)</span>';
+    } else if (trin > 1.5) {
+      trinHint.innerHTML = '<span class="r">🐻 Медвежий (>1.5)</span>';
+    } else {
+      trinHint.innerHTML = '<span class="y">⚖ Нейтрально (0.8-1.5)</span>';
+    }
+  } else {
+    trinHint.innerHTML = '';
+  }
+  
+  // Overall verdict
+  if (!isNaN(spxa) && !isNaN(trin)) {
+    const bullish = spxa > 60 && trin < 0.8;
+    const bearish = spxa < 40 && trin > 1.5;
+    const mixed = (spxa > 60 && trin > 1.5) || (spxa < 40 && trin < 0.8);
+    
+    if (bullish) {
+      verdict.innerHTML = '<span class="g">🟢 БЫЧИЙ ДЕНЬ — фокус на ЛОНГИ</span>';
+      verdict.style.background = 'rgba(126,232,162,.1)';
+    } else if (bearish) {
+      verdict.innerHTML = '<span class="r">🔴 МЕДВЕЖИЙ ДЕНЬ — фокус на ШОРТЫ</span>';
+      verdict.style.background = 'rgba(255,107,138,.1)';
+    } else if (mixed) {
+      verdict.innerHTML = '<span class="y">⚠️ СМЕШАННЫЕ СИГНАЛЫ — осторожно</span>';
+      verdict.style.background = 'rgba(255,200,90,.1)';
+    } else {
+      verdict.innerHTML = '<span style="color:var(--t2)">⚖️ НЕЙТРАЛЬНО — следуем системе</span>';
+      verdict.style.background = 'var(--bg4)';
+    }
+  } else {
+    verdict.innerHTML = '<span style="color:var(--t3)">Заполните $SPXA50R и $TRIN</span>';
+    verdict.style.background = 'var(--bg4)';
+  }
+}
+
+async function saveMorning() {
+  const td = today();
+  const spxa = document.getElementById('spxa50r').value;
+  const trin = document.getElementById('trin').value;
+  const sectors = document.getElementById('topSectors').value;
+  
+  if (!cache.morning) cache.morning = {};
+  cache.morning[td] = {
+    spxa50r: spxa ? parseFloat(spxa) : null,
+    trin: trin ? parseFloat(trin) : null,
+    topSectors: sectors,
+    savedAt: new Date().toISOString()
+  };
+  
+  scheduleSave();
+  toast('Утренний чеклист сохранён ✓');
+}
+
+function loadMorning() {
+  const td = today();
+  const data = cache.morning?.[td];
+  
+  document.getElementById('morningDate').textContent = new Date().toLocaleDateString('ru-RU', {weekday:'short', day:'2-digit', month:'short'});
+  
+  if (data) {
+    if (data.spxa50r != null) document.getElementById('spxa50r').value = data.spxa50r;
+    if (data.trin != null) document.getElementById('trin').value = data.trin;
+    if (data.topSectors) document.getElementById('topSectors').value = data.topSectors;
+    updMorning();
+  }
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -3338,7 +3463,7 @@ async function init() {
 
   try { document.getElementById('hdrDate').textContent = today(); } catch {}
 
-  loadSetsUI(); loadGhUI(); loadFhKeyUI(); initChecklist(); renderHolidays();
+  loadSetsUI(); loadGhUI(); loadFhKeyUI(); initChecklist(); loadMorning(); renderHolidays();
   renderDash(); renderTrades(); renderWL(); renderQ(); renderRsiScan();
 
   const rsi = cache.regime?.spyRsi14;
@@ -3365,7 +3490,7 @@ async function init() {
           applyData(data);
           storageMode = 'github';
           try { localStorage.setItem(LS_KEY, trimmed); } catch {}
-          loadSetsUI(); loadGhUI(); loadFhKeyUI(); initChecklist(); renderHolidays();
+          loadSetsUI(); loadGhUI(); loadFhKeyUI(); initChecklist(); loadMorning(); renderHolidays();
           renderDash(); renderTrades(); renderWL(); renderQ(); renderRsiScan();
           fetchGhSha(token);
         }
