@@ -454,16 +454,6 @@
   ],
   "watchlist": [
     {
-      "ticker": "MTB",
-      "sector": "Финансы",
-      "cap": "32.33",
-      "beta": "1.11",
-      "earningsDate": "2026-04-15",
-      "cooldownDate": "",
-      "notes": "",
-      "addedAt": 1772399887610
-    },
-    {
       "ticker": "FITB",
       "sector": "Финансы",
       "cap": "44.61",
