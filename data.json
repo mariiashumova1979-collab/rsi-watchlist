@@ -1,6 +1,26 @@
 {
   "trades": [
     {
+      "id": "1773077633032",
+      "createdAt": 1773077633032,
+      "ticker": "VLO",
+      "type": "SHORT",
+      "entryDate": "2026-03-09",
+      "entry": 219.73,
+      "shares": 7,
+      "stop": "228.52",
+      "target1": "210.94",
+      "target2": "202.15",
+      "rsi7": "77.51",
+      "rsi14": "73.2",
+      "spyRsi": "38.45",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "commission": 0,
+      "notes": ""
+    },
+    {
       "id": "1773077551742",
       "createdAt": 1773077551742,
       "ticker": "FIGS",
