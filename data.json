@@ -1,6 +1,26 @@
 {
   "trades": [
     {
+      "id": "1773077427075",
+      "createdAt": 1773077427075,
+      "ticker": "ZD",
+      "type": "SHORT",
+      "entryDate": "2026-03-09",
+      "entry": 39.48,
+      "shares": 41,
+      "stop": "41.06",
+      "target1": "37.90",
+      "target2": "36.32",
+      "rsi7": "75.9",
+      "rsi14": "67.48",
+      "spyRsi": "38.45",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "commission": 0,
+      "notes": ""
+    },
+    {
       "id": "1772039941723",
       "createdAt": 1772468268723,
       "ticker": "BX",
@@ -826,15 +846,6 @@
       "TNGX_r14": 76.01,
       "AMPX_r7": 84.66,
       "AMPX_r14": 71.78
-    }
-  },
-  "morning": {
-    "2026-03-06": {
-      "spxa50r": 52.8,
-      "nymo": -40.84,
-      "trin": 0.78,
-      "topSectors": "XLU, XLE, XLI long XLF, XLY, XLK - short",
-      "savedAt": "2026-03-06T16:44:19.855Z"
     }
   }
 }
