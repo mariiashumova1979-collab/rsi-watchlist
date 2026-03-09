@@ -454,6 +454,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "NOW",
+      "sector": "XLK",
+      "cap": "130.06",
+      "beta": "1.22",
+      "earningsDate": "2026-04-29",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1773051223169
+    },
+    {
       "ticker": "LYB",
       "sector": "Другое",
       "cap": "21.22",
