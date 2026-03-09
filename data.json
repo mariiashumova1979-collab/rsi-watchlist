@@ -1,6 +1,26 @@
 {
   "trades": [
     {
+      "id": "1773077468676",
+      "createdAt": 1773077468676,
+      "ticker": "DK",
+      "type": "SHORT",
+      "entryDate": "2026-03-09",
+      "entry": 40.59,
+      "shares": 40,
+      "stop": "42.21",
+      "target1": "38.97",
+      "target2": "37.34",
+      "rsi7": "67.46",
+      "rsi14": "67.9",
+      "spyRsi": "38.45",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "commission": 0,
+      "notes": ""
+    },
+    {
       "id": "1773077427075",
       "createdAt": 1773077427075,
       "ticker": "ZD",
