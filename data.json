@@ -1,6 +1,26 @@
 {
   "trades": [
     {
+      "id": "1773077551742",
+      "createdAt": 1773077551742,
+      "ticker": "FIGS",
+      "type": "SHORT",
+      "entryDate": "2026-03-09",
+      "entry": 15.27,
+      "shares": 108,
+      "stop": "15.88",
+      "target1": "14.66",
+      "target2": "14.05",
+      "rsi7": "78.79",
+      "rsi14": "77.67",
+      "spyRsi": "38.45",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "commission": 0,
+      "notes": ""
+    },
+    {
       "id": "1773077507614",
       "createdAt": 1773077507614,
       "ticker": "PBF",
