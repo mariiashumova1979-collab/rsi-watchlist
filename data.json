@@ -454,6 +454,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "IOT",
+      "sector": "XLK",
+      "cap": "20.4",
+      "beta": "1.09",
+      "earningsDate": "2026-05-28",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1773054313315
+    },
+    {
       "ticker": "NOW",
       "sector": "XLK",
       "cap": "130.06",
