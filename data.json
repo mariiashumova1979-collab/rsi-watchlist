@@ -22,7 +22,7 @@
     },
     {
       "id": "1773077551742",
-      "createdAt": 1773077551742,
+      "createdAt": 1773178774334,
       "ticker": "FIGS",
       "type": "SHORT",
       "entryDate": "2026-03-09",
@@ -34,11 +34,14 @@
       "rsi7": "78.79",
       "rsi14": "77.67",
       "spyRsi": "38.45",
-      "status": "OPEN",
-      "exitPrice": 0,
-      "exitReason": "",
-      "commission": 0,
-      "notes": ""
+      "status": "CLOSED",
+      "exitPrice": 15.904,
+      "exitReason": "STOP",
+      "commission": 8,
+      "notes": "",
+      "pnlNet": -76.47,
+      "pnlPct": -4.64,
+      "result": "LOSS"
     },
     {
       "id": "1773077507614",
