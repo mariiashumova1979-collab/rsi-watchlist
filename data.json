@@ -42,7 +42,7 @@
     },
     {
       "id": "1773077507614",
-      "createdAt": 1773077771660,
+      "createdAt": 1773129814081,
       "ticker": "PBF",
       "type": "SHORT",
       "entryDate": "2026-03-09",
@@ -54,10 +54,10 @@
       "rsi7": "71.16",
       "rsi14": "69.65",
       "spyRsi": "38.45",
-      "status": "PARTIAL",
-      "exitPrice": 0,
-      "exitReason": "",
-      "commission": 0,
+      "status": "CLOSED",
+      "exitPrice": 40.518,
+      "exitReason": "TARGET1",
+      "commission": 8,
       "notes": "",
       "partialExit": {
         "date": "2026-03-09",
@@ -67,7 +67,10 @@
         "breakevenSet": true,
         "pnlNet": 34.24,
         "pnlPct": 4.25
-      }
+      },
+      "pnlNet": 62.19,
+      "pnlPct": 3.86,
+      "result": "WIN"
     },
     {
       "id": "1773077468676",
