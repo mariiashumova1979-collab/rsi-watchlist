@@ -106,7 +106,7 @@
     },
     {
       "id": "1773077468676",
-      "createdAt": 1773077468676,
+      "createdAt": 1773249306557,
       "ticker": "DK",
       "type": "SHORT",
       "entryDate": "2026-03-09",
@@ -118,11 +118,14 @@
       "rsi7": "67.46",
       "rsi14": "67.9",
       "spyRsi": "38.45",
-      "status": "OPEN",
-      "exitPrice": 0,
-      "exitReason": "",
-      "commission": 0,
-      "notes": ""
+      "status": "CLOSED",
+      "exitPrice": 42.4301,
+      "exitReason": "STOP",
+      "commission": 6,
+      "notes": "",
+      "pnlNet": -79.6,
+      "pnlPct": -4.9,
+      "result": "LOSS"
     },
     {
       "id": "1773077427075",
