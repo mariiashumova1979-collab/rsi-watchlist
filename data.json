@@ -589,6 +589,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "CAPR",
+      "sector": "XLK",
+      "cap": "",
+      "beta": "",
+      "earningsDate": "2026-03-25",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1773217381504
+    },
+    {
       "ticker": "HIMS",
       "sector": "XLK",
       "cap": "",
