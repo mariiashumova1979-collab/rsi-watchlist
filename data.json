@@ -589,6 +589,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "AAOI",
+      "sector": "XLK",
+      "cap": "",
+      "beta": "",
+      "earningsDate": "",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1773217253897
+    },
+    {
       "ticker": "AMPX",
       "sector": "XLK",
       "cap": "2.13",
