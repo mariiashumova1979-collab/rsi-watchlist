@@ -589,6 +589,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "HIMS",
+      "sector": "XLK",
+      "cap": "",
+      "beta": "",
+      "earningsDate": "",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1773217272890
+    },
+    {
       "ticker": "AAOI",
       "sector": "XLK",
       "cap": "",
