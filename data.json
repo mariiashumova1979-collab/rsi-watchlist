@@ -589,6 +589,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "BW",
+      "sector": "XLK",
+      "cap": "",
+      "beta": "",
+      "earningsDate": "2026-05-07",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1773217408880
+    },
+    {
       "ticker": "CAPR",
       "sector": "XLK",
       "cap": "",
