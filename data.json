@@ -2,7 +2,7 @@
   "trades": [
     {
       "id": "1773178956259",
-      "createdAt": 1773178956259,
+      "createdAt": 1773249262245,
       "ticker": "IOT",
       "type": "SHORT",
       "entryDate": "2026-03-10",
@@ -14,11 +14,20 @@
       "rsi7": "75.38",
       "rsi14": "65.74",
       "spyRsi": "",
-      "status": "OPEN",
+      "status": "PARTIAL",
       "exitPrice": 0,
       "exitReason": "",
       "commission": 0,
-      "notes": ""
+      "notes": "",
+      "partialExit": {
+        "date": "2026-03-11",
+        "price": 32.306,
+        "shares": 24,
+        "commission": 0,
+        "breakevenSet": false,
+        "pnlNet": 39.46,
+        "pnlPct": 4.84
+      }
     },
     {
       "id": "1773077633032",
