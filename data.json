@@ -71,7 +71,7 @@
     },
     {
       "id": "1773077633032",
-      "createdAt": 1773077633032,
+      "createdAt": 1773249400879,
       "ticker": "VLO",
       "type": "SHORT",
       "entryDate": "2026-03-09",
@@ -83,11 +83,14 @@
       "rsi7": "77.51",
       "rsi14": "73.2",
       "spyRsi": "38.45",
-      "status": "OPEN",
-      "exitPrice": 0,
-      "exitReason": "",
-      "commission": 0,
-      "notes": ""
+      "status": "CLOSED",
+      "exitPrice": 228.636,
+      "exitReason": "STOP",
+      "commission": 4,
+      "notes": "",
+      "pnlNet": -66.34,
+      "pnlPct": -4.31,
+      "result": "LOSS"
     },
     {
       "id": "1773077551742",
