@@ -1,6 +1,26 @@
 {
   "trades": [
     {
+      "id": "1773249339990",
+      "createdAt": 1773249339990,
+      "ticker": "LYB",
+      "type": "SHORT",
+      "entryDate": "2026-03-11",
+      "entry": 66.02,
+      "shares": 24,
+      "stop": "68.66",
+      "target1": "63.38",
+      "target2": "60.74",
+      "rsi7": "74.02",
+      "rsi14": "71.23",
+      "spyRsi": "43.68",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "commission": 0,
+      "notes": ""
+    },
+    {
       "id": "1773178956259",
       "createdAt": 1773249262245,
       "ticker": "IOT",
