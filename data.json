@@ -680,11 +680,11 @@
     },
     {
       "ticker": "FIGS",
-      "sector": "Потребительский",
+      "sector": "",
       "cap": "2.85",
       "beta": "1.04",
       "earningsDate": "2026-05-07",
-      "cooldownDate": "",
+      "cooldownDate": "2026-04-10",
       "notes": "",
       "addedAt": 1772698638344
     },
