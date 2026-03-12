@@ -540,16 +540,19 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
       <span style="font-family:var(--mono);font-size:9px;color:var(--t2);font-weight:400" id="scanDateLabel"></span>
     </div>
     <div style="font-family:var(--mono);font-size:10px;color:var(--t2);margin-bottom:12px;padding:10px 14px;background:var(--bg3);border-radius:8px;border:1px solid var(--line)">
-      Заполните RSI(7) и RSI(14) → нажмите «Сохранить RSI» → сигналы появятся на Дашборде автоматически
+      <b>RSI(2) System:</b> LONG = RSI(2)&lt;10 + Price&gt;SMA200 + Close&lt;Close[1]&lt;Close[2] | SHORT = RSI(2)&gt;90 + Price&lt;SMA200 + Close&gt;Close[1]&gt;Close[2]
     </div>
     <div class="tw">
       <table>
         <thead><tr>
           <th>Тикер</th>
           <th>Сектор</th>
-          <th>RSI(7)</th>
-          <th>RSI(14)</th>
-          <th>История RSI(7)</th>
+          <th>RSI(2)</th>
+          <th>SMA200</th>
+          <th>Close</th>
+          <th>Close[1]</th>
+          <th>Close[2]</th>
+          <th>ATR%</th>
           <th>Сигнал</th>
           <th>Статус</th>
         </tr></thead>
@@ -563,10 +566,17 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
     <input id="wlSrch" placeholder="Поиск..." oninput="renderWL()" style="max-width:180px">
     <select id="wlSect" onchange="renderWL()">
       <option value="">Все секторы</option>
-      <option>XLK</option><option>XLF</option><option>XLV</option>
-      <option>XLY</option><option>XLE</option><option>XLI</option>
-      <option>XLC</option><option>XLU</option><option>XLP</option>
-      <option>XLB</option><option>XLRE</option>
+      <option>Technology</option>
+      <option>Financial</option>
+      <option>Healthcare</option>
+      <option>Consumer Cyclical</option>
+      <option>Consumer Defensive</option>
+      <option>Energy</option>
+      <option>Industrials</option>
+      <option>Communication</option>
+      <option>Utilities</option>
+      <option>Basic Materials</option>
+      <option>Real Estate</option>
     </select>
     <select id="wlStat" onchange="renderWL()">
       <option value="">Все статусы</option>
@@ -925,14 +935,21 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
       <div class="fg"><label>Тикер</label><input type="text" id="wl_tk" placeholder="TSLA" style="text-transform:uppercase"></div>
       <div class="fg"><label>Сектор</label>
         <select id="wl_se">
-          <option>XLK</option><option>XLF</option><option>XLV</option>
-          <option>XLY</option><option>XLE</option><option>XLI</option>
-          <option>XLC</option><option>XLU</option><option>XLP</option>
-          <option>XLB</option><option>XLRE</option>
+          <option>Technology</option>
+          <option>Financial</option>
+          <option>Healthcare</option>
+          <option>Consumer Cyclical</option>
+          <option>Consumer Defensive</option>
+          <option>Energy</option>
+          <option>Industrials</option>
+          <option>Communication</option>
+          <option>Utilities</option>
+          <option>Basic Materials</option>
+          <option>Real Estate</option>
         </select>
       </div>
-      <div class="fg"><label>Капитализация (млрд $)</label><input type="number" id="wl_cap" placeholder="50"></div>
-      <div class="fg"><label>Бета</label><input type="number" id="wl_bt" placeholder="1.4" step=".1"></div>
+      <div class="fg"><label>Капитализация (млрд $)</label><input type="number" id="wl_cap" placeholder="50" min="10"></div>
+      <div class="fg"><label>ATR %</label><input type="number" id="wl_atr" placeholder="3.5" step=".1" min="2" max="5"></div>
       <div class="fg"><label>Дата отчёта (earnings)</label><input type="date" id="wl_bo"></div>
       <div class="fg"><label>Кулдаун до (после стопа)</label><input type="date" id="wl_cd"></div>
       <div class="fg full"><label>Заметки</label><input type="text" id="wl_nt" placeholder="Доп. инфо..."></div>
@@ -1255,6 +1272,32 @@ function applyData(data) {
   if (data.settings)  { cache.settings = data.settings; if (!cache.settings.finnhubKey) cache.settings.finnhubKey = FINNHUB_KEY; }
   if (data.regime)    cache.regime    = data.regime;
   if (data.rsiScans)  cache.rsiScans  = data.rsiScans;
+  
+  // ═══════════════════════════════════════════════════════════
+  // MIGRATION: RSI(7/14) → RSI(2) system
+  // ═══════════════════════════════════════════════════════════
+  
+  // Migrate watchlist: beta → atr
+  cache.watchlist.forEach(w => {
+    if (w.beta && !w.atr) {
+      // Can't convert beta to ATR directly, just clear it
+      delete w.beta;
+    }
+    // Migrate old sector names to TradingView style
+    const sectorMap = {
+      'XLK': 'Technology', 'XLF': 'Financial', 'XLV': 'Healthcare',
+      'XLY': 'Consumer Cyclical', 'XLP': 'Consumer Defensive', 'XLE': 'Energy',
+      'XLI': 'Industrials', 'XLC': 'Communication', 'XLU': 'Utilities',
+      'XLB': 'Basic Materials', 'XLRE': 'Real Estate',
+      'Технологии': 'Technology', 'Финансы': 'Financial', 'Здравоохранение': 'Healthcare'
+    };
+    if (w.sector && sectorMap[w.sector]) {
+      w.sector = sectorMap[w.sector];
+    }
+  });
+  
+  // Note: Old rsiScans with _r7/_r14 fields will be ignored
+  // New system uses _rsi2, _sma200, _close0, _close1, _close2
   
 }
 
@@ -2530,18 +2573,18 @@ function openWL(ticker = null) {
     const w = cache.watchlist.find(x => x.ticker === ticker);
     if (w) {
       document.getElementById('wl_tk').value  = w.ticker      || '';
-      document.getElementById('wl_se').value  = w.sector      || 'XLK';
+      document.getElementById('wl_se').value  = w.sector      || 'Technology';
       document.getElementById('wl_cap').value = w.cap         || '';
-      document.getElementById('wl_bt').value  = w.beta        || '';
+      document.getElementById('wl_atr').value = w.atr         || '';
       document.getElementById('wl_bo').value  = w.earningsDate|| '';
       document.getElementById('wl_cd').value  = w.cooldownDate|| '';
       document.getElementById('wl_nt').value  = w.notes       || '';
     }
   } else {
-    ['tk','cap','bt','bo','cd','nt'].forEach(f => {
+    ['tk','cap','atr','bo','cd','nt'].forEach(f => {
       const el = document.getElementById('wl_'+f); if(el) el.value = '';
     });
-    document.getElementById('wl_se').value = 'XLK';
+    document.getElementById('wl_se').value = 'Technology';
   }
   openMo('moWL');
 }
@@ -2557,8 +2600,8 @@ async function saveWL() {
     ticker,
     sector:       document.getElementById('wl_se').value,
     cap:          document.getElementById('wl_cap').value,
-    beta:         document.getElementById('wl_bt').value,
-    earningsDate: document.getElementById('wl_bo').value,   // renamed from blackoutDate
+    atr:          document.getElementById('wl_atr').value,
+    earningsDate: document.getElementById('wl_bo').value,
     cooldownDate: document.getElementById('wl_cd').value,
     notes:        document.getElementById('wl_nt').value,
     addedAt:      Date.now()
@@ -2678,7 +2721,7 @@ function renderWL() {
         <button class="wr" style="position:static" onclick="delWL('${w.ticker}')">✕</button>
       </div>
       <div class="wt">${w.ticker}${hasPosition ? ' <span style="font-size:10px;color:var(--acc4);font-weight:600">● OPEN</span>' : ''}</div>
-      <div class="wm">${w.sector||'—'} · β${w.beta||'—'}${w.cap ? ' · $'+w.cap+'B' : ''}</div>
+      <div class="wm">${w.sector||'—'} · ATR ${w.atr||'—'}%${w.cap ? ' · $'+w.cap+'B' : ''}</div>
       <div style="font-family:var(--mono);font-size:9px;color:${statusColor};line-height:1.5">${statusText}</div>
       ${w.notes ? `<div style="font-family:var(--mono);font-size:9px;color:var(--t3);margin-top:4px">${w.notes}</div>` : ''}
     </div>`;
@@ -2699,54 +2742,66 @@ function getRsiColor(val) {
 }
 
 function computeSignal(w, scan) {
-  // T0 = сегодня (день входа если сигнал)
-  // T-1 = вчера (предыдущий торговый день)
-  // scan = { rsi7: T0 value, rsi7prev: T-1 value, rsi14: T0 value }
-  const { rsi7, rsi7prev, rsi14 } = scan;
-  if (rsi7 === '' || rsi14 === '') return 'none';
-
-  const r7  = parseFloat(rsi7);     // RSI(7) на T0
-  const r7p = parseFloat(rsi7prev); // RSI(7) на T-1
-  const r14 = parseFloat(rsi14);    // RSI(14) на T0
-  if (isNaN(r7) || isNaN(r14)) return 'none';
-
-  // LONG SIGNAL: RSI(7) пересёк 20 снизу вверх (T-1 < 20, T0 > 20) И RSI(14) < 40
-  // → Открываем позицию СЕГОДНЯ (T0)
-  if (!isNaN(r7p) && r7p < 20 && r7 > 20 && r14 < 40) return 'LONG_SIGNAL';
-
-  // SHORT SIGNAL: RSI(7) пересёк 80 сверху вниз (T-1 > 80, T0 < 80) И RSI(14) > 60
-  // → Открываем позицию СЕГОДНЯ (T0)
-  if (!isNaN(r7p) && r7p > 80 && r7 < 80 && r14 > 60) return 'SHORT_SIGNAL';
-
-  // WATCH LONG: RSI(7) < 25 — приближается к зоне сигнала
-  if (r7 < 25) return 'WATCH_LONG';
-
-  // WATCH SHORT: RSI(7) > 75 — приближается к зоне сигнала
-  if (r7 > 75) return 'WATCH_SHORT';
-
+  // ═══════════════════════════════════════════════════════════
+  // RSI(2) SWING SYSTEM
+  // ═══════════════════════════════════════════════════════════
+  // LONG: RSI(2) < 10 + Price > SMA200 + Close < Close[1] < Close[2]
+  // SHORT: RSI(2) > 90 + Price < SMA200 + Close > Close[1] > Close[2]
+  // ═══════════════════════════════════════════════════════════
+  
+  const { rsi2, sma200, close0, close1, close2 } = scan;
+  
+  // Need at least RSI(2) and Close to evaluate
+  if (rsi2 === '' || close0 === '') return 'none';
+  
+  const rsi = parseFloat(rsi2);
+  const sma = parseFloat(sma200);
+  const c0 = parseFloat(close0);
+  const c1 = parseFloat(close1);
+  const c2 = parseFloat(close2);
+  
+  if (isNaN(rsi) || isNaN(c0)) return 'none';
+  
+  // Check if all candle data available
+  const hasCandles = !isNaN(c1) && !isNaN(c2);
+  const hasSma = !isNaN(sma);
+  
+  // LONG SIGNAL: RSI(2) < 10 + Price > SMA200 + Close < Close[1] < Close[2]
+  const longRsi = rsi < 10;
+  const longTrend = hasSma && c0 > sma;
+  const longCandles = hasCandles && c0 < c1 && c1 < c2;
+  
+  if (longRsi && longTrend && longCandles) return 'LONG_SIGNAL';
+  
+  // SHORT SIGNAL: RSI(2) > 90 + Price < SMA200 + Close > Close[1] > Close[2]
+  const shortRsi = rsi > 90;
+  const shortTrend = hasSma && c0 < sma;
+  const shortCandles = hasCandles && c0 > c1 && c1 > c2;
+  
+  if (shortRsi && shortTrend && shortCandles) return 'SHORT_SIGNAL';
+  
+  // WATCH LONG: RSI(2) < 15 + uptrend
+  if (rsi < 15 && longTrend) return 'WATCH_LONG';
+  
+  // WATCH SHORT: RSI(2) > 85 + downtrend
+  if (rsi > 85 && shortTrend) return 'WATCH_SHORT';
+  
   return 'none';
 }
 
 function renderRsiScan() {
-  const t0 = today(); // T0 = сегодня
+  const t0 = today();
   document.getElementById('scanDateLabel').textContent = 'T0: ' + new Date().toLocaleDateString('ru-RU',{weekday:'short',day:'2-digit',month:'short'});
 
   const wl = cache.watchlist;
   if (!wl.length) {
     document.getElementById('rsiScanTbody').innerHTML =
-      '<tr><td colspan="7" style="text-align:center;color:var(--t2);padding:30px">Добавьте акции в список наблюдения</td></tr>';
+      '<tr><td colspan="10" style="text-align:center;color:var(--t2);padding:30px">Добавьте акции в список наблюдения</td></tr>';
     return;
   }
 
   const scans = cache.rsiScans || {};
-  const t0Scan = scans[t0] || {};           // T0 = сегодня
-  const tMinus1 = getPrevDate(t0);          // T-1 = вчера
-  const tMinus1Scan = scans[tMinus1] || {};
-
-  // Build last 5 trading days history (T-1 to T-5)
-  const histDates = [];
-  let d = t0;
-  for (let i = 0; i < 5; i++) { d = getPrevDate(d); histDates.push(d); }
+  const t0Scan = scans[t0] || {};
 
   // Get tickers with open positions
   const openPositionTickers = new Set(
@@ -2761,105 +2816,96 @@ function renderRsiScan() {
     const hasPosition = openPositionTickers.has(w.ticker.toUpperCase());
     const inactive = boBool || cdBool;
 
-    const r7cur  = t0Scan[w.ticker + '_r7']  ?? '';      // RSI(7) на T0
-    const r14cur = t0Scan[w.ticker + '_r14'] ?? '';      // RSI(14) на T0
-    const r7prev = tMinus1Scan[w.ticker + '_r7'] ?? '';  // RSI(7) на T-1
+    // Get scan values
+    const rsi2 = t0Scan[w.ticker + '_rsi2'] ?? '';
+    const sma200 = t0Scan[w.ticker + '_sma200'] ?? '';
+    const close0 = t0Scan[w.ticker + '_close0'] ?? '';
+    const close1 = t0Scan[w.ticker + '_close1'] ?? '';
+    const close2 = t0Scan[w.ticker + '_close2'] ?? '';
+    const atrPct = w.atr || '';
 
     const sig = inactive ? 'blocked' : hasPosition ? 'position' : computeSignal(w, { 
-      rsi7: r7cur, 
-      rsi7prev: r7prev,
-      rsi14: r14cur
+      rsi2, sma200, close0, close1, close2
     });
 
     let sigHtml;
     switch(sig) {
-      case 'LONG_SIGNAL':  sigHtml = '<span class="sig-long">🟢 ЛОНГ → ВХОД T0</span>'; break;
-      case 'SHORT_SIGNAL': sigHtml = '<span class="sig-short">🔴 ШОРТ → ВХОД T0</span>'; break;
-      case 'WATCH_LONG':   sigHtml = '<span class="sig-watch">👀 СЛЕДИМ ЛОНГ</span>'; break;
-      case 'WATCH_SHORT':  sigHtml = '<span class="sig-watch">👀 СЛЕДИМ ШОРТ</span>'; break;
-      case 'blocked':      sigHtml = `<span class="sig-none">${boBool ? '🚫 БЛЭКАУТ' : '⏳ КУЛДАУН'}</span>`; break;
+      case 'LONG_SIGNAL':  sigHtml = '<span class="sig-long">🟢 LONG SETUP</span>'; break;
+      case 'SHORT_SIGNAL': sigHtml = '<span class="sig-short">🔴 SHORT SETUP</span>'; break;
+      case 'WATCH_LONG':   sigHtml = '<span class="sig-watch">👀 WATCH LONG</span>'; break;
+      case 'WATCH_SHORT':  sigHtml = '<span class="sig-watch">👀 WATCH SHORT</span>'; break;
+      case 'blocked':      sigHtml = `<span class="sig-none">${boBool ? '🚫 EARNINGS' : '⏳ COOLDOWN'}</span>`; break;
       case 'position':     
         const trade = cache.trades.find(t => t.ticker.toUpperCase() === w.ticker.toUpperCase() && (t.status === 'OPEN' || t.status === 'PARTIAL'));
         const tDay = trade ? getTradingDayNumber(trade.entryDate) : '?';
-        sigHtml = `<span class="sig-position">📈 ПОЗИЦИЯ T${tDay}</span>`; 
+        sigHtml = `<span class="sig-position">📈 DAY ${tDay}</span>`; 
         break;
       default:             sigHtml = '<span class="sig-none">—</span>';
     }
 
-    const stText = hasPosition ? `<span class="bl" style="font-size:9px;font-family:var(--mono)">ПОЗИЦИЯ</span>`
-                 : boBool ? `<span class="r" style="font-size:9px;font-family:var(--mono)">БЛЭКАУТ</span>`
-                 : cdBool ? `<span class="y" style="font-size:9px;font-family:var(--mono)">КУЛДАУН</span>`
-                 : `<span class="g" style="font-size:9px;font-family:var(--mono)">АКТИВНА</span>`;
+    const stText = hasPosition ? `<span class="bl" style="font-size:9px;font-family:var(--mono)">IN TRADE</span>`
+                 : boBool ? `<span class="r" style="font-size:9px;font-family:var(--mono)">EARNINGS</span>`
+                 : cdBool ? `<span class="y" style="font-size:9px;font-family:var(--mono)">COOLDOWN</span>`
+                 : `<span class="g" style="font-size:9px;font-family:var(--mono)">ACTIVE</span>`;
 
-    const r7color  = getRsiColor(r7cur  !== '' ? parseFloat(r7cur)  : NaN);
-    const r14color = getRsiColor(r14cur !== '' ? parseFloat(r14cur) : NaN);
+    // RSI(2) color
+    const rsiVal = parseFloat(rsi2);
+    const rsiColor = isNaN(rsiVal) ? 'var(--t2)' : rsiVal < 10 ? 'var(--acc)' : rsiVal > 90 ? 'var(--acc2)' : rsiVal < 20 ? 'var(--acc3)' : rsiVal > 80 ? 'var(--acc3)' : 'var(--t2)';
+    
+    // Trend color (Price vs SMA200)
+    const c0 = parseFloat(close0);
+    const sma = parseFloat(sma200);
+    const trendColor = (isNaN(c0) || isNaN(sma)) ? '' : c0 > sma ? 'color:var(--acc)' : 'color:var(--acc2)';
+    const trendIcon = (isNaN(c0) || isNaN(sma)) ? '' : c0 > sma ? '▲' : '▼';
+    
+    // Candle pattern check
+    const c1 = parseFloat(close1);
+    const c2 = parseFloat(close2);
+    const bearCandles = !isNaN(c0) && !isNaN(c1) && !isNaN(c2) && c0 < c1 && c1 < c2;
+    const bullCandles = !isNaN(c0) && !isNaN(c1) && !isNaN(c2) && c0 > c1 && c1 > c2;
+    const candleIcon = bearCandles ? '📉' : bullCandles ? '📈' : '';
 
     const rowBg = hasPosition ? 'background:rgba(91,156,246,.06)' :
-                  sig === 'LONG_SIGNAL'  ? 'background:rgba(126,232,162,.04)' :
-                  sig === 'SHORT_SIGNAL' ? 'background:rgba(255,107,138,.04)' :
-                  sig === 'WATCH_LONG' || sig === 'WATCH_SHORT' ? 'background:rgba(255,200,90,.03)' : '';
-
-    // Build 5-day history sparkline for RSI(7) - with editable inputs
-    const histVals = histDates.map(dt => {
-      const v = (scans[dt] || {})[w.ticker + '_r7'];
-      return v !== undefined && v !== '' ? parseFloat(v) : null;
-    });
-
-    const histHtml = `<div style="display:flex;align-items:center;gap:4px">
-      ${histVals.map((v, i) => {
-        const dateStr = histDates[i];
-        const tLabel = `T-${i+1}`;
-        if (v === null) {
-          // Editable empty cell - click to add historical RSI
-          return `<div style="display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer" onclick="editHistRsi('${w.ticker}','${dateStr}')" title="Добавить RSI за ${dateStr}">
-            <div style="width:22px;height:28px;background:var(--bg4);border-radius:3px;display:flex;align-items:center;justify-content:center;border:1px dashed var(--line)">
-              <span style="font-family:var(--mono);font-size:10px;color:var(--t3)">+</span>
-            </div>
-            <span style="font-family:var(--mono);font-size:7px;color:var(--t3)">${tLabel}</span>
-            <span style="font-family:var(--mono);font-size:6px;color:var(--t3)">${dateStr.slice(5)}</span>
-          </div>`;
-        }
-        const barH = Math.round((v / 100) * 28);
-        const col  = getRsiColor(v);
-        return `<div title="${dateStr}: RSI7=${v.toFixed(1)} — клик для редактирования" style="display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer" onclick="editHistRsi('${w.ticker}','${dateStr}')">
-          <div style="width:22px;height:28px;background:var(--bg4);border-radius:3px;display:flex;align-items:flex-end;overflow:hidden">
-            <div style="width:100%;height:${barH}px;background:${col};border-radius:2px;transition:height .3s"></div>
-          </div>
-          <span style="font-family:var(--mono);font-size:7px;color:${col};font-weight:700">${v.toFixed(0)}</span>
-          <span style="font-family:var(--mono);font-size:6px;color:var(--t3)">${tLabel}</span>
-        </div>`;
-      }).join('')}
-      ${r7cur !== '' ? `<div style="display:flex;flex-direction:column;align-items:center;gap:2px;margin-left:2px;border-left:1px solid var(--line);padding-left:4px">
-        <div style="width:22px;height:28px;background:var(--bg4);border-radius:3px;display:flex;align-items:flex-end;overflow:hidden;border:1px solid ${r7color}40">
-          <div style="width:100%;height:${Math.round((parseFloat(r7cur)/100)*28)}px;background:${r7color};border-radius:2px"></div>
-        </div>
-        <span style="font-family:var(--mono);font-size:7px;color:${r7color};font-weight:700">${parseFloat(r7cur).toFixed(0)}</span>
-        <span style="font-family:var(--mono);font-size:6px;color:var(--acc)">T0</span>
-      </div>` : ''}
-    </div>`;
+                  sig === 'LONG_SIGNAL'  ? 'background:rgba(126,232,162,.08)' :
+                  sig === 'SHORT_SIGNAL' ? 'background:rgba(255,107,138,.08)' :
+                  sig === 'WATCH_LONG' || sig === 'WATCH_SHORT' ? 'background:rgba(255,200,90,.04)' : '';
 
     return `<tr style="${rowBg}">
       <td style="font-weight:700">${w.ticker}${hasPosition ? ' <span style="color:var(--acc4);font-size:9px">●</span>' : ''}</td>
-      <td style="color:var(--t2)">${w.sector||'—'}</td>
+      <td style="color:var(--t2);font-size:10px">${w.sector||'—'}</td>
       <td>
-        <div class="rsi-bar-wrap">
-          <input class="rsi-inp" type="number" min="0" max="100" step="0.1"
-            value="${r7cur}" placeholder="—"
-            onchange="updateRsiScan('${w.ticker}','r7',this.value)"
-            ${inactive ? 'disabled style="opacity:.4"' : ''}>
-          ${r7cur !== '' ? `<div class="rsi-mini"><div class="rsi-mini-fill" style="width:${Math.min(100,parseFloat(r7cur)||0)}%;background:${r7color}"></div></div><span class="rsi-val" style="color:${r7color}">${parseFloat(r7cur).toFixed(0)}</span>` : ''}
-        </div>
+        <input class="rsi-inp" type="number" min="0" max="100" step="0.1" style="width:55px;${rsiColor ? 'color:'+rsiColor : ''}"
+          value="${rsi2}" placeholder="—"
+          onchange="updateRsiScan('${w.ticker}','rsi2',this.value)"
+          ${inactive ? 'disabled style="opacity:.4"' : ''}>
       </td>
       <td>
-        <div class="rsi-bar-wrap">
-          <input class="rsi-inp" type="number" min="0" max="100" step="0.1"
-            value="${r14cur}" placeholder="—"
-            onchange="updateRsiScan('${w.ticker}','r14',this.value)"
-            ${inactive ? 'disabled style="opacity:.4"' : ''}>
-          ${r14cur !== '' ? `<div class="rsi-mini"><div class="rsi-mini-fill" style="width:${Math.min(100,parseFloat(r14cur)||0)}%;background:${r14color}"></div></div><span class="rsi-val" style="color:${r14color}">${parseFloat(r14cur).toFixed(0)}</span>` : ''}
-        </div>
+        <input class="rsi-inp" type="number" step="0.01" style="width:70px;${trendColor}"
+          value="${sma200}" placeholder="—"
+          onchange="updateRsiScan('${w.ticker}','sma200',this.value)"
+          ${inactive ? 'disabled style="opacity:.4"' : ''}>
+        <span style="font-size:10px">${trendIcon}</span>
       </td>
-      <td style="padding:8px 14px">${histHtml}</td>
+      <td>
+        <input class="rsi-inp" type="number" step="0.01" style="width:70px"
+          value="${close0}" placeholder="—"
+          onchange="updateRsiScan('${w.ticker}','close0',this.value)"
+          ${inactive ? 'disabled style="opacity:.4"' : ''}>
+      </td>
+      <td>
+        <input class="rsi-inp" type="number" step="0.01" style="width:70px"
+          value="${close1}" placeholder="—"
+          onchange="updateRsiScan('${w.ticker}','close1',this.value)"
+          ${inactive ? 'disabled style="opacity:.4"' : ''}>
+      </td>
+      <td>
+        <input class="rsi-inp" type="number" step="0.01" style="width:70px"
+          value="${close2}" placeholder="—"
+          onchange="updateRsiScan('${w.ticker}','close2',this.value)"
+          ${inactive ? 'disabled style="opacity:.4"' : ''}>
+        <span style="font-size:10px">${candleIcon}</span>
+      </td>
+      <td style="font-family:var(--mono);font-size:11px;color:var(--t2)">${atrPct ? atrPct + '%' : '—'}</td>
       <td>${sigHtml}</td>
       <td>${stText}</td>
     </tr>`;
@@ -2869,127 +2915,33 @@ function renderRsiScan() {
 }
 
 function updateRsiScan(ticker, field, value) {
-  const t0 = today(); // T0 = сегодня
+  const t0 = today();
   if (!cache.rsiScans) cache.rsiScans = {};
   if (!cache.rsiScans[t0]) cache.rsiScans[t0] = {};
   cache.rsiScans[t0][ticker + '_' + field] = value === '' ? '' : parseFloat(value);
   
-  // Update signal cell in this row live
-  const rows = document.querySelectorAll('#rsiScanTbody tr');
-  const wl = cache.watchlist;
-  const tMinus1 = getPrevDate(t0);
-  const tMinus1Scan = (cache.rsiScans || {})[tMinus1] || {};
-  
-  rows.forEach((row, i) => {
-    if (!wl[i]) return;
-    if (wl[i].ticker !== ticker && !row.querySelector(`[onchange*="'${ticker}'"]`)) return;
-    // find by ticker in first cell
-    if (row.cells[0]?.textContent?.trim() !== ticker) return;
-    const scans = cache.rsiScans || {};
-    const t0Scan = scans[t0] || {};
-    const r7cur  = t0Scan[ticker + '_r7']  ?? '';
-    const r7prev = tMinus1Scan[ticker + '_r7'] ?? '';
-    const r14cur = t0Scan[ticker + '_r14'] ?? '';
-    
-    const sig = computeSignal(wl[i], { rsi7: r7cur, rsi7prev: r7prev, rsi14: r14cur });
-    
-    // Update signal cell (index 5)
-    const sigCell = row.cells[5];
-    if (sigCell) {
-      switch(sig) {
-        case 'LONG_SIGNAL':  sigCell.innerHTML = '<span class="sig-long">🟢 ЛОНГ → ВХОД T0</span>'; break;
-        case 'SHORT_SIGNAL': sigCell.innerHTML = '<span class="sig-short">🔴 ШОРТ → ВХОД T0</span>'; break;
-        case 'WATCH_LONG':   sigCell.innerHTML = '<span class="sig-watch">👀 СЛЕДИМ ЛОНГ</span>'; break;
-        case 'WATCH_SHORT':  sigCell.innerHTML = '<span class="sig-watch">👀 СЛЕДИМ ШОРТ</span>'; break;
-        default:             sigCell.innerHTML = '<span class="sig-none">—</span>';
-      }
-      // row highlight
-      const bg = sig === 'LONG_SIGNAL'  ? 'rgba(126,232,162,.04)' :
-                 sig === 'SHORT_SIGNAL' ? 'rgba(255,107,138,.04)' :
-                 (sig.includes && sig.includes('WATCH'))? 'rgba(255,200,90,.03)'  : '';
-      row.style.background = bg;
-    }
-    // Update mini bar in changed cell
-    const colIdx = field === 'r7' ? 2 : 3;
-    const cell = row.cells[colIdx];
-    if (cell && value !== '') {
-      const color = getRsiColor(parseFloat(value));
-      const barWrap = cell.querySelector('.rsi-bar-wrap');
-      if (barWrap) {
-        let mini = barWrap.querySelector('.rsi-mini');
-        let val  = barWrap.querySelector('.rsi-val');
-        if (!mini) {
-          mini = document.createElement('div'); mini.className = 'rsi-mini'; barWrap.appendChild(mini);
-          val  = document.createElement('span'); val.className  = 'rsi-val';  barWrap.appendChild(val);
-        }
-        mini.innerHTML = `<div class="rsi-mini-fill" style="width:${Math.min(100,parseFloat(value)||0)}%;background:${color}"></div>`;
-        val.textContent = parseFloat(value).toFixed(0);
-        val.style.color = color;
-      }
-    }
-  });
-  renderDashSignals();
+  // Re-render to update signal
+  renderRsiScan();
   scheduleSave();
 }
 
 // ═══════════════════════════════════════════════════════════
-// HISTORICAL RSI EDITING
+// HISTORICAL RSI EDITING (legacy - kept for compatibility)
 // ═══════════════════════════════════════════════════════════
 function editHistRsi(ticker, dateStr) {
-  document.getElementById('histRsi_ticker').value = ticker;
-  document.getElementById('histRsi_date').value = dateStr;
-  document.getElementById('histRsiTicker').textContent = ticker;
-  document.getElementById('histRsiDate').textContent = dateStr;
-  
-  // Load existing values
-  const scans = cache.rsiScans || {};
-  const dayScan = scans[dateStr] || {};
-  document.getElementById('histRsi_r7').value = dayScan[ticker + '_r7'] ?? '';
-  document.getElementById('histRsi_r14').value = dayScan[ticker + '_r14'] ?? '';
-  
-  openMo('moHistRsi');
+  // Legacy function - not used in RSI(2) system
+  console.log('editHistRsi is deprecated');
 }
 
 function saveHistRsi() {
-  const ticker = document.getElementById('histRsi_ticker').value;
-  const dateStr = document.getElementById('histRsi_date').value;
-  const r7 = document.getElementById('histRsi_r7').value;
-  const r14 = document.getElementById('histRsi_r14').value;
-  
-  if (!cache.rsiScans) cache.rsiScans = {};
-  if (!cache.rsiScans[dateStr]) cache.rsiScans[dateStr] = {};
-  
-  if (r7 !== '') {
-    cache.rsiScans[dateStr][ticker + '_r7'] = parseFloat(r7);
-  } else {
-    delete cache.rsiScans[dateStr][ticker + '_r7'];
-  }
-  
-  if (r14 !== '') {
-    cache.rsiScans[dateStr][ticker + '_r14'] = parseFloat(r14);
-  } else {
-    delete cache.rsiScans[dateStr][ticker + '_r14'];
-  }
-  
-  scheduleSave();
+  // Legacy function - not used in RSI(2) system
+  console.log('saveHistRsi is deprecated');
   closeMo('moHistRsi');
-  renderRsiScan();
-  toast(`RSI за ${dateStr} сохранён ✓`);
 }
 
 function clearHistRsi() {
-  const ticker = document.getElementById('histRsi_ticker').value;
-  const dateStr = document.getElementById('histRsi_date').value;
-  
-  if (cache.rsiScans && cache.rsiScans[dateStr]) {
-    delete cache.rsiScans[dateStr][ticker + '_r7'];
-    delete cache.rsiScans[dateStr][ticker + '_r14'];
-  }
-  
-  scheduleSave();
+  // Legacy function - not used in RSI(2) system
   closeMo('moHistRsi');
-  renderRsiScan();
-  toast(`RSI за ${dateStr} очищен`);
 }
 
 async function saveRsiScan() {
@@ -3000,10 +2952,12 @@ async function saveRsiScan() {
   document.querySelectorAll('#rsiScanTbody tr').forEach(row => {
     const ticker = row.cells[0]?.textContent?.trim();
     if (!ticker) return;
-    const inp7  = row.cells[2]?.querySelector('input');
-    const inp14 = row.cells[3]?.querySelector('input');
-    if (inp7  && inp7.value  !== '') cache.rsiScans[td][ticker + '_r7']  = parseFloat(inp7.value);
-    if (inp14 && inp14.value !== '') cache.rsiScans[td][ticker + '_r14'] = parseFloat(inp14.value);
+    // RSI(2) system fields
+    const fields = ['rsi2', 'sma200', 'close0', 'close1', 'close2'];
+    fields.forEach((field, idx) => {
+      const inp = row.cells[idx + 2]?.querySelector('input');
+      if (inp && inp.value !== '') cache.rsiScans[td][ticker + '_' + field] = parseFloat(inp.value);
+    });
   });
   await persistToCloud();
   renderRsiScan();
@@ -3013,9 +2967,7 @@ async function saveRsiScan() {
 function renderDashSignals() {
   const td = today();
   const scans = cache.rsiScans || {};
-  const todayScan  = scans[td]          || {};
-  const yesterday  = getPrevDate(td);
-  const yesterScan = scans[yesterday]   || {};
+  const todayScan = scans[td] || {};
   const wl = cache.watchlist;
 
   const signals = [];
@@ -3028,11 +2980,14 @@ function renderDashSignals() {
     );
     if (hasPosition) return;
     
-    const r7cur  = todayScan[w.ticker + '_r7']  ?? '';
-    const r14cur = todayScan[w.ticker + '_r14'] ?? '';
-    const r7prev = yesterScan[w.ticker + '_r7'] ?? '';
-    const sig = computeSignal(w, { rsi7: r7cur, rsi7prev: r7prev, rsi14: r14cur });
-    if (sig !== 'none') signals.push({ w, sig, r7: r7cur, r14: r14cur, r7prev });
+    const rsi2 = todayScan[w.ticker + '_rsi2'] ?? '';
+    const sma200 = todayScan[w.ticker + '_sma200'] ?? '';
+    const close0 = todayScan[w.ticker + '_close0'] ?? '';
+    const close1 = todayScan[w.ticker + '_close1'] ?? '';
+    const close2 = todayScan[w.ticker + '_close2'] ?? '';
+    
+    const sig = computeSignal(w, { rsi2, sma200, close0, close1, close2 });
+    if (sig !== 'none') signals.push({ w, sig, rsi2, sma200, close0, close1, close2 });
   });
 
   // Sort: SIGNAL first, then WATCH
@@ -3046,32 +3001,37 @@ function renderDashSignals() {
   if (dateEl) dateEl.textContent = new Date().toLocaleDateString('ru-RU',{weekday:'short',day:'2-digit',month:'short'});
 
   if (!signals.length) {
-    el.innerHTML = '<div class="empty" style="padding:20px"><div class="empty-t" style="font-family:var(--mono);font-size:11px">Нет сигналов — заполните RSI в разделе «Список»</div></div>';
+    el.innerHTML = '<div class="empty" style="padding:20px"><div class="empty-t" style="font-family:var(--mono);font-size:11px">No signals — fill RSI(2) data in Watchlist tab</div></div>';
     return;
   }
 
-  el.innerHTML = signals.map(({ w, sig, r7, r14, r7prev }) => {
+  el.innerHTML = signals.map(({ w, sig, rsi2, sma200, close0, close1, close2 }) => {
     const isSignal = sig.includes('SIGNAL');
     const isLong   = sig.includes('LONG');
     const cls      = isSignal ? (isLong ? 'long' : 'short') : 'watch';
+    
+    const c0 = parseFloat(close0);
+    const sma = parseFloat(sma200);
+    const trendIcon = isNaN(c0) || isNaN(sma) ? '' : c0 > sma ? '▲' : '▼';
 
-    const label = sig === 'LONG_SIGNAL'  ? '🟢 ЛОНГ → ВХОД T0 (сегодня)'
-                : sig === 'SHORT_SIGNAL' ? '🔴 ШОРТ → ВХОД T0 (сегодня)'
-                : sig === 'WATCH_LONG'   ? '👀 НАБЛЮДАЕМ ЛОНГ'
-                :                          '👀 НАБЛЮДАЕМ ШОРТ';
+    const label = sig === 'LONG_SIGNAL'  ? '🟢 LONG SETUP → Entry next open'
+                : sig === 'SHORT_SIGNAL' ? '🔴 SHORT SETUP → Entry next open'
+                : sig === 'WATCH_LONG'   ? '👀 WATCH LONG'
+                :                          '👀 WATCH SHORT';
 
     return `<div class="sig-card ${cls}">
       <div style="display:flex;align-items:center;gap:12px">
         <span style="font-size:17px;font-weight:800">${w.ticker}</span>
         <span style="font-family:var(--mono);font-size:9px;color:var(--t2)">${w.sector||''}</span>
+        <span style="font-family:var(--mono);font-size:9px;color:var(--acc3)">ATR ${w.atr||'?'}%</span>
       </div>
       <div style="font-family:var(--mono);font-size:11px;font-weight:700;${isSignal?'color:var(--text)':'color:var(--t2)'}">${label}</div>
       <div style="display:flex;gap:14px;font-family:var(--mono);font-size:10px;color:var(--t2)">
-        <span>RSI7: <span style="color:${getRsiColor(parseFloat(r7))};font-weight:700">${r7||'—'}</span></span>
-        <span>RSI14: <span style="color:${getRsiColor(parseFloat(r14))};font-weight:700">${r14||'—'}</span></span>
-        <span>RSI7 T-1: <span style="color:var(--text)">${r7prev||'—'}</span></span>
+        <span>RSI(2): <span style="color:${parseFloat(rsi2)<10?'var(--acc)':parseFloat(rsi2)>90?'var(--acc2)':'var(--text)'};font-weight:700">${rsi2||'—'}</span></span>
+        <span>Price vs SMA200: <span style="font-weight:700">${trendIcon}</span></span>
       </div>
-      ${isSignal ? `<button class="btn btn-p btn-s" onclick="openTrade();setTimeout(()=>{document.getElementById('te_tk').value='${w.ticker}';document.getElementById('te_r7').value='${r7}';document.getElementById('te_r14').value='${r14}';},50)">+ СДЕЛКА T0</button>` : ''}
+      ${isSignal ? `<div style="font-family:var(--mono);font-size:10px;color:var(--acc3);margin-top:6px">Stop: 1.5×ATR = ${w.atr ? (parseFloat(w.atr)*1.5).toFixed(1) : '?'}%</div>` : ''}
+      ${isSignal ? `<button class="btn btn-p btn-s" onclick="openTrade();setTimeout(()=>{document.getElementById('te_tk').value='${w.ticker}';},50)">+ NEW TRADE</button>` : ''}
     </div>`;
   }).join('');
 }
