@@ -405,29 +405,26 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
       <div id="openPos"></div>
     </div>
     <div>
-      <div class="sh">Рыночный фильтр SPY</div>
+      <div class="sh">Market Regime (SPY vs SMA200)</div>
       <div class="card" style="padding:18px">
         <div class="fgrid" style="grid-template-columns:1fr 1fr;margin-bottom:14px">
           <div class="fg">
-            <label>SPY RSI(14)</label>
-            <input type="number" id="spyRsi" min="0" max="100" step="0.1" placeholder="52.0" oninput="updRegime()">
+            <label>SPY Position</label>
+            <select id="spyTrend" onchange="updRegime()">
+              <option value="">—</option>
+              <option value="ABOVE">▲ Above SMA200 (LONG ok)</option>
+              <option value="BELOW">▼ Below SMA200 (SHORT ok)</option>
+            </select>
           </div>
           <div class="fg">
-            <label>Состояние</label>
+            <label>Режим</label>
             <div class="regime-box" id="regimeBox">—</div>
           </div>
         </div>
-        <div class="gauge-wrap">
-          <div class="gauge-bg"></div>
-          <div class="gauge-ptr" id="gaugePtr" style="left:50%"></div>
+        <div id="regimeRules" style="font-family:var(--mono);font-size:10px;color:var(--t2);line-height:1.7;padding:12px;background:var(--bg3);border-radius:8px;margin-bottom:14px">
+          <div><b style="color:var(--acc)">LONG:</b> SPY > SMA200 → Buy panic in uptrend</div>
+          <div><b style="color:var(--acc2)">SHORT:</b> SPY < SMA200 → Fade euphoria in downtrend</div>
         </div>
-        <div class="gauge-labels">
-          <span>0</span><span>20</span><span>30</span><span>45</span><span>55</span><span>70</span><span>80</span><span>100</span>
-        </div>
-        <hr>
-        <div style="font-family:var(--mono);font-size:9px;color:var(--t2);letter-spacing:1px;margin-bottom:6px">РАЗМЕР ЛОНГ / ШОРТ</div>
-        <div id="sizeGuide" style="font-size:22px;font-weight:800;letter-spacing:-1px">— / —</div>
-        <div id="tradeNote" style="font-family:var(--mono);font-size:10px;color:var(--t2);margin-top:4px"></div>
         <div class="ar">
           <button class="btn btn-p btn-s" onclick="saveRegime()">СОХРАНИТЬ</button>
         </div>
@@ -435,14 +432,14 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
     </div>
   </div>
   <div style="margin-top:28px">
-    <div class="sh">🎯 Сигналы дня <span style="font-family:var(--mono);font-size:9px;color:var(--t2);font-weight:400" id="signalsDate"></span></div>
+    <div class="sh">🎯 Signals Today <span style="font-family:var(--mono);font-size:9px;color:var(--t2);font-weight:400" id="signalsDate"></span></div>
     <div id="signalsSection">
-      <div class="empty" style="padding:24px"><div class="empty-t" style="font-family:var(--mono);font-size:11px">Нет сигналов — заполните RSI в разделе «Список наблюдения»</div></div>
+      <div class="empty" style="padding:24px"><div class="empty-t" style="font-family:var(--mono);font-size:11px">No signals — fill RSI(2) data in Watchlist tab</div></div>
     </div>
   </div>
 
   <div style="margin-top:28px">
-    <div class="sh">Последние 8 сделок</div>
+    <div class="sh">Recent 8 Trades</div>
     <div class="tw">
       <table><thead><tr>
         <th>Дата</th><th>Тикер</th><th>Тип</th><th>Вход</th><th>Выход</th><th>P&L%</th><th>T</th><th>Статус</th>
@@ -505,8 +502,8 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
   <div class="tw">
     <table><thead><tr>
       <th>Дата</th><th>Тикер</th><th>Тип</th><th>Вход $</th><th>Стоп $</th>
-      <th>Ц1 $</th><th>Ц2 $</th><th>RSI7</th><th>RSI14</th><th>SPY</th>
-      <th>T</th><th>P&L%</th><th>Статус</th><th></th>
+      <th>Ц1 $</th><th>Ц2 $</th><th>RSI(2)</th><th>ATR%</th><th>Trend</th>
+      <th>Day</th><th>P&L%</th><th>Статус</th><th></th>
     </tr></thead>
     <tbody id="tradesTb"></tbody>
     </table>
@@ -801,19 +798,19 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
       </div>
       <div class="fg">
         <label>Кол-во акций</label>
-        <input type="number" id="te_sh" placeholder="0">
+        <input type="number" id="te_sh" placeholder="0" oninput="tradeAutoCalc()">
       </div>
       <div class="fg">
-        <label>Стоп ($) <span style="color:var(--t3);font-size:9px">авто −4%</span></label>
-        <input type="number" id="te_st" step=".01" placeholder="авто" oninput="tradeMarkManual('st')">
+        <label>Stop ($) <span style="color:var(--t3);font-size:9px">1.5×ATR (3-6%)</span></label>
+        <input type="number" id="te_st" step=".01" placeholder="auto" oninput="tradeMarkManual('st')">
       </div>
       <div class="fg">
-        <label>Цель 1 ($) <span style="color:var(--t3);font-size:9px">авто +4%</span></label>
-        <input type="number" id="te_t1" step=".01" placeholder="авто" oninput="tradeMarkManual('t1')">
+        <label>Target 1 ($) <span style="color:var(--t3);font-size:9px">RSI(2)>50 exit</span></label>
+        <input type="number" id="te_t1" step=".01" placeholder="auto" oninput="tradeMarkManual('t1')">
       </div>
       <div class="fg">
-        <label>Цель 2 ($) <span style="color:var(--t3);font-size:9px">авто +8%</span></label>
-        <input type="number" id="te_t2" step=".01" placeholder="авто" oninput="tradeMarkManual('t2')">
+        <label>Target 2 ($) <span style="color:var(--t3);font-size:9px">optional</span></label>
+        <input type="number" id="te_t2" step=".01" placeholder="auto" oninput="tradeMarkManual('t2')">
       </div>
     </div>
 
@@ -825,11 +822,20 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
 
     <hr style="margin:14px 0">
 
-    <!-- ROW 3: RSI + SMA + status -->
+    <!-- ROW 3: RSI(2) + ATR + Day + status -->
+    <div style="font-family:var(--mono);font-size:9px;color:var(--acc);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px">
+      📊 RSI(2) SYSTEM — Stop = 1.5 × ATR, Exit on RSI(2) > 50 or Day 5
+    </div>
     <div class="fgrid">
-      <div class="fg"><label>RSI(7)</label><input type="number" id="te_r7" step=".1" placeholder="18.5"></div>
-      <div class="fg"><label>RSI(14)</label><input type="number" id="te_r14" step=".1" placeholder="32.0"></div>
-      <div class="fg"><label>SPY RSI(14)</label><input type="number" id="te_spy" step=".1" placeholder="52.0"></div>
+      <div class="fg"><label>RSI(2) at entry</label><input type="number" id="te_rsi2" step=".1" min="0" max="100" placeholder="8.5"></div>
+      <div class="fg"><label>ATR %</label><input type="number" id="te_atr" step=".1" min="1" max="10" placeholder="3.5" oninput="tradeAutoCalc()"></div>
+      <div class="fg"><label>Price vs SMA200</label>
+        <select id="te_trend">
+          <option value="">—</option>
+          <option value="ABOVE">▲ Above (LONG ok)</option>
+          <option value="BELOW">▼ Below (SHORT ok)</option>
+        </select>
+      </div>
       <div class="fg"><label>Статус</label><select id="te_sta" onchange="toggleExitFields()"><option value="OPEN">Открыта</option><option value="PARTIAL">Частичный выход</option><option value="CLOSED">Закрыта</option></select></div>
     </div>
 
@@ -1254,7 +1260,18 @@ async function syncFromGithub() {
   setSyncState('syncing', 'ЗАГРУЗКА...');
   try {
     const data = await loadFromStorage();
-    if (data) { applyData(data); loadSetsUI(); loadGhUI(); loadFhKeyUI(); initChecklist(); renderDash(); renderTrades(); renderWL(); renderQ(); renderRsiScan(); const rsi = cache.regime?.spyRsi14; if (rsi) { document.getElementById('spyRsi').value = rsi; updRegime(false); } }
+    if (data) { 
+      applyData(data); 
+      loadSetsUI(); loadGhUI(); loadFhKeyUI(); initChecklist(); 
+      renderDash(); renderTrades(); renderWL(); renderQ(); renderRsiScan(); 
+      // Load regime
+      const trend = cache.regime?.spyTrend;
+      if (trend) { 
+        const el = document.getElementById('spyTrend');
+        if (el) el.value = trend;
+        updRegime(false);
+      }
+    }
     setSyncState('synced', storageModeLabel());
     updateStorageInfo();
     toast('Синхронизировано ✓');
@@ -1395,54 +1412,36 @@ function showSyncBanner(msg, err=false) {
 function hideSyncBanner() { document.getElementById('syncBanner').className=''; }
 
 // ═══════════════════════════════════════════════════════════
-// REGIME
+// REGIME (SPY vs SMA200)
 // ═══════════════════════════════════════════════════════════
 function updRegime(flash=true) {
-  const val = parseFloat(document.getElementById('spyRsi').value);
-  const ptr = document.getElementById('gaugePtr');
-  if (!isNaN(val)) ptr.style.left = Math.min(100,Math.max(0,val)) + '%';
+  const trend = document.getElementById('spyTrend')?.value;
+  const box = document.getElementById('regimeBox');
+  const hdr = document.getElementById('hdrRegime');
 
-  const box  = document.getElementById('regimeBox');
-  const size = document.getElementById('sizeGuide');
-  const note = document.getElementById('tradeNote');
-  const hdr  = document.getElementById('hdrRegime');
-
-  if (isNaN(val)) return;
-
-  let regime, longS, shortS, noteT, color;
-
-  if (val > 80 || val < 20) {
-    regime='🚫 ТОРГОВЛЯ ОТКЛЮЧЕНА'; longS='—'; shortS='—';
-    noteT='Только кэш — паника на рынке'; color='var(--acc2)';
-  } else if (val > 75) {
-    regime='⚠️ ЭКСТРЕМ. ПЕРЕКУПЛЕННОСТЬ'; longS='НЕТ'; shortS='100%';
-    noteT='Только шорты'; color='var(--acc2)';
-  } else if (val >= 55) {
-    regime='📈 БЫЧИЙ'; longS='50%'; shortS='100%';
-    noteT='Лонги 50% размера'; color='var(--acc3)';
-  } else if (val >= 45) {
-    regime='⚖️ НЕЙТРАЛЬНЫЙ'; longS='100%'; shortS='100%';
-    noteT='Полная система активна'; color='var(--acc)';
-  } else if (val >= 30) {
-    regime='📉 МЕДВЕЖИЙ'; longS='100%'; shortS='50%';
-    noteT='Шорты 50% размера'; color='var(--acc3)';
-  } else {
-    regime='⚠️ ЭКСТРЕМ. ПЕРЕПРОДАННОСТЬ'; longS='100%'; shortS='НЕТ';
-    noteT='Только лонги'; color='var(--acc)';
+  if (!trend) {
+    box.textContent = '—';
+    box.style.color = 'var(--t2)';
+    if (hdr) hdr.textContent = 'NO DATA';
+    return;
   }
 
-  box.textContent = regime; box.style.color = color;
-  size.innerHTML = `<span class="g">${longS}</span> <span style="color:var(--t2)"> / </span> <span class="r">${shortS}</span>`;
-  note.textContent = noteT;
-  hdr.textContent = regime.replace(/[^а-яёА-ЯЁa-zA-Z\s\.%]/g,'').trim();
+  if (trend === 'ABOVE') {
+    box.innerHTML = '<span class="g">▲ UPTREND — LONG MODE</span>';
+    box.style.color = 'var(--acc)';
+    if (hdr) hdr.textContent = 'LONG MODE';
+  } else {
+    box.innerHTML = '<span class="r">▼ DOWNTREND — SHORT MODE</span>';
+    box.style.color = 'var(--acc2)';
+    if (hdr) hdr.textContent = 'SHORT MODE';
+  }
 }
 
 async function saveRegime() {
-  const val = parseFloat(document.getElementById('spyRsi').value);
-  if (isNaN(val)) return;
-  cache.regime = { spyRsi14: val, savedAt: new Date().toISOString() };
-  scheduleSave(); const ok = true;
-  if (ok) toast('Режим сохранён ✓');
+  const trend = document.getElementById('spyTrend')?.value;
+  cache.regime = { spyTrend: trend, savedAt: new Date().toISOString() };
+  scheduleSave();
+  toast('Regime saved ✓');
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -1874,6 +1873,7 @@ function calcPartialPnl() {
 function tradeAutoCalc() {
   const entry  = parseFloat(document.getElementById('te_en').value);
   const type   = document.getElementById('te_tp').value;
+  const atrPct = parseFloat(document.getElementById('te_atr')?.value) || 0;
   const s      = getSets();
 
   const preview = document.getElementById('te_calc_preview');
@@ -1883,12 +1883,24 @@ function tradeAutoCalc() {
 
   const dir = type === 'LONG' ? 1 : -1;
 
-  // Auto-fill stop if not manually set
+  // ═══════════════════════════════════════════════════════════
+  // RSI(2) SYSTEM STOP CALCULATION
+  // Stop = 1.5 × ATR%, clamped to [3%, 6%]
+  // ═══════════════════════════════════════════════════════════
   if (!manualFields.has('st')) {
-    const stopPrice = entry * (1 - dir * s.stopPct / 100);
+    let stopPctCalc;
+    if (atrPct > 0) {
+      // Stop = 1.5 × ATR, clamped between 3% and 6%
+      stopPctCalc = Math.min(6, Math.max(3, atrPct * 1.5));
+    } else {
+      // Default fallback if no ATR provided
+      stopPctCalc = s.stopPct || 4;
+    }
+    const stopPrice = entry * (1 - dir * stopPctCalc / 100);
     document.getElementById('te_st').value = stopPrice.toFixed(2);
   }
-  // Auto-fill target1
+  
+  // Auto-fill target1 (RSI(2) > 50 exit, but keep price target for reference)
   if (!manualFields.has('t1')) {
     const t1 = entry * (1 + dir * s.target1 / 100);
     document.getElementById('te_t1').value = t1.toFixed(2);
@@ -1910,12 +1922,17 @@ function tradeAutoCalc() {
   const posSize = sh * entry;
   const riskAmt = sh && stop ? Math.abs(sh * (entry - stop)) : 0;
 
+  // ATR-based stop info
+  const atrStopInfo = atrPct > 0 
+    ? `ATR ${atrPct}% × 1.5 = ${(atrPct * 1.5).toFixed(1)}% → clamped to ${stopPct}%`
+    : 'Enter ATR% to calculate stop';
+
   rows.innerHTML = [
-    { l:'Стоп',     v:`$${stop.toFixed(2)}`, sub:`−${stopPct}%`,  c:'var(--acc2)' },
-    { l:'Цель 1',   v:`$${t1.toFixed(2)}`,   sub:`+${t1Pct}%`,    c:'var(--acc)'  },
-    { l:'Цель 2',   v:`$${t2.toFixed(2)}`,   sub:`+${t2Pct}%`,    c:'var(--acc)'  },
-    sh ? { l:'Позиция',  v:`$${posSize.toFixed(0)}`, sub:`${sh} акц · ${sh&&s.portfolio?(posSize/s.portfolio*100).toFixed(1):'—'}% порт.`, c:'var(--text)' } : null,
-    sh && stop ? { l:'Риск $', v:`$${riskAmt.toFixed(0)}`, sub:s.portfolio?`${(riskAmt/s.portfolio*100).toFixed(2)}% порт.`:'', c:'var(--acc3)' } : null,
+    { l:'Stop',     v:`$${stop.toFixed(2)}`, sub:`−${stopPct}%`,  c:'var(--acc2)' },
+    { l:'Target 1', v:`$${t1.toFixed(2)}`,   sub:`+${t1Pct}%`,    c:'var(--acc)'  },
+    { l:'Target 2', v:`$${t2.toFixed(2)}`,   sub:`+${t2Pct}%`,    c:'var(--acc)'  },
+    sh ? { l:'Position',  v:`$${posSize.toFixed(0)}`, sub:`${sh} shares · ${sh&&s.portfolio?(posSize/s.portfolio*100).toFixed(1)+'%':''} port.`, c:'var(--text)' } : null,
+    sh && stop ? { l:'Risk $', v:`$${riskAmt.toFixed(0)}`, sub:s.portfolio?`${(riskAmt/s.portfolio*100).toFixed(2)}% port.`:'', c:'var(--acc3)' } : null,
   ].filter(Boolean).map(({l,v,sub,c}) => `<div style="min-width:80px">
     <div style="font-family:var(--mono);font-size:8px;color:var(--t2);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px">${l}</div>
     <div style="font-family:var(--mono);font-size:13px;font-weight:700;color:${c}">${v}</div>
@@ -1925,11 +1942,12 @@ function tradeAutoCalc() {
   // Show formula basis
   const basisEl = document.getElementById('te_calc_basis');
   if (basisEl) {
-    basisEl.innerHTML = `Портфель: <b>$${s.portfolio.toLocaleString()}</b> · Риск/сделку: <b>${s.riskPct}%</b> ($${(s.portfolio*s.riskPct/100).toFixed(0)}) · Стоп: <b>${s.stopPct}%</b> · Макс позиция: <b>${s.maxPosPct}%</b> ($${(s.portfolio*s.maxPosPct/100).toFixed(0)})`;
+    basisEl.innerHTML = `<div style="margin-bottom:4px"><b style="color:var(--acc3)">Stop formula:</b> ${atrStopInfo}</div>
+    Portfolio: <b>$${s.portfolio.toLocaleString()}</b> · Risk/trade: <b>${s.riskPct}%</b> ($${(s.portfolio*s.riskPct/100).toFixed(0)}) · Max position: <b>${s.maxPosPct}%</b>`;
   }
   preview.style.display = '';
 
-  // P&L preview for exit (с комиссиями)
+  // P&L preview for exit
   const exitPrice = parseFloat(document.getElementById('te_ex')?.value);
   const comm      = parseFloat(document.getElementById('te_comm')?.value) || 0;
   const pnlFg = document.getElementById('pnl_preview_fg');
@@ -1941,7 +1959,7 @@ function tradeAutoCalc() {
     const pnlPct   = netPnl / basis * 100;
     pnlFg.style.display = '';
     pnlEl.innerHTML = `<span style="color:${pnlPct>=0?'var(--acc)':'var(--acc2)'}">${pnlPct>=0?'+':''}${pnlPct.toFixed(2)}%</span>`
-      + (sh ? ` <span style="font-size:11px;color:var(--t2)">($${netPnl.toFixed(0)}${comm?` · −$${comm} комис.`:''})</span>` : '');
+      + (sh ? ` <span style="font-size:11px;color:var(--t2)">($${netPnl.toFixed(0)}${comm?` · −$${comm} comm.`:''})</span>` : '');
   } else if (pnlFg) { pnlFg.style.display = 'none'; }
 }
 
@@ -1960,10 +1978,14 @@ function openTrade(id=null) {
   if (id) {
     const t = cache.trades.find(x => x.id === id);
     if (t) {
-      const map = {tk:'ticker',tp:'type',dt:'entryDate',en:'entry',sh:'shares',st:'stop',t1:'target1',t2:'target2',r7:'rsi7',r14:'rsi14',spy:'spyRsi',sta:'status',ex:'exitPrice',er:'exitReason',comm:'commission',nt:'notes'};
+      const map = {tk:'ticker',tp:'type',dt:'entryDate',en:'entry',sh:'shares',st:'stop',t1:'target1',t2:'target2',rsi2:'rsi2',atr:'atrPct',trend:'trend',sta:'status',ex:'exitPrice',er:'exitReason',comm:'commission',nt:'notes'};
       Object.entries(map).forEach(([elId,key]) => {
         const el = document.getElementById('te_'+elId); if(el) el.value = t[key] || '';
       });
+      // Legacy migration: old RSI(7) → RSI(2) display
+      if (!t.rsi2 && t.rsi7) {
+        document.getElementById('te_rsi2').value = t.rsi7;
+      }
       // Load partial exit data
       if (t.partialExit) {
         document.getElementById('te_p_date').value = t.partialExit.date || '';
@@ -1978,15 +2000,14 @@ function openTrade(id=null) {
       if (t.target2) manualFields.add('t2');
     }
   } else {
-    ['tk','en','sh','st','t1','t2','r7','r14','spy','ex','comm','nt'].forEach(f => {
+    ['tk','en','sh','st','t1','t2','rsi2','atr','ex','comm','nt'].forEach(f => {
       const el = document.getElementById('te_'+f); if(el) el.value = '';
     });
     document.getElementById('te_dt').value  = today();
     document.getElementById('te_tp').value  = 'LONG';
     document.getElementById('te_sta').value = 'OPEN';
     document.getElementById('te_er').value  = '';
-    const rsi = document.getElementById('spyRsi').value;
-    if (rsi) document.getElementById('te_spy').value = rsi;
+    document.getElementById('te_trend').value = '';
   }
 
   toggleExitFields();
@@ -1998,7 +2019,7 @@ async function saveTrade() {
   const ticker = document.getElementById('te_tk').value.trim().toUpperCase();
   if(!ticker) { toast('Введите тикер!',true); return; }
   const id = document.getElementById('te_id').value;
-  const map = {tk:'ticker',tp:'type',dt:'entryDate',en:'entry',sh:'shares',st:'stop',t1:'target1',t2:'target2',r7:'rsi7',r14:'rsi14',spy:'spyRsi',sta:'status',ex:'exitPrice',er:'exitReason',comm:'commission',nt:'notes'};
+  const map = {tk:'ticker',tp:'type',dt:'entryDate',en:'entry',sh:'shares',st:'stop',t1:'target1',t2:'target2',rsi2:'rsi2',atr:'atrPct',trend:'trend',sta:'status',ex:'exitPrice',er:'exitReason',comm:'commission',nt:'notes'};
   const t = { id: id||Date.now().toString(), createdAt: Date.now() };
   Object.entries(map).forEach(([elId,key]) => { const el=document.getElementById('te_'+elId); if(el) t[key]=el.value; });
   t.ticker = ticker;
@@ -2170,12 +2191,21 @@ function renderTrades() {
   const tb = document.getElementById('tradesTb');
   if(!fl.length){ tb.innerHTML='<tr><td colspan="14" style="text-align:center;color:var(--t2);padding:36px">Сделок нет</td></tr>'; return; }
   tb.innerHTML = fl.map(t => {
-    // T-day logic: T0=entry, T4=exit
+    // Day count: T0=entry, exit at RSI(2)>50 or Day 5
     const tDay = (t.status==='OPEN' || t.status==='PARTIAL') ? getTradingDayNumber(t.entryDate) : null;
-    const tLabel = tDay !== null ? `T${tDay}` : '—';
-    // Color: T0-T2 blue, T3 yellow, T4+ red
-    const tColor = tDay === null ? '' : tDay <= 2 ? 'd1' : tDay === 3 ? 'd3' : 'd5';
+    const tLabel = tDay !== null ? `D${tDay}` : '—';
+    // Color: D0-D2 blue, D3-D4 yellow, D5+ red (must exit!)
+    const tColor = tDay === null ? '' : tDay <= 2 ? 'd1' : tDay <= 4 ? 'd3' : 'd5';
     const db = tDay !== null ? `<span class="db ${tColor}">${tLabel}</span>` : '—';
+    
+    // Trend icon
+    const trendIcon = t.trend === 'ABOVE' ? '<span class="g">▲</span>' : t.trend === 'BELOW' ? '<span class="r">▼</span>' : '—';
+    
+    // RSI display (legacy support: show rsi7 if rsi2 not available)
+    const rsiDisplay = t.rsi2 || t.rsi7 || '—';
+    
+    // ATR% display
+    const atrDisplay = t.atrPct || '—';
     
     // P&L: процент + абсолютное значение
     let pnl = '<span style="color:var(--t2)">—</span>';
@@ -2187,25 +2217,29 @@ function renderTrades() {
       // Show partial P&L for PARTIAL status
       const pctStr = `${t.partialExit.pnlPct>0?'+':''}${t.partialExit.pnlPct}%`;
       const netStr = `<span style="font-size:9px;color:var(--t2)"> ($${t.partialExit.pnlNet>0?'+':''}${t.partialExit.pnlNet.toFixed(0)})</span>`;
-      pnl = `<span class="${t.partialExit.pnlPct>=0?'g':'r'}">${pctStr}</span>${netStr}<div style="font-size:8px;color:var(--acc3);margin-top:2px">50% закрыто</div>`;
+      pnl = `<span class="${t.partialExit.pnlPct>=0?'g':'r'}">${pctStr}</span>${netStr}<div style="font-size:8px;color:var(--acc3);margin-top:2px">50% closed</div>`;
     }
     // Status badge
     let stBadge;
     if (t.status === 'OPEN') {
-      stBadge = '<span class="b b-open">ОТКРЫТА</span>';
+      stBadge = '<span class="b b-open">OPEN</span>';
     } else if (t.status === 'PARTIAL') {
-      stBadge = '<span class="b b-warn">ЧАСТИЧН.</span>';
+      stBadge = '<span class="b b-warn">PARTIAL</span>';
     } else {
-      stBadge = t.result === 'WIN' ? '<span class="b b-win">ВЫИГРЫШ</span>' : '<span class="b b-loss">УБЫТОК</span>';
+      stBadge = t.result === 'WIN' ? '<span class="b b-win">WIN</span>' : '<span class="b b-loss">LOSS</span>';
     }
+    
+    // Day 5 warning
+    const dayWarn = tDay !== null && tDay >= 5 ? '<div style="font-size:8px;color:var(--acc2);margin-top:2px">⚠️ EXIT!</div>' : '';
+    
     return `<tr>
       <td>${t.entryDate||'—'}</td>
       <td style="font-weight:700">${t.ticker}</td>
       <td><span class="b ${t.type==='LONG'?'b-long':'b-short'}">${t.type}</span></td>
       <td>$${t.entry||'—'}</td><td class="r">$${t.stop||'—'}</td>
       <td class="g">$${t.target1||'—'}</td><td class="g">$${t.target2||'—'}</td>
-      <td>${t.rsi7||'—'}</td><td>${t.rsi14||'—'}</td><td>${t.spyRsi||'—'}</td>
-      <td>${db}</td><td>${pnl}</td><td>${stBadge}</td>
+      <td>${rsiDisplay}</td><td>${atrDisplay}</td><td>${trendIcon}</td>
+      <td>${db}${dayWarn}</td><td>${pnl}</td><td>${stBadge}</td>
       <td><div style="display:flex;gap:5px">
         <button class="btn btn-g btn-s" onclick="openTrade('${t.id}')">✏</button>
         <button class="btn btn-d btn-s" onclick="delTrade('${t.id}')">✕</button>
@@ -2260,8 +2294,12 @@ function renderDash() {
 
   const opEl = document.getElementById('openPos');
   if (!op.length) {
-    opEl.innerHTML = '<div class="empty"><div class="empty-i">📭</div><div class="empty-t">Нет открытых позиций</div></div>';
+    opEl.innerHTML = '<div class="empty"><div class="empty-i">📭</div><div class="empty-t">No open positions</div></div>';
   } else {
+    // Get today's RSI scan data
+    const td = today();
+    const todayScan = (cache.rsiScans || {})[td] || {};
+    
     opEl.innerHTML = op.map(t => {
       const tDay   = getTradingDayNumber(t.entryDate);
       const entry  = parseFloat(t.entry)  || 0;
@@ -2270,77 +2308,77 @@ function renderDash() {
       const t2     = parseFloat(t.target2)|| 0;
       const shares = parseInt(t.shares)   || 0;
       const dir    = t.type === 'LONG' ? 1 : -1;
+      const atrPct = parseFloat(t.atrPct) || 0;
 
-      // Current P&L estimate (we don't have live price, show vs targets)
-      const pnlVsT1  = t1 && entry ? ((t1 - entry) / entry * 100 * dir).toFixed(1) : null;
-      const pnlVsT2  = t2 && entry ? ((t2 - entry) / entry * 100 * dir).toFixed(1) : null;
+      // Get current RSI(2) from scan
+      const currentRsi2 = todayScan[t.ticker + '_rsi2'];
+      const rsi2Val = currentRsi2 !== undefined ? parseFloat(currentRsi2) : null;
+      
+      // Current P&L estimate
       const stopPct  = stop && entry ? Math.abs((stop - entry) / entry * 100).toFixed(1) : null;
 
-      // ── Smart action hints (T0-T4 logic) ──────────────────
+      // ══════════════════════════════════════════════════════════
+      // RSI(2) SYSTEM EXIT RULES
+      // ══════════════════════════════════════════════════════════
       const hints = [];
-
-      // T0: entry day
+      
+      // Check RSI(2) exit condition
+      const rsiExitCondition = t.type === 'LONG' ? rsi2Val > 50 : rsi2Val < 50;
+      const rsiExitText = t.type === 'LONG' ? 'RSI(2) > 50' : 'RSI(2) < 50';
+      
+      // Day 5 = mandatory exit
+      if (tDay >= 5) {
+        hints.push({
+          icon: '🚨',
+          text: `DAY 5+ — MANDATORY EXIT at today's close`,
+          color: 'var(--acc2)', urgency: 3
+        });
+      }
+      
+      // RSI(2) exit signal
+      if (rsi2Val !== null && rsiExitCondition) {
+        hints.push({
+          icon: '✅',
+          text: `EXIT SIGNAL: ${rsiExitText} (current: ${rsi2Val.toFixed(1)})`,
+          color: 'var(--acc)', urgency: 2
+        });
+      }
+      
+      // Day-based hints
       if (tDay === 0) {
-        hints.push({ icon:'🚀', text:'T0 — день входа. Стоп-лосс должен быть выставлен!', color:'var(--acc4)', urgency:1 });
+        hints.push({ icon: '🚀', text: 'D0 — Entry day. Stop loss must be set!', color: 'var(--acc4)', urgency: 1 });
+      } else if (tDay === 1) {
+        hints.push({ icon: '👁', text: 'D1 — Monitoring. Check RSI(2) daily', color: 'var(--acc4)', urgency: 0 });
+      } else if (tDay === 2) {
+        hints.push({ icon: '👁', text: 'D2 — Monitoring. Watch for RSI(2) exit', color: 'var(--acc4)', urgency: 0 });
+      } else if (tDay === 3) {
+        hints.push({ icon: '📅', text: 'D3 — Day 4 tomorrow. Prepare exit plan', color: 'var(--acc3)', urgency: 1 });
+      } else if (tDay === 4) {
+        hints.push({ icon: '⚠️', text: 'D4 — Exit tomorrow if no RSI signal today', color: 'var(--acc3)', urgency: 2 });
       }
-
-      // T1: first day after entry
-      if (tDay === 1) {
-        hints.push({ icon:'👁', text:'T1 — мониторинг, ждём движения', color:'var(--acc4)', urgency:0 });
-      }
-
-      // T2: second day
-      if (tDay === 2) {
-        hints.push({ icon:'👁', text:'T2 — мониторинг. Проверить достижение Цели 1', color:'var(--acc4)', urgency:0 });
-        if (t1) hints.push({
-          icon:'🎯',
-          text:`Цель 1 = $${t1.toFixed(2)} (+${pnlVsT1}%) → закрыть 50%, стоп → breakeven`,
-          color:'var(--acc)', urgency:0
-        });
-      }
-
-      // T3: warning day
-      if (tDay === 3) {
+      
+      // Current RSI(2) display
+      if (rsi2Val !== null && !rsiExitCondition) {
+        const rsiColor = rsi2Val < 20 ? 'var(--acc)' : rsi2Val > 80 ? 'var(--acc2)' : 'var(--t2)';
         hints.push({
-          icon:'📅',
-          text:`T3 — ЗАВТРА T4 (последний день). Готовьтесь к выходу`,
-          color:'var(--acc3)', urgency:1
+          icon: '📊',
+          text: `RSI(2) = ${rsi2Val.toFixed(1)} — waiting for ${rsiExitText}`,
+          color: rsiColor, urgency: 0
         });
-      }
-
-      // T4: mandatory exit day
-      if (tDay >= 4) {
+      } else if (rsi2Val === null) {
         hints.push({
-          icon:'🚨',
-          text:`T4 — ВЫХОД ОБЯЗАТЕЛЕН сегодня на закрытии (16:00 EST) по любой цене`,
-          color:'var(--acc2)', urgency:3
+          icon: '❓',
+          text: `RSI(2) not entered — update in Watchlist tab`,
+          color: 'var(--acc3)', urgency: 1
         });
       }
 
-      // Target 1 reminder (T1+)
-      if (tDay >= 1 && tDay < 4 && t1) {
-        hints.push({
-          icon:'🎯',
-          text:`Цель 1: $${t1.toFixed(2)} (+${pnlVsT1}%) → 50% выход, стоп → breakeven`,
-          color:'var(--acc)', urgency:0
-        });
-      }
-
-      // Stop reminder always
+      // Stop reminder
       if (stop) {
         hints.push({
-          icon:'🛑',
-          text:`Стоп-лосс: $${stop.toFixed(2)} (−${stopPct}%) — GTC ордер должен стоять`,
-          color:'var(--t2)', urgency:0
-        });
-      }
-
-      // Target 2 reminder
-      if (t2 && tDay >= 1) {
-        hints.push({
-          icon:'🏆',
-          text:`Цель 2: $${t2.toFixed(2)} (+${pnlVsT2}%) → закрыть оставшиеся 50%`,
-          color:'var(--acc)', urgency:0
+          icon: '🛑',
+          text: `Stop: $${stop.toFixed(2)} (−${stopPct}%) — GTC order must be active`,
+          color: 'var(--t2)', urgency: 0
         });
       }
 
@@ -2348,11 +2386,16 @@ function renderDash() {
       hints.sort((a,b) => b.urgency - a.urgency);
 
       const urgency = hints[0]?.urgency || 0;
-      const borderCol = urgency >= 3 ? 'var(--acc2)' : urgency >= 2 ? 'rgba(255,107,138,.5)' : urgency >= 1 ? 'rgba(255,200,90,.4)' : 'var(--line)';
+      const borderCol = urgency >= 3 ? 'var(--acc2)' : urgency >= 2 ? 'rgba(126,232,162,.6)' : urgency >= 1 ? 'rgba(255,200,90,.4)' : 'var(--line)';
       
-      // T-day color: T0-T2 blue, T3 yellow, T4+ red
-      const tColor = tDay <= 2 ? 'd1' : tDay === 3 ? 'd3' : 'd5';
-      const tLabel = `T${tDay}`;
+      // Day color: D0-D2 blue, D3-D4 yellow, D5+ red
+      const tColor = tDay <= 2 ? 'd1' : tDay <= 4 ? 'd3' : 'd5';
+      const tLabel = `D${tDay}`;
+      
+      // RSI(2) badge
+      const rsiBadge = rsi2Val !== null 
+        ? `<span style="font-family:var(--mono);font-size:10px;padding:2px 6px;border-radius:4px;background:${rsiExitCondition ? 'rgba(126,232,162,.2)' : 'var(--bg4)'};color:${rsiExitCondition ? 'var(--acc)' : 'var(--t2)'}">RSI(2): ${rsi2Val.toFixed(1)}${rsiExitCondition ? ' ✓' : ''}</span>`
+        : '<span style="font-family:var(--mono);font-size:10px;padding:2px 6px;border-radius:4px;background:rgba(255,200,90,.15);color:var(--acc3)">RSI(2): ?</span>';
 
       return `<div class="opc" style="border-color:${borderCol};margin-bottom:12px">
         <!-- Header row -->
@@ -2361,20 +2404,20 @@ function renderDash() {
             <span style="font-size:17px;font-weight:800">${t.ticker}</span>
             <span class="b ${t.type==='LONG'?'b-long':'b-short'}">${t.type}</span>
             <span class="db ${tColor}">${tLabel}</span>
+            ${rsiBadge}
             <span style="font-family:var(--mono);font-size:9px;color:var(--t2)">${t.entryDate||''}</span>
-            ${tDay >= 4 ? '<span style="font-family:var(--mono);font-size:9px;color:var(--acc2);font-weight:700;background:rgba(255,107,138,.15);padding:2px 6px;border-radius:4px">⚠ ВЫХОД СЕГОДНЯ</span>' : ''}
+            ${tDay >= 5 ? '<span style="font-family:var(--mono);font-size:9px;color:var(--acc2);font-weight:700;background:rgba(255,107,138,.15);padding:2px 6px;border-radius:4px">⚠ EXIT TODAY</span>' : ''}
+            ${rsiExitCondition ? '<span style="font-family:var(--mono);font-size:9px;color:var(--acc);font-weight:700;background:rgba(126,232,162,.15);padding:2px 6px;border-radius:4px">✓ EXIT SIGNAL</span>' : ''}
           </div>
-          <button class="btn btn-g btn-s" onclick="openTrade('${t.id}')">✏ ОБНОВИТЬ</button>
+          <button class="btn btn-g btn-s" onclick="openTrade('${t.id}')">✏ UPDATE</button>
         </div>
 
         <!-- Price row -->
         <div style="display:flex;gap:16px;margin-top:10px;flex-wrap:wrap;font-family:var(--mono);font-size:11px">
-          <span>Вход: <span style="color:var(--text);font-weight:700">$${entry||'—'}</span></span>
-          <span>Стоп: <span class="r">$${stop||'—'}</span></span>
-          <span>Ц1: <span class="g">$${t1||'—'}</span></span>
-          <span>Ц2: <span class="g">$${t2||'—'}</span></span>
-          ${shares ? `<span>Акций: <span style="color:var(--text)">${shares}</span></span>` : ''}
-          ${shares && t1 ? `<span>½ закрыть: <span style="color:var(--acc4)">${Math.ceil(shares/2)} шт.</span></span>` : ''}
+          <span>Entry: <span style="color:var(--text);font-weight:700">$${entry||'—'}</span></span>
+          <span>Stop: <span class="r">$${stop||'—'}</span> <span style="color:var(--t3)">(−${stopPct||'?'}%)</span></span>
+          ${atrPct ? `<span>ATR: <span style="color:var(--acc3)">${atrPct}%</span></span>` : ''}
+          ${shares ? `<span>Shares: <span style="color:var(--text)">${shares}</span></span>` : ''}
         </div>
 
         <!-- Live price row -->
@@ -3234,8 +3277,15 @@ async function init() {
   loadSetsUI(); loadGhUI(); loadFhKeyUI(); initChecklist(); renderHolidays();
   renderDash(); renderTrades(); renderWL(); renderQ(); renderRsiScan();
 
-  const rsi = cache.regime?.spyRsi14;
-  if (rsi) { try { document.getElementById('spyRsi').value = rsi; updRegime(false); } catch {} }
+  // Load regime (SPY vs SMA200)
+  const trend = cache.regime?.spyTrend;
+  if (trend) { 
+    try { 
+      const el = document.getElementById('spyTrend');
+      if (el) el.value = trend;
+      updRegime(false); 
+    } catch {} 
+  }
 
   setSyncState('synced', storageModeLabel());
   updateStorageInfo();
