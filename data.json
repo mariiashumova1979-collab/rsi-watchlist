@@ -642,17 +642,7 @@
       "result": "LOSS"
     }
   ],
-  "watchlist": [
-    {
-      "ticker": "LYB",
-      "sector": "Другое",
-      "cap": "21.22",
-      "earningsDate": "2026-04-24",
-      "cooldownDate": "",
-      "notes": "",
-      "addedAt": 1772785679614
-    }
-  ],
+  "watchlist": [],
   "quarterly": {},
   "checklist": {},
   "settings": {
