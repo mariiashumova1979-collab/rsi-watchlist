@@ -644,15 +644,6 @@
   ],
   "watchlist": [
     {
-      "ticker": "IOT",
-      "sector": "Technology",
-      "cap": "20.4",
-      "earningsDate": "2026-05-28",
-      "cooldownDate": "",
-      "notes": "",
-      "addedAt": 1773054313315
-    },
-    {
       "ticker": "LYB",
       "sector": "Другое",
       "cap": "21.22",
