@@ -642,7 +642,18 @@
       "result": "LOSS"
     }
   ],
-  "watchlist": [],
+  "watchlist": [
+    {
+      "ticker": "CRWD",
+      "sector": "Technology",
+      "cap": "114.44",
+      "atr": "4.65",
+      "earningsDate": "2026-06-09",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1773321807877
+    }
+  ],
   "quarterly": {},
   "checklist": {},
   "settings": {
