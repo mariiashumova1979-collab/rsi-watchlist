@@ -644,6 +644,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "JD",
+      "sector": "Consumer Defensive",
+      "cap": "35.9",
+      "atr": "2.7",
+      "earningsDate": "2026-05-19",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1773321910391
+    },
+    {
       "ticker": "CRWD",
       "sector": "Technology",
       "cap": "114.44",
