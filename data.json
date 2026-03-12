@@ -212,7 +212,7 @@
     },
     {
       "id": "1773077427075",
-      "createdAt": 1773077427075,
+      "createdAt": 1773323295533,
       "ticker": "ZD",
       "type": "SHORT",
       "entryDate": "2026-03-09",
@@ -224,11 +224,14 @@
       "rsi7": "75.9",
       "rsi14": "67.48",
       "spyRsi": "38.45",
-      "status": "OPEN",
-      "exitPrice": 0,
-      "exitReason": "",
-      "commission": 0,
-      "notes": ""
+      "status": "CLOSED",
+      "exitPrice": 41.052,
+      "exitReason": "STOP",
+      "commission": 6,
+      "notes": "",
+      "pnlNet": -70.45,
+      "pnlPct": -4.35,
+      "result": "LOSS"
     },
     {
       "id": "1772039941723",
