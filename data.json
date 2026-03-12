@@ -644,15 +644,6 @@
   ],
   "watchlist": [
     {
-      "ticker": "AMPX",
-      "sector": "Technology",
-      "cap": "2.13",
-      "earningsDate": "2026-05-07",
-      "cooldownDate": "",
-      "notes": "",
-      "addedAt": 1773054762340
-    },
-    {
       "ticker": "ERAS",
       "sector": "Technology",
       "cap": "4.79",
