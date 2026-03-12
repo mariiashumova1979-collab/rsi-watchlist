@@ -644,16 +644,6 @@
   ],
   "watchlist": [
     {
-      "ticker": "AAOI",
-      "sector": "Technology",
-      "cap": "",
-      "beta": "",
-      "earningsDate": "2026-04-30",
-      "cooldownDate": "",
-      "notes": "",
-      "addedAt": 1773217253897
-    },
-    {
       "ticker": "AMPX",
       "sector": "Technology",
       "cap": "2.13",
