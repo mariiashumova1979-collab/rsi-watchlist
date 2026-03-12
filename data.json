@@ -62,7 +62,7 @@
     },
     {
       "id": "1773249339990",
-      "createdAt": 1773249339990,
+      "createdAt": 1773323379863,
       "ticker": "LYB",
       "type": "SHORT",
       "entryDate": "2026-03-11",
@@ -74,11 +74,14 @@
       "rsi7": "74.02",
       "rsi14": "71.23",
       "spyRsi": "43.68",
-      "status": "OPEN",
-      "exitPrice": 0,
-      "exitReason": "",
-      "commission": 0,
-      "notes": ""
+      "status": "CLOSED",
+      "exitPrice": 69.934,
+      "exitReason": "STOP",
+      "commission": 5,
+      "notes": "",
+      "pnlNet": -98.94,
+      "pnlPct": -6.24,
+      "result": "LOSS"
     },
     {
       "id": "1773178956259",
