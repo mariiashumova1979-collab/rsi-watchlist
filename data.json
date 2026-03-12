@@ -644,15 +644,6 @@
   ],
   "watchlist": [
     {
-      "ticker": "ERAS",
-      "sector": "Technology",
-      "cap": "4.79",
-      "earningsDate": "2026-03-19",
-      "cooldownDate": "",
-      "notes": "",
-      "addedAt": 1773054610752
-    },
-    {
       "ticker": "IOT",
       "sector": "Technology",
       "cap": "20.4",
