@@ -1,6 +1,26 @@
 {
   "trades": [
     {
+      "id": "1773322880545",
+      "createdAt": 1773322880545,
+      "ticker": "JD",
+      "type": "SHORT",
+      "entryDate": "2026-03-12",
+      "entry": 28.182,
+      "shares": 58,
+      "stop": "29.31",
+      "target1": "27.05",
+      "target2": "25.93",
+      "rsi7": "",
+      "rsi14": "",
+      "spyRsi": "43.68",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "commission": 0,
+      "notes": ""
+    },
+    {
       "id": "1773322365260",
       "createdAt": 1773322365260,
       "ticker": "CRWD",
