@@ -696,6 +696,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "PANW",
+      "sector": "Technology",
+      "cap": "137.19",
+      "atr": "3.74",
+      "earningsDate": "2026-05-26",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1773385564633
+    },
+    {
       "ticker": "DKNG",
       "sector": "Consumer Cyclical",
       "cap": "12.61",
