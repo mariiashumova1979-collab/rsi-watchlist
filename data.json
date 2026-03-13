@@ -1125,7 +1125,16 @@
       "CRWD_close2": 436.33,
       "CRWD_close3": 434.13,
       "_migration_done": true,
-      "AAPL_close3": 259.88
+      "AAPL_close3": 259.88,
+      "AAPL ●_rsi2": 9.24,
+      "AAPL ●_sma200": 245.33,
+      "AAPL ●_close1": 260.81,
+      "AAPL ●_close2": 260.83,
+      "AAPL ●_close3": 259.88,
+      "JD ●_close2": 27.73,
+      "JD ●_close3": 27.03,
+      "CRWD ●_close2": 436.33,
+      "CRWD ●_close3": 434.13
     }
   }
 }
