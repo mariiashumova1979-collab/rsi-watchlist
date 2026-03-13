@@ -696,6 +696,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "AAPL",
+      "sector": "Technology",
+      "cap": "3734",
+      "atr": "2.3",
+      "earningsDate": "2026-04-30",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1773414298145
+    },
+    {
       "ticker": "PANW",
       "sector": "Technology",
       "cap": "137.19",
