@@ -1094,7 +1094,8 @@
       "PANW_close0": 168.12,
       "PANW_close1": 164.93,
       "PANW_close2": 165.58,
-      "AAPL_rsi2": 9.24
+      "AAPL_rsi2": 9.24,
+      "AAPL_sma200": 245.33
     }
   }
 }
