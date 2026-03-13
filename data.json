@@ -740,8 +740,8 @@
     "finnhubKey": "d65uv7pr01qiish15ra0d65uv7pr01qiish15rag"
   },
   "regime": {
-    "spyRsi14": 43.68,
-    "savedAt": "2026-03-11T13:45:06.130Z"
+    "spyTrend": "ABOVE",
+    "savedAt": "2026-03-13T07:00:53.252Z"
   },
   "rsiScans": {
     "2026-02-11": {
