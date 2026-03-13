@@ -1,6 +1,26 @@
 {
   "trades": [
     {
+      "id": "1773416418033",
+      "createdAt": 1773416418033,
+      "ticker": "AAPL",
+      "type": "LONG",
+      "entryDate": "2026-03-13",
+      "entry": 253.172,
+      "shares": 6,
+      "stop": "243.05",
+      "target1": "263.30",
+      "target2": "273.43",
+      "rsi2": "",
+      "atrPct": "",
+      "trend": "",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "commission": 0,
+      "notes": ""
+    },
+    {
       "id": "1773322880545",
       "createdAt": 1773322880545,
       "ticker": "JD",
