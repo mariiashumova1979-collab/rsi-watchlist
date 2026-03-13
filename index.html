@@ -316,6 +316,34 @@ tr:hover td{background:rgba(126,232,162,.02)}
   background:var(--bg3);transition:all .3s
 }
 
+/* POSITION HISTORY ACCORDION */
+.btn-hist{
+  background:none;border:none;cursor:pointer;font-size:11px;
+  padding:2px 5px;margin-left:6px;border-radius:4px;
+  opacity:.6;transition:opacity .2s,background .2s
+}
+.btn-hist:hover{opacity:1;background:var(--bg4)}
+.hist-row td{background:var(--bg2)}
+.hist-panel{
+  padding:14px 18px;background:var(--bg3);border-radius:8px;margin:8px 12px;
+  border:1px solid var(--line)
+}
+.hist-title{
+  font-family:var(--mono);font-size:11px;font-weight:700;
+  color:var(--acc4);margin-bottom:12px;letter-spacing:.5px
+}
+.hist-table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:10px}
+.hist-table th{
+  text-align:left;padding:6px 10px;background:var(--bg4);
+  color:var(--t2);font-weight:600;font-size:9px;letter-spacing:.5px;
+  border-bottom:1px solid var(--line)
+}
+.hist-table td{
+  padding:6px 10px;border-bottom:1px solid var(--bg4);color:var(--t1)
+}
+.hist-table tr:last-child td{border-bottom:none}
+.hist-table tr:hover td{background:rgba(126,232,162,.03)}
+
 /* ACTIONS ROW */
 .ar{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
 
@@ -417,16 +445,14 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
             </select>
           </div>
           <div class="fg">
-            <label>Режим</label>
+            <label>Mode</label>
             <div class="regime-box" id="regimeBox">—</div>
           </div>
         </div>
-        <div id="regimeRules" style="font-family:var(--mono);font-size:10px;color:var(--t2);line-height:1.7;padding:12px;background:var(--bg3);border-radius:8px;margin-bottom:14px">
+        <div id="regimeRules" style="font-family:var(--mono);font-size:10px;color:var(--t2);line-height:1.7;padding:12px;background:var(--bg3);border-radius:8px">
           <div><b style="color:var(--acc)">LONG:</b> SPY > SMA200 → Buy panic in uptrend</div>
           <div><b style="color:var(--acc2)">SHORT:</b> SPY < SMA200 → Fade euphoria in downtrend</div>
-        </div>
-        <div class="ar">
-          <button class="btn btn-p btn-s" onclick="saveRegime()">СОХРАНИТЬ</button>
+          <div style="margin-top:8px;color:var(--acc3);font-size:9px">💾 Auto-saves to GitHub on change</div>
         </div>
       </div>
     </div>
@@ -537,21 +563,21 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
       <span style="font-family:var(--mono);font-size:9px;color:var(--t2);font-weight:400" id="scanDateLabel"></span>
     </div>
     <div style="font-family:var(--mono);font-size:10px;color:var(--t2);margin-bottom:12px;padding:10px 14px;background:var(--bg3);border-radius:8px;border:1px solid var(--line)">
-      <b>RSI(2) System:</b> LONG = RSI(2)&lt;10 + Price&gt;SMA200 + Close&lt;Close[1]&lt;Close[2] | SHORT = RSI(2)&gt;90 + Price&lt;SMA200 + Close&gt;Close[1]&gt;Close[2]
+      <b>RSI(2) System:</b> Check T-1,T-2,T-3 → Entry Open(T0) | LONG: RSI&lt;10 + &gt;SMA200 + 3 down closes | SHORT: RSI&gt;90 + &lt;SMA200 + 3 up closes
     </div>
     <div class="tw">
       <table>
         <thead><tr>
-          <th>Тикер</th>
-          <th>Сектор</th>
-          <th>RSI(2)</th>
+          <th>Ticker</th>
+          <th>Sector</th>
+          <th>RSI(2)<br><span style="font-weight:400;font-size:9px">T-1</span></th>
           <th>SMA200</th>
-          <th>Close</th>
-          <th>Close[1]</th>
-          <th>Close[2]</th>
+          <th>Close<br><span style="font-weight:400;font-size:9px">T-1</span></th>
+          <th>Close<br><span style="font-weight:400;font-size:9px">T-2</span></th>
+          <th>Close<br><span style="font-weight:400;font-size:9px">T-3</span></th>
           <th>ATR%</th>
-          <th>Сигнал</th>
-          <th>Статус</th>
+          <th>Signal</th>
+          <th>Status</th>
         </tr></thead>
         <tbody id="rsiScanTbody"></tbody>
       </table>
@@ -1414,7 +1440,7 @@ function hideSyncBanner() { document.getElementById('syncBanner').className=''; 
 // ═══════════════════════════════════════════════════════════
 // REGIME (SPY vs SMA200)
 // ═══════════════════════════════════════════════════════════
-function updRegime(flash=true) {
+function updRegime(autoSave=true) {
   const trend = document.getElementById('spyTrend')?.value;
   const box = document.getElementById('regimeBox');
   const hdr = document.getElementById('hdrRegime');
@@ -1435,12 +1461,18 @@ function updRegime(flash=true) {
     box.style.color = 'var(--acc2)';
     if (hdr) hdr.textContent = 'SHORT MODE';
   }
+  
+  // Auto-save regime on change (but not when loading from storage)
+  if (autoSave) {
+    cache.regime = { spyTrend: trend, savedAt: new Date().toISOString() };
+    scheduleSave();
+  }
 }
 
 async function saveRegime() {
   const trend = document.getElementById('spyTrend')?.value;
   cache.regime = { spyTrend: trend, savedAt: new Date().toISOString() };
-  scheduleSave();
+  await scheduleSave();
   toast('Regime saved ✓');
 }
 
@@ -2189,13 +2221,13 @@ function renderTrades() {
   const tk = (document.getElementById('fTicker')?.value||'').toUpperCase();
   const fl = tr.filter(t=>(!tf||t.type===tf)&&(!sf||t.status===sf)&&(!rf||t.result===rf)&&(!tk||t.ticker.includes(tk)));
   const tb = document.getElementById('tradesTb');
-  if(!fl.length){ tb.innerHTML='<tr><td colspan="14" style="text-align:center;color:var(--t2);padding:36px">Сделок нет</td></tr>'; return; }
+  if(!fl.length){ tb.innerHTML='<tr><td colspan="14" style="text-align:center;color:var(--t2);padding:36px">No trades</td></tr>'; return; }
   tb.innerHTML = fl.map(t => {
-    // Day count: T0=entry, exit at RSI(2)>50 or Day 5
+    // Day count: T0=entry, hold T1-T3, exit T4
     const tDay = (t.status==='OPEN' || t.status==='PARTIAL') ? getTradingDayNumber(t.entryDate) : null;
-    const tLabel = tDay !== null ? `D${tDay}` : '—';
-    // Color: D0-D2 blue, D3-D4 yellow, D5+ red (must exit!)
-    const tColor = tDay === null ? '' : tDay <= 2 ? 'd1' : tDay <= 4 ? 'd3' : 'd5';
+    const tLabel = tDay !== null ? `T${tDay}` : '—';
+    // Color: T0-T2 blue (hold), T3 yellow (last hold), T4+ red (exit!)
+    const tColor = tDay === null ? '' : tDay <= 2 ? 'd1' : tDay === 3 ? 'd3' : 'd5';
     const db = tDay !== null ? `<span class="db ${tColor}">${tLabel}</span>` : '—';
     
     // Trend icon
@@ -2229,12 +2261,20 @@ function renderTrades() {
       stBadge = t.result === 'WIN' ? '<span class="b b-win">WIN</span>' : '<span class="b b-loss">LOSS</span>';
     }
     
-    // Day 5 warning
-    const dayWarn = tDay !== null && tDay >= 5 ? '<div style="font-size:8px;color:var(--acc2);margin-top:2px">⚠️ EXIT!</div>' : '';
+    // T4+ warning (mandatory exit)
+    const dayWarn = tDay !== null && tDay >= 4 ? '<div style="font-size:8px;color:var(--acc2);margin-top:2px">🚨 T4 EXIT</div>' : '';
+    
+    // Get position history log
+    const historyLog = getPositionHistory(t);
+    const hasHistory = historyLog.length > 0;
+    const historyId = `hist_${t.id}`;
     
     return `<tr>
       <td>${t.entryDate||'—'}</td>
-      <td style="font-weight:700">${t.ticker}</td>
+      <td style="font-weight:700">
+        ${t.ticker}
+        ${hasHistory ? `<button class="btn-hist" onclick="toggleHistory('${historyId}')" title="Position history">📋</button>` : ''}
+      </td>
       <td><span class="b ${t.type==='LONG'?'b-long':'b-short'}">${t.type}</span></td>
       <td>$${t.entry||'—'}</td><td class="r">$${t.stop||'—'}</td>
       <td class="g">$${t.target1||'—'}</td><td class="g">$${t.target2||'—'}</td>
@@ -2244,8 +2284,169 @@ function renderTrades() {
         <button class="btn btn-g btn-s" onclick="openTrade('${t.id}')">✏</button>
         <button class="btn btn-d btn-s" onclick="delTrade('${t.id}')">✕</button>
       </div></td>
-    </tr>`;
+    </tr>
+    ${hasHistory ? `<tr class="hist-row" id="${historyId}" style="display:none">
+      <td colspan="14" style="padding:0">
+        <div class="hist-panel">
+          <div class="hist-title">📋 Position History: ${t.ticker} (${t.type})</div>
+          <table class="hist-table">
+            <thead><tr>
+              <th>Date</th><th>Day</th><th>Close</th><th>RSI(2)</th><th>SMA200</th><th>Trend</th><th>Signal</th>
+            </tr></thead>
+            <tbody>
+              ${historyLog.map(h => `<tr>
+                <td>${h.date}</td>
+                <td><span class="db ${h.dayColor}">${h.dayLabel}</span></td>
+                <td>$${h.close || '—'}</td>
+                <td style="color:${h.rsiColor}">${h.rsi2 || '—'}</td>
+                <td>$${h.sma200 || '—'}</td>
+                <td>${h.trendIcon}</td>
+                <td>${h.signal}</td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+      </td>
+    </tr>` : ''}`;
   }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// POSITION HISTORY LOG
+// ═══════════════════════════════════════════════════════════
+function getPositionHistory(trade) {
+  if (!trade.entryDate) return [];
+  
+  const history = [];
+  const scans = cache.rsiScans || {};
+  const ticker = trade.ticker;
+  const entryDate = trade.entryDate;
+  const exitDate = trade.exitDate || today();
+  const type = trade.type;
+  
+  // Generate list of trading days from T-2 (before entry) to exit/today
+  let currentDate = entryDate;
+  let dayCount = 0;
+  
+  // Start from T-2 (2 days before entry for context)
+  let contextDate = currentDate;
+  for (let i = 0; i < 2; i++) {
+    contextDate = getPrevDate(contextDate);
+  }
+  
+  // Add T-2 context
+  const t2Scan = findScanForDate(contextDate, ticker);
+  if (t2Scan.close1 || t2Scan.rsi2) {
+    history.push({
+      date: contextDate,
+      dayLabel: 'T-2',
+      dayColor: 'd1',
+      ...formatHistoryRow(t2Scan, type)
+    });
+  }
+  
+  // Add T-1 context
+  const t1Date = getPrevDate(entryDate);
+  const t1Scan = findScanForDate(t1Date, ticker);
+  if (t1Scan.close1 || t1Scan.rsi2) {
+    history.push({
+      date: t1Date,
+      dayLabel: 'T-1',
+      dayColor: 'd1',
+      ...formatHistoryRow(t1Scan, type)
+    });
+  }
+  
+  // Add entry day and subsequent days
+  currentDate = entryDate;
+  while (currentDate <= exitDate && dayCount <= 10) {
+    const scan = findScanForDate(currentDate, ticker);
+    const dayLabel = `T${dayCount}`;
+    const dayColor = dayCount <= 2 ? 'd1' : dayCount === 3 ? 'd3' : 'd5';
+    
+    // Check for exit signal
+    const rsi2Val = parseFloat(scan.rsi2);
+    const exitSignal = !isNaN(rsi2Val) && (type === 'LONG' ? rsi2Val > 50 : rsi2Val < 50);
+    let signal = '—';
+    if (dayCount === 0) signal = '🚀 ENTRY';
+    else if (exitSignal) signal = '✅ RSI EXIT';
+    else if (dayCount >= 4) signal = '🚨 T4 EXIT';
+    else if (currentDate === exitDate && trade.status === 'CLOSED') signal = '📤 CLOSED';
+    
+    if (scan.close1 || scan.rsi2 || dayCount === 0) {
+      history.push({
+        date: currentDate,
+        dayLabel,
+        dayColor,
+        ...formatHistoryRow(scan, type),
+        signal
+      });
+    }
+    
+    // Move to next trading day
+    currentDate = getNextTradingDay(currentDate);
+    dayCount++;
+    
+    // Stop if trade is closed
+    if (trade.status === 'CLOSED' && currentDate > exitDate) break;
+  }
+  
+  return history;
+}
+
+function findScanForDate(date, ticker) {
+  const scans = cache.rsiScans || {};
+  const dayScan = scans[date] || {};
+  
+  return {
+    rsi2: dayScan[ticker + '_rsi2'],
+    sma200: dayScan[ticker + '_sma200'],
+    close1: dayScan[ticker + '_close1'],
+    close2: dayScan[ticker + '_close2'],
+    close3: dayScan[ticker + '_close3']
+  };
+}
+
+function formatHistoryRow(scan, type) {
+  const rsi2 = scan.rsi2;
+  const sma200 = scan.sma200;
+  const close1 = scan.close1;
+  
+  const rsi2Val = parseFloat(rsi2);
+  const smaVal = parseFloat(sma200);
+  const closeVal = parseFloat(close1);
+  
+  // RSI color
+  let rsiColor = 'var(--t2)';
+  if (!isNaN(rsi2Val)) {
+    if (rsi2Val < 10) rsiColor = 'var(--acc)';
+    else if (rsi2Val > 90) rsiColor = 'var(--acc2)';
+    else if (rsi2Val < 20) rsiColor = 'var(--acc3)';
+    else if (rsi2Val > 80) rsiColor = 'var(--acc3)';
+  }
+  
+  // Trend icon
+  let trendIcon = '—';
+  if (!isNaN(closeVal) && !isNaN(smaVal)) {
+    trendIcon = closeVal > smaVal 
+      ? '<span class="g">▲ Above</span>' 
+      : '<span class="r">▼ Below</span>';
+  }
+  
+  return {
+    close: closeVal ? closeVal.toFixed(2) : null,
+    rsi2: rsi2Val ? rsi2Val.toFixed(1) : null,
+    sma200: smaVal ? smaVal.toFixed(2) : null,
+    rsiColor,
+    trendIcon
+  };
+}
+
+function toggleHistory(id) {
+  const row = document.getElementById(id);
+  if (row) {
+    row.style.display = row.style.display === 'none' ? 'table-row' : 'none';
+  }
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -2319,42 +2520,43 @@ function renderDash() {
 
       // ══════════════════════════════════════════════════════════
       // RSI(2) SYSTEM EXIT RULES
+      // Morning T0: Check T-1,T-2,T-3 → Entry Open(T0)
+      // Hold: T0, T1, T2, T3
+      // Exit: RSI signal OR Stop OR T4 close
       // ══════════════════════════════════════════════════════════
       const hints = [];
       
       // Check RSI(2) exit condition
-      const rsiExitCondition = t.type === 'LONG' ? rsi2Val > 50 : rsi2Val < 50;
+      const rsiExitCondition = rsi2Val !== null && (t.type === 'LONG' ? rsi2Val > 50 : rsi2Val < 50);
       const rsiExitText = t.type === 'LONG' ? 'RSI(2) > 50' : 'RSI(2) < 50';
       
-      // Day 5 = mandatory exit
-      if (tDay >= 5) {
+      // T4 = exit at close
+      if (tDay >= 4) {
         hints.push({
           icon: '🚨',
-          text: `DAY 5+ — MANDATORY EXIT at today's close`,
+          text: `T${tDay} — EXIT AT CLOSE TODAY`,
           color: 'var(--acc2)', urgency: 3
         });
       }
       
       // RSI(2) exit signal
-      if (rsi2Val !== null && rsiExitCondition) {
+      if (rsiExitCondition) {
         hints.push({
           icon: '✅',
-          text: `EXIT SIGNAL: ${rsiExitText} (current: ${rsi2Val.toFixed(1)})`,
+          text: `EXIT SIGNAL: ${rsiExitText} (current: ${rsi2Val.toFixed(1)}) — close position`,
           color: 'var(--acc)', urgency: 2
         });
       }
       
-      // Day-based hints
+      // Day-based hints (T0=entry, T1-T3=hold, T4 close=exit)
       if (tDay === 0) {
-        hints.push({ icon: '🚀', text: 'D0 — Entry day. Stop loss must be set!', color: 'var(--acc4)', urgency: 1 });
+        hints.push({ icon: '🚀', text: 'T0 — Entry day. Stop must be set!', color: 'var(--acc4)', urgency: 1 });
       } else if (tDay === 1) {
-        hints.push({ icon: '👁', text: 'D1 — Monitoring. Check RSI(2) daily', color: 'var(--acc4)', urgency: 0 });
+        hints.push({ icon: '👁', text: 'T1 — Hold. Check RSI(2) for exit signal', color: 'var(--acc4)', urgency: 0 });
       } else if (tDay === 2) {
-        hints.push({ icon: '👁', text: 'D2 — Monitoring. Watch for RSI(2) exit', color: 'var(--acc4)', urgency: 0 });
+        hints.push({ icon: '👁', text: 'T2 — Hold. Check RSI(2) for exit signal', color: 'var(--acc4)', urgency: 0 });
       } else if (tDay === 3) {
-        hints.push({ icon: '📅', text: 'D3 — Day 4 tomorrow. Prepare exit plan', color: 'var(--acc3)', urgency: 1 });
-      } else if (tDay === 4) {
-        hints.push({ icon: '⚠️', text: 'D4 — Exit tomorrow if no RSI signal today', color: 'var(--acc3)', urgency: 2 });
+        hints.push({ icon: '📅', text: 'T3 — Last hold day. Tomorrow T4 = exit at close', color: 'var(--acc3)', urgency: 1 });
       }
       
       // Current RSI(2) display
@@ -2377,7 +2579,7 @@ function renderDash() {
       if (stop) {
         hints.push({
           icon: '🛑',
-          text: `Stop: $${stop.toFixed(2)} (−${stopPct}%) — GTC order must be active`,
+          text: `Stop: $${stop.toFixed(2)} (−${stopPct}%) — GTC order active`,
           color: 'var(--t2)', urgency: 0
         });
       }
@@ -2388,9 +2590,9 @@ function renderDash() {
       const urgency = hints[0]?.urgency || 0;
       const borderCol = urgency >= 3 ? 'var(--acc2)' : urgency >= 2 ? 'rgba(126,232,162,.6)' : urgency >= 1 ? 'rgba(255,200,90,.4)' : 'var(--line)';
       
-      // Day color: D0-D2 blue, D3-D4 yellow, D5+ red
-      const tColor = tDay <= 2 ? 'd1' : tDay <= 4 ? 'd3' : 'd5';
-      const tLabel = `D${tDay}`;
+      // T-day color: T0-T2 blue (hold), T3 yellow (last hold), T4+ red (exit)
+      const tColor = tDay <= 2 ? 'd1' : tDay === 3 ? 'd3' : 'd5';
+      const tLabel = `T${tDay}`;
       
       // RSI(2) badge
       const rsiBadge = rsi2Val !== null 
@@ -2406,8 +2608,8 @@ function renderDash() {
             <span class="db ${tColor}">${tLabel}</span>
             ${rsiBadge}
             <span style="font-family:var(--mono);font-size:9px;color:var(--t2)">${t.entryDate||''}</span>
-            ${tDay >= 5 ? '<span style="font-family:var(--mono);font-size:9px;color:var(--acc2);font-weight:700;background:rgba(255,107,138,.15);padding:2px 6px;border-radius:4px">⚠ EXIT TODAY</span>' : ''}
-            ${rsiExitCondition ? '<span style="font-family:var(--mono);font-size:9px;color:var(--acc);font-weight:700;background:rgba(126,232,162,.15);padding:2px 6px;border-radius:4px">✓ EXIT SIGNAL</span>' : ''}
+            ${tDay >= 4 ? '<span style="font-family:var(--mono);font-size:9px;color:var(--acc2);font-weight:700;background:rgba(255,107,138,.15);padding:2px 6px;border-radius:4px">🚨 T4 EXIT</span>' : ''}
+            ${rsiExitCondition && tDay < 4 ? '<span style="font-family:var(--mono);font-size:9px;color:var(--acc);font-weight:700;background:rgba(126,232,162,.15);padding:2px 6px;border-radius:4px">✓ RSI EXIT</span>' : ''}
           </div>
           <button class="btn btn-g btn-s" onclick="openTrade('${t.id}')">✏ UPDATE</button>
         </div>
@@ -2784,62 +2986,147 @@ function getRsiColor(val) {
   return 'var(--acc3)';                 // neutral
 }
 
+// ═══════════════════════════════════════════════════════════
+// AUTO-SHIFT RSI DATA ON NEW DAY
+// Yesterday's Close T-1 → Today's Close T-2
+// Yesterday's Close T-2 → Today's Close T-3
+// RSI(2), SMA200, Close T-1 = need fresh input
+// ═══════════════════════════════════════════════════════════
+function migrateRsiData(todayDate) {
+  if (!cache.rsiScans) cache.rsiScans = {};
+  
+  // Check if we already have data for today
+  const todayScan = cache.rsiScans[todayDate];
+  
+  // Find the most recent previous day with data
+  const dates = Object.keys(cache.rsiScans).sort().reverse();
+  const prevDate = dates.find(d => d < todayDate);
+  
+  if (!prevDate) return; // No previous data to migrate
+  
+  const prevScan = cache.rsiScans[prevDate];
+  if (!prevScan) return;
+  
+  // Check if migration already done (if today has any close2 or close3 data)
+  // We only migrate once per day
+  const migrationKey = '_migration_done';
+  if (todayScan && todayScan[migrationKey]) return;
+  
+  // Initialize today's scan if needed
+  if (!cache.rsiScans[todayDate]) cache.rsiScans[todayDate] = {};
+  
+  // Get all tickers from watchlist
+  const tickers = cache.watchlist.map(w => w.ticker);
+  let migrated = false;
+  
+  tickers.forEach(ticker => {
+    const prevClose1 = prevScan[ticker + '_close1'];
+    const prevClose2 = prevScan[ticker + '_close2'];
+    const prevSma200 = prevScan[ticker + '_sma200'];
+    
+    // Only migrate if today doesn't have this data yet
+    const todayClose2 = cache.rsiScans[todayDate][ticker + '_close2'];
+    const todayClose3 = cache.rsiScans[todayDate][ticker + '_close3'];
+    
+    // Yesterday's T-1 → Today's T-2 (if not already set)
+    if (prevClose1 !== undefined && todayClose2 === undefined) {
+      cache.rsiScans[todayDate][ticker + '_close2'] = prevClose1;
+      migrated = true;
+    }
+    
+    // Yesterday's T-2 → Today's T-3 (if not already set)
+    if (prevClose2 !== undefined && todayClose3 === undefined) {
+      cache.rsiScans[todayDate][ticker + '_close3'] = prevClose2;
+      migrated = true;
+    }
+    
+    // Also carry forward SMA200 as it changes slowly
+    const todaySma200 = cache.rsiScans[todayDate][ticker + '_sma200'];
+    if (prevSma200 !== undefined && todaySma200 === undefined) {
+      cache.rsiScans[todayDate][ticker + '_sma200'] = prevSma200;
+      migrated = true;
+    }
+  });
+  
+  // Mark migration as done for today
+  cache.rsiScans[todayDate][migrationKey] = true;
+  
+  if (migrated) {
+    console.log(`RSI data migrated from ${prevDate} to ${todayDate}`);
+    scheduleSave();
+  }
+}
+
 function computeSignal(w, scan) {
   // ═══════════════════════════════════════════════════════════
-  // RSI(2) SWING SYSTEM
+  // RSI(2) SWING SYSTEM — SIGNAL CHECK
   // ═══════════════════════════════════════════════════════════
-  // LONG: RSI(2) < 10 + Price > SMA200 + Close < Close[1] < Close[2]
-  // SHORT: RSI(2) > 90 + Price < SMA200 + Close > Close[1] > Close[2]
+  // Check T-1, T-2, T-3 data in the morning of T0
+  // If signal → Enter on Open(T0)
+  // 
+  // LONG:  RSI(2)[T-1] < 10 + Price[T-1] > SMA200 + 
+  //        Close[T-1] < Close[T-2] < Close[T-3] (3 down days)
+  // SHORT: RSI(2)[T-1] > 90 + Price[T-1] < SMA200 + 
+  //        Close[T-1] > Close[T-2] > Close[T-3] (3 up days)
   // ═══════════════════════════════════════════════════════════
   
-  const { rsi2, sma200, close0, close1, close2 } = scan;
+  // scan contains: rsi2 (T-1), sma200, close1 (T-1), close2 (T-2), close3 (T-3)
+  const { rsi2, sma200, close1, close2, close3 } = scan;
   
-  // Need at least RSI(2) and Close to evaluate
-  if (rsi2 === '' || close0 === '') return 'none';
+  // Need RSI(2) from T-1 to evaluate
+  if (rsi2 === '' || rsi2 === undefined) return 'none';
   
   const rsi = parseFloat(rsi2);
   const sma = parseFloat(sma200);
-  const c0 = parseFloat(close0);
-  const c1 = parseFloat(close1);
-  const c2 = parseFloat(close2);
+  const c1 = parseFloat(close1);  // Close T-1 (yesterday)
+  const c2 = parseFloat(close2);  // Close T-2
+  const c3 = parseFloat(close3);  // Close T-3
   
-  if (isNaN(rsi) || isNaN(c0)) return 'none';
+  if (isNaN(rsi)) return 'none';
   
   // Check if all candle data available
-  const hasCandles = !isNaN(c1) && !isNaN(c2);
+  const hasCandles = !isNaN(c1) && !isNaN(c2) && !isNaN(c3);
   const hasSma = !isNaN(sma);
   
-  // LONG SIGNAL: RSI(2) < 10 + Price > SMA200 + Close < Close[1] < Close[2]
+  // LONG SIGNAL: RSI(2) < 10 + Price > SMA200 + 3 consecutive down closes
   const longRsi = rsi < 10;
-  const longTrend = hasSma && c0 > sma;
-  const longCandles = hasCandles && c0 < c1 && c1 < c2;
+  const longTrend = hasSma && c1 > sma;
+  const longCandles = hasCandles && c1 < c2 && c2 < c3;  // 3 down days
   
   if (longRsi && longTrend && longCandles) return 'LONG_SIGNAL';
   
-  // SHORT SIGNAL: RSI(2) > 90 + Price < SMA200 + Close > Close[1] > Close[2]
+  // SHORT SIGNAL: RSI(2) > 90 + Price < SMA200 + 3 consecutive up closes
   const shortRsi = rsi > 90;
-  const shortTrend = hasSma && c0 < sma;
-  const shortCandles = hasCandles && c0 > c1 && c1 > c2;
+  const shortTrend = hasSma && c1 < sma;
+  const shortCandles = hasCandles && c1 > c2 && c2 > c3;  // 3 up days
   
   if (shortRsi && shortTrend && shortCandles) return 'SHORT_SIGNAL';
   
-  // WATCH LONG: RSI(2) < 15 + uptrend
-  if (rsi < 15 && longTrend) return 'WATCH_LONG';
+  // WATCH LONG: RSI(2) < 15 + uptrend (approaching signal)
+  if (rsi < 15 && (longTrend || !hasSma)) return 'WATCH_LONG';
   
-  // WATCH SHORT: RSI(2) > 85 + downtrend
-  if (rsi > 85 && shortTrend) return 'WATCH_SHORT';
+  // WATCH SHORT: RSI(2) > 85 + downtrend (approaching signal)
+  if (rsi > 85 && (shortTrend || !hasSma)) return 'WATCH_SHORT';
   
   return 'none';
 }
 
 function renderRsiScan() {
   const t0 = today();
-  document.getElementById('scanDateLabel').textContent = 'T0: ' + new Date().toLocaleDateString('ru-RU',{weekday:'short',day:'2-digit',month:'short'});
+  document.getElementById('scanDateLabel').textContent = 'T0: ' + new Date().toLocaleDateString('en-US',{weekday:'short',day:'2-digit',month:'short'});
+
+  // ═══════════════════════════════════════════════════════════
+  // AUTO-SHIFT: Migrate yesterday's data to today
+  // Yesterday's T-1 → Today's T-2
+  // Yesterday's T-2 → Today's T-3
+  // RSI(2), SMA200, Close T-1 need fresh input
+  // ═══════════════════════════════════════════════════════════
+  migrateRsiData(t0);
 
   const wl = cache.watchlist;
   if (!wl.length) {
     document.getElementById('rsiScanTbody').innerHTML =
-      '<tr><td colspan="10" style="text-align:center;color:var(--t2);padding:30px">Добавьте акции в список наблюдения</td></tr>';
+      '<tr><td colspan="10" style="text-align:center;color:var(--t2);padding:30px">Add stocks to watchlist</td></tr>';
     return;
   }
 
@@ -2859,29 +3146,29 @@ function renderRsiScan() {
     const hasPosition = openPositionTickers.has(w.ticker.toUpperCase());
     const inactive = boBool || cdBool;
 
-    // Get scan values
-    const rsi2 = t0Scan[w.ticker + '_rsi2'] ?? '';
-    const sma200 = t0Scan[w.ticker + '_sma200'] ?? '';
-    const close0 = t0Scan[w.ticker + '_close0'] ?? '';
-    const close1 = t0Scan[w.ticker + '_close1'] ?? '';
-    const close2 = t0Scan[w.ticker + '_close2'] ?? '';
+    // Get scan values (T-1, T-2, T-3 data entered today for signal check)
+    const rsi2 = t0Scan[w.ticker + '_rsi2'] ?? '';      // RSI(2) as of T-1
+    const sma200 = t0Scan[w.ticker + '_sma200'] ?? '';  // SMA200
+    const close1 = t0Scan[w.ticker + '_close1'] ?? '';  // Close T-1 (yesterday)
+    const close2 = t0Scan[w.ticker + '_close2'] ?? '';  // Close T-2
+    const close3 = t0Scan[w.ticker + '_close3'] ?? '';  // Close T-3
     const atrPct = w.atr || '';
 
     const sig = inactive ? 'blocked' : hasPosition ? 'position' : computeSignal(w, { 
-      rsi2, sma200, close0, close1, close2
+      rsi2, sma200, close1, close2, close3
     });
 
     let sigHtml;
     switch(sig) {
-      case 'LONG_SIGNAL':  sigHtml = '<span class="sig-long">🟢 LONG SETUP</span>'; break;
-      case 'SHORT_SIGNAL': sigHtml = '<span class="sig-short">🔴 SHORT SETUP</span>'; break;
+      case 'LONG_SIGNAL':  sigHtml = '<span class="sig-long">🟢 LONG → BUY OPEN</span>'; break;
+      case 'SHORT_SIGNAL': sigHtml = '<span class="sig-short">🔴 SHORT → SELL OPEN</span>'; break;
       case 'WATCH_LONG':   sigHtml = '<span class="sig-watch">👀 WATCH LONG</span>'; break;
       case 'WATCH_SHORT':  sigHtml = '<span class="sig-watch">👀 WATCH SHORT</span>'; break;
       case 'blocked':      sigHtml = `<span class="sig-none">${boBool ? '🚫 EARNINGS' : '⏳ COOLDOWN'}</span>`; break;
       case 'position':     
         const trade = cache.trades.find(t => t.ticker.toUpperCase() === w.ticker.toUpperCase() && (t.status === 'OPEN' || t.status === 'PARTIAL'));
         const tDay = trade ? getTradingDayNumber(trade.entryDate) : '?';
-        sigHtml = `<span class="sig-position">📈 DAY ${tDay}</span>`; 
+        sigHtml = `<span class="sig-position">📈 T${tDay}</span>`; 
         break;
       default:             sigHtml = '<span class="sig-none">—</span>';
     }
@@ -2895,18 +3182,18 @@ function renderRsiScan() {
     const rsiVal = parseFloat(rsi2);
     const rsiColor = isNaN(rsiVal) ? 'var(--t2)' : rsiVal < 10 ? 'var(--acc)' : rsiVal > 90 ? 'var(--acc2)' : rsiVal < 20 ? 'var(--acc3)' : rsiVal > 80 ? 'var(--acc3)' : 'var(--t2)';
     
-    // Trend color (Price vs SMA200)
-    const c0 = parseFloat(close0);
-    const sma = parseFloat(sma200);
-    const trendColor = (isNaN(c0) || isNaN(sma)) ? '' : c0 > sma ? 'color:var(--acc)' : 'color:var(--acc2)';
-    const trendIcon = (isNaN(c0) || isNaN(sma)) ? '' : c0 > sma ? '▲' : '▼';
-    
-    // Candle pattern check
+    // Trend color (Close T-1 vs SMA200)
     const c1 = parseFloat(close1);
+    const sma = parseFloat(sma200);
+    const trendColor = (isNaN(c1) || isNaN(sma)) ? '' : c1 > sma ? 'color:var(--acc)' : 'color:var(--acc2)';
+    const trendIcon = (isNaN(c1) || isNaN(sma)) ? '' : c1 > sma ? '▲' : '▼';
+    
+    // Candle pattern check (3 consecutive down/up closes)
     const c2 = parseFloat(close2);
-    const bearCandles = !isNaN(c0) && !isNaN(c1) && !isNaN(c2) && c0 < c1 && c1 < c2;
-    const bullCandles = !isNaN(c0) && !isNaN(c1) && !isNaN(c2) && c0 > c1 && c1 > c2;
-    const candleIcon = bearCandles ? '📉' : bullCandles ? '📈' : '';
+    const c3 = parseFloat(close3);
+    const threeDownDays = !isNaN(c1) && !isNaN(c2) && !isNaN(c3) && c1 < c2 && c2 < c3;
+    const threeUpDays = !isNaN(c1) && !isNaN(c2) && !isNaN(c3) && c1 > c2 && c2 > c3;
+    const candleIcon = threeDownDays ? '📉3' : threeUpDays ? '📈3' : '';
 
     const rowBg = hasPosition ? 'background:rgba(91,156,246,.06)' :
                   sig === 'LONG_SIGNAL'  ? 'background:rgba(126,232,162,.08)' :
@@ -2931,20 +3218,20 @@ function renderRsiScan() {
       </td>
       <td>
         <input class="rsi-inp" type="number" step="0.01" style="width:70px"
-          value="${close0}" placeholder="—"
-          onchange="updateRsiScan('${w.ticker}','close0',this.value)"
-          ${inactive ? 'disabled style="opacity:.4"' : ''}>
-      </td>
-      <td>
-        <input class="rsi-inp" type="number" step="0.01" style="width:70px"
-          value="${close1}" placeholder="—"
+          value="${close1}" placeholder="T-1"
           onchange="updateRsiScan('${w.ticker}','close1',this.value)"
           ${inactive ? 'disabled style="opacity:.4"' : ''}>
       </td>
       <td>
         <input class="rsi-inp" type="number" step="0.01" style="width:70px"
-          value="${close2}" placeholder="—"
+          value="${close2}" placeholder="T-2"
           onchange="updateRsiScan('${w.ticker}','close2',this.value)"
+          ${inactive ? 'disabled style="opacity:.4"' : ''}>
+      </td>
+      <td>
+        <input class="rsi-inp" type="number" step="0.01" style="width:70px"
+          value="${close3}" placeholder="T-3"
+          onchange="updateRsiScan('${w.ticker}','close3',this.value)"
           ${inactive ? 'disabled style="opacity:.4"' : ''}>
         <span style="font-size:10px">${candleIcon}</span>
       </td>
@@ -2995,8 +3282,8 @@ async function saveRsiScan() {
   document.querySelectorAll('#rsiScanTbody tr').forEach(row => {
     const ticker = row.cells[0]?.textContent?.trim();
     if (!ticker) return;
-    // RSI(2) system fields
-    const fields = ['rsi2', 'sma200', 'close0', 'close1', 'close2'];
+    // RSI(2) system fields: rsi2, sma200, close1(T-1), close2(T-2), close3(T-3)
+    const fields = ['rsi2', 'sma200', 'close1', 'close2', 'close3'];
     fields.forEach((field, idx) => {
       const inp = row.cells[idx + 2]?.querySelector('input');
       if (inp && inp.value !== '') cache.rsiScans[td][ticker + '_' + field] = parseFloat(inp.value);
@@ -3023,14 +3310,15 @@ function renderDashSignals() {
     );
     if (hasPosition) return;
     
+    // T-1, T-2, T-3 data
     const rsi2 = todayScan[w.ticker + '_rsi2'] ?? '';
     const sma200 = todayScan[w.ticker + '_sma200'] ?? '';
-    const close0 = todayScan[w.ticker + '_close0'] ?? '';
     const close1 = todayScan[w.ticker + '_close1'] ?? '';
     const close2 = todayScan[w.ticker + '_close2'] ?? '';
+    const close3 = todayScan[w.ticker + '_close3'] ?? '';
     
-    const sig = computeSignal(w, { rsi2, sma200, close0, close1, close2 });
-    if (sig !== 'none') signals.push({ w, sig, rsi2, sma200, close0, close1, close2 });
+    const sig = computeSignal(w, { rsi2, sma200, close1, close2, close3 });
+    if (sig !== 'none') signals.push({ w, sig, rsi2, sma200, close1, close2, close3 });
   });
 
   // Sort: SIGNAL first, then WATCH
@@ -3041,24 +3329,28 @@ function renderDashSignals() {
 
   const el = document.getElementById('signalsSection');
   const dateEl = document.getElementById('signalsDate');
-  if (dateEl) dateEl.textContent = new Date().toLocaleDateString('ru-RU',{weekday:'short',day:'2-digit',month:'short'});
+  if (dateEl) dateEl.textContent = 'T0: ' + new Date().toLocaleDateString('en-US',{weekday:'short',day:'2-digit',month:'short'});
 
   if (!signals.length) {
-    el.innerHTML = '<div class="empty" style="padding:20px"><div class="empty-t" style="font-family:var(--mono);font-size:11px">No signals — fill RSI(2) data in Watchlist tab</div></div>';
+    el.innerHTML = '<div class="empty" style="padding:20px"><div class="empty-t" style="font-family:var(--mono);font-size:11px">No signals — fill T-1,T-2,T-3 data in Watchlist tab</div></div>';
     return;
   }
 
-  el.innerHTML = signals.map(({ w, sig, rsi2, sma200, close0, close1, close2 }) => {
+  el.innerHTML = signals.map(({ w, sig, rsi2, sma200, close1, close2, close3 }) => {
     const isSignal = sig.includes('SIGNAL');
     const isLong   = sig.includes('LONG');
     const cls      = isSignal ? (isLong ? 'long' : 'short') : 'watch';
     
-    const c0 = parseFloat(close0);
+    const c1 = parseFloat(close1);
     const sma = parseFloat(sma200);
-    const trendIcon = isNaN(c0) || isNaN(sma) ? '' : c0 > sma ? '▲' : '▼';
+    const trendIcon = isNaN(c1) || isNaN(sma) ? '' : c1 > sma ? '▲' : '▼';
+    
+    // Calculate stop (1.5 × ATR, clamped 3-6%)
+    const atr = parseFloat(w.atr) || 0;
+    const stopPct = atr > 0 ? Math.min(6, Math.max(3, atr * 1.5)).toFixed(1) : '?';
 
-    const label = sig === 'LONG_SIGNAL'  ? '🟢 LONG SETUP → Entry next open'
-                : sig === 'SHORT_SIGNAL' ? '🔴 SHORT SETUP → Entry next open'
+    const label = sig === 'LONG_SIGNAL'  ? '🟢 LONG → BUY Open(T0)'
+                : sig === 'SHORT_SIGNAL' ? '🔴 SHORT → SELL Open(T0)'
                 : sig === 'WATCH_LONG'   ? '👀 WATCH LONG'
                 :                          '👀 WATCH SHORT';
 
@@ -3071,10 +3363,10 @@ function renderDashSignals() {
       <div style="font-family:var(--mono);font-size:11px;font-weight:700;${isSignal?'color:var(--text)':'color:var(--t2)'}">${label}</div>
       <div style="display:flex;gap:14px;font-family:var(--mono);font-size:10px;color:var(--t2)">
         <span>RSI(2): <span style="color:${parseFloat(rsi2)<10?'var(--acc)':parseFloat(rsi2)>90?'var(--acc2)':'var(--text)'};font-weight:700">${rsi2||'—'}</span></span>
-        <span>Price vs SMA200: <span style="font-weight:700">${trendIcon}</span></span>
+        <span>Trend: <span style="font-weight:700">${trendIcon} ${c1 > sma ? 'Above' : 'Below'} SMA200</span></span>
       </div>
-      ${isSignal ? `<div style="font-family:var(--mono);font-size:10px;color:var(--acc3);margin-top:6px">Stop: 1.5×ATR = ${w.atr ? (parseFloat(w.atr)*1.5).toFixed(1) : '?'}%</div>` : ''}
-      ${isSignal ? `<button class="btn btn-p btn-s" onclick="openTrade();setTimeout(()=>{document.getElementById('te_tk').value='${w.ticker}';},50)">+ NEW TRADE</button>` : ''}
+      ${isSignal ? `<div style="font-family:var(--mono);font-size:10px;color:var(--acc3);margin-top:6px">Stop = 1.5×ATR = ${stopPct}% | Exit: RSI(2) ${isLong?'>50':'<50'} or T4 close</div>` : ''}
+      ${isSignal ? `<button class="btn btn-p btn-s" onclick="openTrade();setTimeout(()=>{document.getElementById('te_tk').value='${w.ticker}';document.getElementById('te_atr').value='${w.atr||''}';tradeAutoCalc();},50)">+ NEW TRADE</button>` : ''}
     </div>`;
   }).join('');
 }
