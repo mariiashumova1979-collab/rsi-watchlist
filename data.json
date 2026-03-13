@@ -1118,7 +1118,13 @@
       "AAPL_sma200": 245.33,
       "AAPL_close0": 255.76,
       "AAPL_close1": 260.81,
-      "AAPL_close2": 260.83
+      "AAPL_close2": 260.83,
+      "DKNG_close3": 25.16,
+      "JD_close2": 27.73,
+      "JD_close3": 27.03,
+      "CRWD_close2": 436.33,
+      "CRWD_close3": 434.13,
+      "_migration_done": true
     }
   }
 }
