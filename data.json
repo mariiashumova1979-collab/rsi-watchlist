@@ -1135,6 +1135,22 @@
       "JD ●_close3": 27.03,
       "CRWD ●_close2": 436.33,
       "CRWD ●_close3": 434.13
+    },
+    "2026-03-14": {
+      "AAPL_close2": 255.76,
+      "AAPL_close3": 260.81,
+      "AAPL_sma200": 245.33,
+      "PANW_close2": 164.93,
+      "PANW_close3": 165.58,
+      "PANW_sma200": 190.23,
+      "DKNG_close2": 25.57,
+      "DKNG_close3": 25.14,
+      "DKNG_sma200": 36.02,
+      "JD_close3": 27.73,
+      "JD_sma200": 31.14,
+      "CRWD_close3": 436.33,
+      "CRWD_sma200": 468.87,
+      "_migration_done": true
     }
   }
 }
