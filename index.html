@@ -850,11 +850,11 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
 
     <!-- ROW 3: RSI(2) + ATR + Day + status -->
     <div style="font-family:var(--mono);font-size:9px;color:var(--acc);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px">
-      📊 RSI(2) SYSTEM — Stop = 1.5 × ATR, Exit on RSI(2) > 50 or Day 5
+      📊 RSI(2) SYSTEM — Stop = 1.5 × ATR, Exit on RSI(2) > 50 or T4 close
     </div>
     <div class="fgrid">
       <div class="fg"><label>RSI(2) at entry</label><input type="number" id="te_rsi2" step=".1" min="0" max="100" placeholder="8.5"></div>
-      <div class="fg"><label>ATR %</label><input type="number" id="te_atr" step=".1" min="1" max="10" placeholder="3.5" oninput="tradeAutoCalc()"></div>
+      <div class="fg"><label>ATR %</label><input type="number" id="te_atr" step=".1" min="0" max="15" placeholder="3.5" oninput="manualFields.delete('st');tradeAutoCalc()"></div>
       <div class="fg"><label>Price vs SMA200</label>
         <select id="te_trend">
           <option value="">—</option>
@@ -862,7 +862,7 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
           <option value="BELOW">▼ Below (SHORT ok)</option>
         </select>
       </div>
-      <div class="fg"><label>Статус</label><select id="te_sta" onchange="toggleExitFields()"><option value="OPEN">Открыта</option><option value="PARTIAL">Частичный выход</option><option value="CLOSED">Закрыта</option></select></div>
+      <div class="fg"><label>Status</label><select id="te_sta" onchange="toggleExitFields()"><option value="OPEN">Open</option><option value="PARTIAL">Partial</option><option value="CLOSED">Closed</option></select></div>
     </div>
 
     <!-- PARTIAL EXIT FIELDS (shown only when PARTIAL) -->
@@ -2026,8 +2026,9 @@ function openTrade(id=null) {
         document.getElementById('te_p_comm').value = t.partialExit.commission || '';
         if (beCheckbox) beCheckbox.checked = t.partialExit.breakevenSet || false;
       }
-      // Mark existing prices as manually set (don't overwrite)
-      if (t.stop)    manualFields.add('st');
+      // Mark existing prices as manually set ONLY if no ATR (legacy trades)
+      // If ATR exists, stop should be recalculated from ATR
+      if (t.stop && !t.atrPct) manualFields.add('st');
       if (t.target1) manualFields.add('t1');
       if (t.target2) manualFields.add('t2');
     }
@@ -2313,6 +2314,8 @@ function renderTrades() {
 
 // ═══════════════════════════════════════════════════════════
 // POSITION HISTORY LOG
+// Shows daily log of position from entry to exit/today
+// Data is pulled from rsiScans entered each day
 // ═══════════════════════════════════════════════════════════
 function getPositionHistory(trade) {
   if (!trade.entryDate) return [];
@@ -2324,122 +2327,79 @@ function getPositionHistory(trade) {
   const exitDate = trade.exitDate || today();
   const type = trade.type;
   
-  // Generate list of trading days from T-2 (before entry) to exit/today
-  let currentDate = entryDate;
+  // Get all scan dates sorted
+  const scanDates = Object.keys(scans).sort();
+  
+  // Find scan dates from entry onwards
   let dayCount = 0;
   
-  // Start from T-2 (2 days before entry for context)
-  let contextDate = currentDate;
-  for (let i = 0; i < 2; i++) {
-    contextDate = getPrevDate(contextDate);
-  }
-  
-  // Add T-2 context
-  const t2Scan = findScanForDate(contextDate, ticker);
-  if (t2Scan.close1 || t2Scan.rsi2) {
-    history.push({
-      date: contextDate,
-      dayLabel: 'T-2',
-      dayColor: 'd1',
-      ...formatHistoryRow(t2Scan, type)
-    });
-  }
-  
-  // Add T-1 context
-  const t1Date = getPrevDate(entryDate);
-  const t1Scan = findScanForDate(t1Date, ticker);
-  if (t1Scan.close1 || t1Scan.rsi2) {
-    history.push({
-      date: t1Date,
-      dayLabel: 'T-1',
-      dayColor: 'd1',
-      ...formatHistoryRow(t1Scan, type)
-    });
-  }
-  
-  // Add entry day and subsequent days
-  currentDate = entryDate;
-  while (currentDate <= exitDate && dayCount <= 10) {
-    const scan = findScanForDate(currentDate, ticker);
-    const dayLabel = `T${dayCount}`;
-    const dayColor = dayCount <= 2 ? 'd1' : dayCount === 3 ? 'd3' : 'd5';
+  for (const scanDate of scanDates) {
+    // Skip dates before entry
+    if (scanDate < entryDate) continue;
+    // Stop after exit date
+    if (scanDate > exitDate) break;
+    // Limit to 10 days
+    if (dayCount > 10) break;
     
-    // Check for exit signal
-    const rsi2Val = parseFloat(scan.rsi2);
-    const exitSignal = !isNaN(rsi2Val) && (type === 'LONG' ? rsi2Val > 50 : rsi2Val < 50);
-    let signal = '—';
-    if (dayCount === 0) signal = '🚀 ENTRY';
-    else if (exitSignal) signal = '✅ RSI EXIT';
-    else if (dayCount >= 4) signal = '🚨 T4 EXIT';
-    else if (currentDate === exitDate && trade.status === 'CLOSED') signal = '📤 CLOSED';
+    const dayScan = scans[scanDate] || {};
+    const rsi2 = dayScan[ticker + '_rsi2'];
+    const sma200 = dayScan[ticker + '_sma200'];
+    const close1 = dayScan[ticker + '_close1'];
     
-    if (scan.close1 || scan.rsi2 || dayCount === 0) {
-      history.push({
-        date: currentDate,
-        dayLabel,
-        dayColor,
-        ...formatHistoryRow(scan, type),
-        signal
-      });
+    // Skip if no data for this ticker on this date
+    if (rsi2 === undefined && close1 === undefined) {
+      dayCount++;
+      continue;
     }
     
-    // Move to next trading day
-    currentDate = getNextTradingDay(currentDate);
-    dayCount++;
+    const rsi2Val = parseFloat(rsi2);
+    const smaVal = parseFloat(sma200);
+    const closeVal = parseFloat(close1);
     
-    // Stop if trade is closed
-    if (trade.status === 'CLOSED' && currentDate > exitDate) break;
+    // Day label
+    const dayLabel = scanDate === entryDate ? 'T0' : `T${dayCount}`;
+    const dayColor = dayCount <= 2 ? 'd1' : dayCount === 3 ? 'd3' : 'd5';
+    
+    // RSI color
+    let rsiColor = 'var(--t2)';
+    if (!isNaN(rsi2Val)) {
+      if (rsi2Val < 10) rsiColor = 'var(--acc)';
+      else if (rsi2Val > 90) rsiColor = 'var(--acc2)';
+      else if (rsi2Val < 20 || rsi2Val > 80) rsiColor = 'var(--acc3)';
+    }
+    
+    // Trend icon
+    let trendIcon = '—';
+    if (!isNaN(closeVal) && !isNaN(smaVal)) {
+      trendIcon = closeVal > smaVal 
+        ? '<span class="g">▲</span>' 
+        : '<span class="r">▼</span>';
+    }
+    
+    // Signal
+    const exitSignal = !isNaN(rsi2Val) && (type === 'LONG' ? rsi2Val > 50 : rsi2Val < 50);
+    let signal = '—';
+    if (scanDate === entryDate) signal = '🚀 ENTRY';
+    else if (exitSignal) signal = '✅ RSI EXIT';
+    else if (dayCount >= 4) signal = '🚨 T4 EXIT';
+    else if (scanDate === exitDate && trade.status === 'CLOSED') signal = '📤 CLOSED';
+    
+    history.push({
+      date: scanDate,
+      dayLabel,
+      dayColor,
+      close: closeVal ? closeVal.toFixed(2) : null,
+      rsi2: !isNaN(rsi2Val) ? rsi2Val.toFixed(1) : null,
+      sma200: !isNaN(smaVal) ? smaVal.toFixed(2) : null,
+      rsiColor,
+      trendIcon,
+      signal
+    });
+    
+    dayCount++;
   }
   
   return history;
-}
-
-function findScanForDate(date, ticker) {
-  const scans = cache.rsiScans || {};
-  const dayScan = scans[date] || {};
-  
-  return {
-    rsi2: dayScan[ticker + '_rsi2'],
-    sma200: dayScan[ticker + '_sma200'],
-    close1: dayScan[ticker + '_close1'],
-    close2: dayScan[ticker + '_close2'],
-    close3: dayScan[ticker + '_close3']
-  };
-}
-
-function formatHistoryRow(scan, type) {
-  const rsi2 = scan.rsi2;
-  const sma200 = scan.sma200;
-  const close1 = scan.close1;
-  
-  const rsi2Val = parseFloat(rsi2);
-  const smaVal = parseFloat(sma200);
-  const closeVal = parseFloat(close1);
-  
-  // RSI color
-  let rsiColor = 'var(--t2)';
-  if (!isNaN(rsi2Val)) {
-    if (rsi2Val < 10) rsiColor = 'var(--acc)';
-    else if (rsi2Val > 90) rsiColor = 'var(--acc2)';
-    else if (rsi2Val < 20) rsiColor = 'var(--acc3)';
-    else if (rsi2Val > 80) rsiColor = 'var(--acc3)';
-  }
-  
-  // Trend icon
-  let trendIcon = '—';
-  if (!isNaN(closeVal) && !isNaN(smaVal)) {
-    trendIcon = closeVal > smaVal 
-      ? '<span class="g">▲ Above</span>' 
-      : '<span class="r">▼ Below</span>';
-  }
-  
-  return {
-    close: closeVal ? closeVal.toFixed(2) : null,
-    rsi2: rsi2Val ? rsi2Val.toFixed(1) : null,
-    sma200: smaVal ? smaVal.toFixed(2) : null,
-    rsiColor,
-    trendIcon
-  };
 }
 
 function toggleHistory(id) {
@@ -3250,8 +3210,9 @@ function updateRsiScan(ticker, field, value) {
   if (!cache.rsiScans[t0]) cache.rsiScans[t0] = {};
   cache.rsiScans[t0][ticker + '_' + field] = value === '' ? '' : parseFloat(value);
   
-  // Re-render to update signal
+  // Re-render to update signal and dashboard
   renderRsiScan();
+  renderDash();  // Update open positions with new RSI data
   scheduleSave();
 }
 
