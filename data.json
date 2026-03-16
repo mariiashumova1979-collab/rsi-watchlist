@@ -1201,7 +1201,8 @@
       "AAPL ●_rsi2": 3.17,
       "AAPL ●_close1": 250.12,
       "AAPL ●_close2": 255.76,
-      "ABBV_rsi2": 2.67
+      "ABBV_rsi2": 2.67,
+      "ABBV_sma200": 214.59
     }
   }
 }
