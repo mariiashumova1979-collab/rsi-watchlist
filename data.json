@@ -1151,6 +1151,17 @@
       "CRWD_close3": 436.33,
       "CRWD_sma200": 468.87,
       "_migration_done": true
+    },
+    "2026-03-16": {
+      "AAPL_close3": 255.76,
+      "AAPL_sma200": 245.33,
+      "PANW_close3": 164.93,
+      "PANW_sma200": 190.23,
+      "DKNG_close3": 25.57,
+      "DKNG_sma200": 36.02,
+      "JD_sma200": 31.14,
+      "CRWD_sma200": 468.87,
+      "_migration_done": true
     }
   }
 }
