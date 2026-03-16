@@ -1166,8 +1166,8 @@
       "CRWD_close1": 441.78,
       "CRWD_close2": 441.54,
       "CRWD_close3": 442.03,
-      "AAPL ●_sma200": 245.33,
-      "AAPL ●_close3": 255.76,
+      "AAPL ●_sma200": 245.58,
+      "AAPL ●_close3": 260.81,
       "JD ●_sma200": 31.12,
       "CRWD ●_rsi2": 91.66,
       "CRWD ●_sma200": 468.72,
@@ -1187,7 +1187,10 @@
       "JD ●_close3": 28.11,
       "AAPL_rsi2": 3.17,
       "AAPL_close1": 250.12,
-      "AAPL_close2": 255.76
+      "AAPL_close2": 255.76,
+      "AAPL ●_rsi2": 3.17,
+      "AAPL ●_close1": 250.12,
+      "AAPL ●_close2": 255.76
     }
   }
 }
