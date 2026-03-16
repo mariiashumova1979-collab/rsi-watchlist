@@ -1,6 +1,26 @@
 {
   "trades": [
     {
+      "id": "1773668581006",
+      "createdAt": 1773668581006,
+      "ticker": "ABBV",
+      "type": "LONG",
+      "entryDate": "2026-03-16",
+      "entry": 221.94,
+      "shares": 7,
+      "stop": "212.85",
+      "target1": "230.82",
+      "target2": "239.70",
+      "rsi2": "",
+      "atrPct": "2.73",
+      "trend": "",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "commission": 0,
+      "notes": ""
+    },
+    {
       "id": "1773416418033",
       "createdAt": 1773416418033,
       "ticker": "AAPL",
