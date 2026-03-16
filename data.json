@@ -1161,7 +1161,8 @@
       "DKNG_sma200": 36.02,
       "JD_sma200": 31.14,
       "CRWD_sma200": 468.87,
-      "_migration_done": true
+      "_migration_done": true,
+      "CRWD_rsi2": 91.66
     }
   }
 }
