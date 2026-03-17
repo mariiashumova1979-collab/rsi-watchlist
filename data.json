@@ -1,6 +1,26 @@
 {
   "trades": [
     {
+      "id": "1773755030573",
+      "createdAt": 1773755030573,
+      "ticker": "NTAP",
+      "type": "SHORT",
+      "entryDate": "2026-03-17",
+      "entry": 103.66,
+      "shares": 15,
+      "stop": "108.87",
+      "target1": "99.51",
+      "target2": "95.37",
+      "rsi2": "",
+      "atrPct": "3.35",
+      "trend": "BELOW",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "commission": 0,
+      "notes": ""
+    },
+    {
       "id": "1773668581006",
       "createdAt": 1773668581006,
       "ticker": "ABBV",
