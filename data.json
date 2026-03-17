@@ -736,6 +736,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "CPNG",
+      "sector": "Consumer Cyclical",
+      "cap": "37.39",
+      "atr": "4.78",
+      "earningsDate": "2026-05-12",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1773731118350
+    },
+    {
       "ticker": "ABBV",
       "sector": "Healthcare",
       "cap": "388.43",
