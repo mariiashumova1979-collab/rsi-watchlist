@@ -736,6 +736,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "NTAP",
+      "sector": "Technology",
+      "cap": "20.18",
+      "atr": "3.35",
+      "earningsDate": "2026-05-28",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1773731249443
+    },
+    {
       "ticker": "CPNG",
       "sector": "Consumer Cyclical",
       "cap": "37.39",
