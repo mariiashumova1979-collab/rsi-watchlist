@@ -1253,7 +1253,7 @@
       "AAPL ●_sma200": 245.58,
       "AAPL ●_close2": 250.12,
       "AAPL ●_close3": 255.76,
-      "JD ●_sma200": 31.12,
+      "JD ●_sma200": 31.1,
       "JD ●_close2": 28.32,
       "JD ●_close3": 27.94,
       "CRWD ●_rsi2": 7.26,
@@ -1262,7 +1262,9 @@
       "CRWD ●_close2": 441.78,
       "CRWD ●_close3": 441.54,
       "JD_rsi2": 91.07,
-      "JD_close1": 28.49
+      "JD_close1": 28.49,
+      "JD ●_rsi2": 91.07,
+      "JD ●_close1": 28.49
     }
   }
 }
