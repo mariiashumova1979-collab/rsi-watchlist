@@ -82,7 +82,7 @@
     },
     {
       "id": "1773322365260",
-      "createdAt": 1773755061438,
+      "createdAt": 1773755084751,
       "ticker": "CRWD",
       "type": "SHORT",
       "entryDate": "2026-03-12",
@@ -96,7 +96,7 @@
       "trend": "",
       "status": "CLOSED",
       "exitPrice": 429.87,
-      "exitReason": "",
+      "exitReason": "RSI",
       "commission": 4,
       "notes": "",
       "pnlNet": 41.81,
