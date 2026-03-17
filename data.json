@@ -1310,7 +1310,8 @@
       "MRK_close1": 115.43,
       "MRK_close2": 115.61,
       "MRK_close3": 115.91,
-      "AAPL_rsi2": 40.55
+      "AAPL_rsi2": 40.55,
+      "AAPL_close1": 252.82
     }
   }
 }
