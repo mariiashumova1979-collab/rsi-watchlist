@@ -1291,7 +1291,8 @@
       "CPNG_close2": 18.45,
       "CPNG_close3": 18.54,
       "NTAP_rsi2": 91.41,
-      "NTAP_sma200": 109
+      "NTAP_sma200": 109,
+      "NTAP_close1": 98.66
     }
   }
 }
