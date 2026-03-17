@@ -1280,7 +1280,7 @@
       "ABBV ●_sma200": 214.59,
       "ABBV ●_close2": 219.698,
       "ABBV ●_close3": 225.37,
-      "AAPL ●_sma200": 245.58,
+      "AAPL ●_sma200": 245.85,
       "AAPL ●_close2": 250.12,
       "AAPL ●_close3": 255.76,
       "JD ●_sma200": 31.1,
@@ -1311,7 +1311,9 @@
       "MRK_close2": 115.61,
       "MRK_close3": 115.91,
       "AAPL_rsi2": 40.55,
-      "AAPL_close1": 252.82
+      "AAPL_close1": 252.82,
+      "AAPL ●_rsi2": 40.55,
+      "AAPL ●_close1": 252.82
     }
   }
 }
