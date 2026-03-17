@@ -1277,7 +1277,7 @@
       "_migration_done": true,
       "CRWD_rsi2": 7.26,
       "CRWD_close1": 423.84,
-      "ABBV ●_sma200": 214.59,
+      "ABBV ●_sma200": 214.78,
       "ABBV ●_close2": 219.698,
       "ABBV ●_close3": 225.37,
       "AAPL ●_sma200": 245.85,
@@ -1315,7 +1315,9 @@
       "AAPL ●_rsi2": 40.55,
       "AAPL ●_close1": 252.82,
       "ABBV_rsi2": 34.17,
-      "ABBV_close1": 221.45
+      "ABBV_close1": 221.45,
+      "ABBV ●_rsi2": 34.17,
+      "ABBV ●_close1": 221.45
     }
   }
 }
