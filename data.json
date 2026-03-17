@@ -736,6 +736,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "MRK",
+      "sector": "Healthcare",
+      "cap": "285.39",
+      "atr": "2.45",
+      "earningsDate": "2026-04-30",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1773731847699
+    },
+    {
       "ticker": "NTAP",
       "sector": "Technology",
       "cap": "20.18",
