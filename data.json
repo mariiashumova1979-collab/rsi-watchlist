@@ -1390,7 +1390,8 @@
       "_migration_done": true,
       "JD_rsi2": 92.54,
       "JD_close1": 28.54,
-      "AAPL_rsi2": 57.63
+      "AAPL_rsi2": 57.63,
+      "AAPL_close1": 254.23
     }
   }
 }
