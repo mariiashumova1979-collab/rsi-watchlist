@@ -1478,7 +1478,8 @@
       "AMGN_close1": 361.13,
       "AMGN_close2": 366.25,
       "AMGN_close3": 366.21,
-      "HON_rsi2": 9.5
+      "HON_rsi2": 9.5,
+      "HON_sma200": 210.2
     }
   }
 }
