@@ -779,6 +779,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "AMGN",
+      "sector": "Healthcare",
+      "cap": "194.67",
+      "atr": "2.52",
+      "earningsDate": "2026-04-29",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1773818804743
+    },
+    {
       "ticker": "LLY",
       "sector": "Healthcare",
       "cap": "879.01",
