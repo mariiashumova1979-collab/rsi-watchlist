@@ -779,6 +779,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "HON",
+      "sector": "Technology",
+      "cap": "147.11",
+      "atr": "2.34",
+      "earningsDate": "2026-04-23",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1773818936834
+    },
+    {
       "ticker": "AMGN",
       "sector": "Healthcare",
       "cap": "194.67",
