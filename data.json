@@ -2,7 +2,7 @@
   "trades": [
     {
       "id": "1773755356014",
-      "createdAt": 1773755356014,
+      "createdAt": 1773841111568,
       "ticker": "MRK",
       "type": "LONG",
       "entryDate": "2026-03-17",
@@ -14,11 +14,14 @@
       "rsi2": "",
       "atrPct": "2.45",
       "trend": "",
-      "status": "OPEN",
-      "exitPrice": 0,
-      "exitReason": "",
-      "commission": 0,
-      "notes": ""
+      "status": "CLOSED",
+      "exitPrice": 115.51,
+      "exitReason": "RSI",
+      "commission": 5,
+      "notes": "",
+      "pnlNet": -11.44,
+      "pnlPct": -0.7,
+      "result": "LOSS"
     },
     {
       "id": "1773755030573",
