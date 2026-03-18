@@ -1394,7 +1394,8 @@
       "AAPL_close1": 254.23,
       "ABBV_rsi2": 21.12,
       "ABBV_close1": 219.76,
-      "NTAP_rsi2": 81
+      "NTAP_rsi2": 81,
+      "NTAP_close1": 101.92
     }
   }
 }
