@@ -1,6 +1,26 @@
 {
   "trades": [
     {
+      "id": "1773841155209",
+      "createdAt": 1773841155209,
+      "ticker": "LMT",
+      "type": "LONG",
+      "entryDate": "2026-03-18",
+      "entry": 638.1,
+      "shares": 2,
+      "stop": "611.40",
+      "target1": "663.62",
+      "target2": "689.15",
+      "rsi2": "",
+      "atrPct": "2.79",
+      "trend": "",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "commission": 0,
+      "notes": ""
+    },
+    {
       "id": "1773755356014",
       "createdAt": 1773841111568,
       "ticker": "MRK",
