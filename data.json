@@ -1407,7 +1407,32 @@
       "NTAP_rsi2": 81,
       "NTAP_close1": 101.92,
       "MRK_rsi2": 62.3,
-      "MRK_close1": 115.87
+      "MRK_close1": 115.87,
+      "MRK ●_rsi2": 62.3,
+      "MRK ●_sma200": 93.88,
+      "MRK ●_close1": 115.87,
+      "MRK ●_close2": 115.43,
+      "MRK ●_close3": 115.61,
+      "NTAP ●_rsi2": 81,
+      "NTAP ●_sma200": 109,
+      "NTAP ●_close1": 101.92,
+      "NTAP ●_close2": 102.24,
+      "NTAP ●_close3": 98.66,
+      "ABBV ●_rsi2": 21.12,
+      "ABBV ●_sma200": 214.78,
+      "ABBV ●_close1": 219.76,
+      "ABBV ●_close2": 221.45,
+      "ABBV ●_close3": 219.698,
+      "AAPL ●_rsi2": 57.63,
+      "AAPL ●_sma200": 245.85,
+      "AAPL ●_close1": 254.23,
+      "AAPL ●_close2": 252.82,
+      "AAPL ●_close3": 250.12,
+      "JD ●_rsi2": 92.54,
+      "JD ●_sma200": 31.1,
+      "JD ●_close1": 28.54,
+      "JD ●_close2": 28.49,
+      "JD ●_close3": 28.32
     }
   }
 }
