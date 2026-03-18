@@ -1361,6 +1361,33 @@
       "ABBV_close1": 221.45,
       "ABBV ●_rsi2": 34.17,
       "ABBV ●_close1": 221.45
+    },
+    "2026-03-18": {
+      "MRK_close2": 115.43,
+      "MRK_close3": 115.61,
+      "MRK_sma200": 93.88,
+      "NTAP_close2": 102.24,
+      "NTAP_close3": 98.66,
+      "NTAP_sma200": 109,
+      "CPNG_close2": 20.45,
+      "CPNG_close3": 18.45,
+      "CPNG_sma200": 26.85,
+      "ABBV_close2": 221.45,
+      "ABBV_close3": 219.698,
+      "ABBV_sma200": 214.78,
+      "AAPL_close2": 252.82,
+      "AAPL_close3": 250.12,
+      "AAPL_sma200": 245.85,
+      "PANW_sma200": 190.23,
+      "DKNG_close3": 25.87,
+      "DKNG_sma200": 35.97,
+      "JD_close2": 28.49,
+      "JD_close3": 28.32,
+      "JD_sma200": 31.1,
+      "CRWD_close2": 423.84,
+      "CRWD_close3": 441.78,
+      "CRWD_sma200": 468.5,
+      "_migration_done": true
     }
   }
 }
