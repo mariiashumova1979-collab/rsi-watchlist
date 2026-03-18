@@ -779,6 +779,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "IBM",
+      "sector": "Technology",
+      "cap": "240.24",
+      "atr": "3.4",
+      "earningsDate": "2026-04-22",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1773818495337
+    },
+    {
       "ticker": "MRK",
       "sector": "Healthcare",
       "cap": "285.39",
