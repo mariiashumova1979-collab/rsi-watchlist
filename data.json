@@ -779,6 +779,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "LMT",
+      "sector": "Technology",
+      "cap": "146.41",
+      "atr": "2.79",
+      "earningsDate": "2026-04-21",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1773819048194
+    },
+    {
       "ticker": "HON",
       "sector": "Technology",
       "cap": "147.11",
