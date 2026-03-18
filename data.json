@@ -62,7 +62,7 @@
     },
     {
       "id": "1773416418033",
-      "createdAt": 1773416418033,
+      "createdAt": 1773841080760,
       "ticker": "AAPL",
       "type": "LONG",
       "entryDate": "2026-03-13",
@@ -74,11 +74,14 @@
       "rsi2": "",
       "atrPct": "",
       "trend": "",
-      "status": "OPEN",
-      "exitPrice": 0,
-      "exitReason": "",
-      "commission": 0,
-      "notes": ""
+      "status": "CLOSED",
+      "exitPrice": 252.66,
+      "exitReason": "RSI",
+      "commission": 4,
+      "notes": "",
+      "pnlNet": -7.07,
+      "pnlPct": -0.47,
+      "result": "LOSS"
     },
     {
       "id": "1773322880545",
