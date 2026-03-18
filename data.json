@@ -779,6 +779,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "LLY",
+      "sector": "Healthcare",
+      "cap": "879.01",
+      "atr": "3.48",
+      "earningsDate": "2026-04-30",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1773818695214
+    },
+    {
       "ticker": "IBM",
       "sector": "Technology",
       "cap": "240.24",
