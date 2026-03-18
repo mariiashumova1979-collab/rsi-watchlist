@@ -1,6 +1,26 @@
 {
   "trades": [
     {
+      "id": "1773841756641",
+      "createdAt": 1773841756641,
+      "ticker": "IBM",
+      "type": "SHORT",
+      "entryDate": "2026-03-18",
+      "entry": 257.34,
+      "shares": 6,
+      "stop": "270.46",
+      "target1": "247.05",
+      "target2": "236.75",
+      "rsi2": "",
+      "atrPct": "3.4",
+      "trend": "",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "commission": 0,
+      "notes": ""
+    },
+    {
       "id": "1773841155209",
       "createdAt": 1773841155209,
       "ticker": "LMT",
