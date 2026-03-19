@@ -68,7 +68,7 @@
     },
     {
       "id": "1773755030573",
-      "createdAt": 1773755030573,
+      "createdAt": 1773924467993,
       "ticker": "NTAP",
       "type": "SHORT",
       "entryDate": "2026-03-17",
@@ -80,11 +80,14 @@
       "rsi2": "",
       "atrPct": "3.35",
       "trend": "BELOW",
-      "status": "OPEN",
-      "exitPrice": 0,
-      "exitReason": "",
-      "commission": 0,
-      "notes": ""
+      "status": "CLOSED",
+      "exitPrice": 100.29,
+      "exitReason": "RSI",
+      "commission": 5,
+      "notes": "",
+      "pnlNet": 45.55,
+      "pnlPct": 2.93,
+      "result": "WIN"
     },
     {
       "id": "1773668581006",
