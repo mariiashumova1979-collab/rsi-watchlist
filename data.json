@@ -1,6 +1,26 @@
 {
   "trades": [
     {
+      "id": "1773925029584",
+      "createdAt": 1773925029584,
+      "ticker": "ARM",
+      "type": "SHORT",
+      "entryDate": "2026-03-19",
+      "entry": 124.99,
+      "shares": 9,
+      "stop": "132.49",
+      "target1": "119.99",
+      "target2": "114.99",
+      "rsi2": "",
+      "atrPct": "4.57",
+      "trend": "",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "commission": 0,
+      "notes": ""
+    },
+    {
       "id": "1773841756641",
       "createdAt": 1773924804043,
       "ticker": "IBM",
