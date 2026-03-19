@@ -831,6 +831,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "BX",
+      "sector": "Financial",
+      "cap": "138.76",
+      "atr": "4.82",
+      "earningsDate": "2026-04-16",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1773908795821
+    },
+    {
       "ticker": "LMT",
       "sector": "Technology",
       "cap": "146.41",
