@@ -1566,7 +1566,7 @@
       "LLY_sma200": 890.03,
       "IBM_close2": 256.11,
       "IBM_close3": 249.25,
-      "IBM_sma200": 279.25,
+      "IBM_sma200": 279.21,
       "MRK_close2": 115.87,
       "MRK_close3": 115.43,
       "MRK_sma200": 93.88,
@@ -1601,7 +1601,8 @@
       "NTAP ●_sma200": 109.02,
       "NTAP ●_close1": 100.77,
       "NTAP ●_close2": 101.92,
-      "NTAP ●_close3": 102.24
+      "NTAP ●_close3": 102.24,
+      "IBM_rsi2": 46.2
     }
   }
 }
