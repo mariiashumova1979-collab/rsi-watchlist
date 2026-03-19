@@ -1589,7 +1589,8 @@
       "CRWD_close3": 423.84,
       "CRWD_sma200": 468.5,
       "_migration_done": true,
-      "NTAP_rsi2": 44.55
+      "NTAP_rsi2": 44.55,
+      "NTAP_close1": 100.77
     }
   }
 }
