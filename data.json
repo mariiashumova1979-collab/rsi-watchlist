@@ -1650,7 +1650,8 @@
       "WMT_close1": 121.98,
       "WMT_close2": 125.08,
       "WMT_close3": 125.99,
-      "ARM_rsi2": 93.87
+      "ARM_rsi2": 93.87,
+      "ARM_sma200": 138.09
     }
   }
 }
