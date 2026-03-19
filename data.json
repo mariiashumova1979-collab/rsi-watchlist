@@ -2,7 +2,7 @@
   "trades": [
     {
       "id": "1773841756641",
-      "createdAt": 1773841756641,
+      "createdAt": 1773924804043,
       "ticker": "IBM",
       "type": "SHORT",
       "entryDate": "2026-03-18",
@@ -14,11 +14,14 @@
       "rsi2": "",
       "atrPct": "3.4",
       "trend": "",
-      "status": "OPEN",
-      "exitPrice": 0,
-      "exitReason": "",
-      "commission": 0,
-      "notes": ""
+      "status": "CLOSED",
+      "exitPrice": 248.56,
+      "exitReason": "RSI",
+      "commission": 4,
+      "notes": "",
+      "pnlNet": 48.68,
+      "pnlPct": 3.15,
+      "result": "WIN"
     },
     {
       "id": "1773841155209",
