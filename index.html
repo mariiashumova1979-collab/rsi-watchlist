@@ -3235,8 +3235,8 @@ function renderRsiScan() {
     switch(sig) {
       case 'LONG_SIGNAL':  sigHtml = '<span class="sig-long">🟢 LONG</span>'; break;
       case 'SHORT_SIGNAL': sigHtml = '<span class="sig-short">🔴 SHORT</span>'; break;
-      case 'CLV_FAIL_LONG':  sigHtml = `<span class="sig-watch" title="${sigResult.reason}">⚠️ CLV</span>`; break;
-      case 'CLV_FAIL_SHORT': sigHtml = `<span class="sig-watch" title="${sigResult.reason}">⚠️ CLV</span>`; break;
+      case 'CLV_FAIL_LONG':  sigHtml = `<span class="sig-watch" title="${sigResult.reason||''}">⚠️ CLV</span>`; break;
+      case 'CLV_FAIL_SHORT': sigHtml = `<span class="sig-watch" title="${sigResult.reason||''}">⚠️ CLV</span>`; break;
       case 'WATCH_LONG':   sigHtml = '<span class="sig-watch">👀 L</span>'; break;
       case 'WATCH_SHORT':  sigHtml = '<span class="sig-watch">👀 S</span>'; break;
       case 'blocked':      sigHtml = `<span class="sig-none">${boBool ? '🚫' : '⏳'}</span>`; break;
@@ -3288,7 +3288,7 @@ function renderRsiScan() {
     const rowBg = hasPosition ? 'background:rgba(91,156,246,.06)' :
                   sig === 'LONG_SIGNAL'  ? 'background:rgba(126,232,162,.08)' :
                   sig === 'SHORT_SIGNAL' ? 'background:rgba(255,107,138,.08)' :
-                  sig.includes('CLV_FAIL') ? 'background:rgba(255,200,90,.06)' :
+                  (sig && sig.includes('CLV_FAIL')) ? 'background:rgba(255,200,90,.06)' :
                   sig === 'WATCH_LONG' || sig === 'WATCH_SHORT' ? 'background:rgba(255,200,90,.04)' : '';
 
     return `<tr style="${rowBg}">
