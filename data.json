@@ -1,6 +1,26 @@
 {
   "trades": [
     {
+      "id": "1773927250347",
+      "createdAt": 1773927250347,
+      "ticker": "BX",
+      "type": "SHORT",
+      "entryDate": "2026-03-19",
+      "entry": 111.96,
+      "shares": 11,
+      "stop": "118.68",
+      "target1": "107.48",
+      "target2": "103.00",
+      "rsi2": "",
+      "atrPct": "4.82",
+      "trend": "",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "commission": 0,
+      "notes": ""
+    },
+    {
       "id": "1773925029584",
       "createdAt": 1773925029584,
       "ticker": "ARM",
