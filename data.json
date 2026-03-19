@@ -22,7 +22,7 @@
     },
     {
       "id": "1773841155209",
-      "createdAt": 1773841155209,
+      "createdAt": 1773924446234,
       "ticker": "LMT",
       "type": "LONG",
       "entryDate": "2026-03-18",
@@ -34,11 +34,14 @@
       "rsi2": "",
       "atrPct": "2.79",
       "trend": "",
-      "status": "OPEN",
-      "exitPrice": 0,
-      "exitReason": "",
-      "commission": 0,
-      "notes": ""
+      "status": "CLOSED",
+      "exitPrice": 640.84,
+      "exitReason": "RSI",
+      "commission": 4,
+      "notes": "",
+      "pnlNet": 1.48,
+      "pnlPct": 0.12,
+      "result": "WIN"
     },
     {
       "id": "1773755356014",
