@@ -1345,8 +1345,28 @@ function applyData(data) {
     }
   });
   
-  // Note: Old rsiScans with _r7/_r14 fields will be ignored
-  // New system uses _rsi2, _sma200, _close0, _close1, _close2
+  // ═══════════════════════════════════════════════════════════
+  // MIGRATION: rsiScans field names
+  // Old: close0, close1, close2 → New: close1, close2, close3
+  // Also add support for new fields: low1, high1, open0
+  // ═══════════════════════════════════════════════════════════
+  if (cache.rsiScans) {
+    Object.keys(cache.rsiScans).forEach(dateKey => {
+      const scan = cache.rsiScans[dateKey];
+      if (!scan) return;
+      
+      Object.keys(scan).forEach(key => {
+        // Migrate old close0 → close1 (if close1 doesn't exist)
+        if (key.endsWith('_close0')) {
+          const ticker = key.replace('_close0', '');
+          if (scan[ticker + '_close1'] === undefined) {
+            scan[ticker + '_close1'] = scan[key];
+          }
+          delete scan[key];
+        }
+      });
+    });
+  }
   
 }
 
@@ -3254,7 +3274,7 @@ function renderRsiScan() {
     
     // CLV color and display
     let clvHtml = '—';
-    if (clv !== null) {
+    if (clv !== null && clv !== undefined) {
       const clvColor = clv <= 0.3 ? 'var(--acc)' : clv >= 0.7 ? 'var(--acc2)' : 'var(--t2)';
       const clvIcon = clv <= 0.3 ? '✓L' : clv >= 0.7 ? '✓S' : '';
       clvHtml = `<span style="color:${clvColor};font-weight:${clvIcon ? '700' : '400'}">${clv.toFixed(2)}</span>`;
@@ -3465,10 +3485,10 @@ function renderDashSignals() {
     // Entry recommendation
     let entryRec = '';
     if (isSignal) {
-      if (badGap && mid1) {
-        const gapStr = (gapPct !== null && gapPct !== undefined) ? `${gapPct>=0?'+':''}${gapPct.toFixed(1)}%` : '';
+      if (badGap && mid1 != null) {
+        const gapStr = (gapPct != null) ? `${gapPct>=0?'+':''}${gapPct.toFixed(1)}%` : '';
         entryRec = `<span style="color:var(--acc2)">⚠️ Bad gap ${gapStr} → Entry at Mid: $${mid1.toFixed(2)} only</span>`;
-      } else if (entryPrice !== null && entryPrice !== undefined) {
+      } else if (entryPrice != null) {
         entryRec = `<span style="color:var(--acc)">✓ Entry at Open: $${entryPrice.toFixed(2)}</span>`;
       } else {
         entryRec = `<span>Add Open(T0) to see gap check</span>`;
