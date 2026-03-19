@@ -1601,10 +1601,10 @@
       "_migration_done": true,
       "NTAP_rsi2": 44.55,
       "NTAP_close1": 100.77,
-      "LMT ●_sma200": 504.74,
+      "LMT ●_sma200": 505.54,
       "LMT ●_close2": 633.33,
       "LMT ●_close3": 645.2,
-      "IBM ●_sma200": 279.25,
+      "IBM ●_sma200": 279.21,
       "IBM ●_close2": 256.11,
       "IBM ●_close3": 249.25,
       "NTAP ●_rsi2": 44.55,
@@ -1615,7 +1615,11 @@
       "IBM_rsi2": 46.2,
       "IBM_close1": 251.6,
       "LMT_rsi2": 51.66,
-      "LMT_close1": 642.28
+      "LMT_close1": 642.28,
+      "LMT ●_rsi2": 51.66,
+      "LMT ●_close1": 642.28,
+      "IBM ●_rsi2": 46.2,
+      "IBM ●_close1": 251.6
     }
   }
 }
