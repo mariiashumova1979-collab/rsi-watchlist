@@ -1635,7 +1635,8 @@
       "BX_close1": 113.53,
       "BX_close2": 112,
       "BX_close3": 107.12,
-      "WMT_rsi2": 7.02
+      "WMT_rsi2": 7.02,
+      "WMT_sma200": 107.86
     }
   }
 }
