@@ -3167,7 +3167,7 @@ function renderRsiScan() {
   const wl = cache.watchlist;
   if (!wl.length) {
     document.getElementById('rsiScanTbody').innerHTML =
-      '<tr><td colspan="11" style="text-align:center;color:var(--t2);padding:30px">Add stocks to watchlist</td></tr>';
+      '<tr><td colspan="13" style="text-align:center;color:var(--t2);padding:30px">Add stocks to watchlist</td></tr>';
     return;
   }
 
@@ -3230,7 +3230,7 @@ function renderRsiScan() {
 
     // Gap display
     let gapHtml = '—';
-    if (gapPct !== null) {
+    if (gapPct !== null && gapPct !== undefined) {
       const gapColor = badGap ? 'var(--acc2)' : 'var(--acc)';
       const gapIcon = badGap ? '⚠️' : '✓';
       gapHtml = `<span style="color:${gapColor};font-size:9px">${gapPct >= 0 ? '+' : ''}${gapPct.toFixed(1)}% ${gapIcon}</span>`;
@@ -3241,10 +3241,10 @@ function renderRsiScan() {
     if (sig === 'LONG_SIGNAL' || sig === 'SHORT_SIGNAL') {
       if (entryType === 'MID' && mid1) {
         entryHtml = `<span style="color:var(--acc3);font-weight:700">$${mid1.toFixed(2)}</span><br><span style="font-size:8px;color:var(--acc2)">Mid only!</span>`;
-      } else if (entryPrice) {
+      } else if (entryPrice !== null && entryPrice !== undefined) {
         entryHtml = `<span style="color:var(--acc);font-weight:700">$${entryPrice.toFixed(2)}</span><br><span style="font-size:8px">Open OK</span>`;
       } else {
-        entryHtml = `<span style="font-size:9px">Enter Open(T0)</span>`;
+        entryHtml = `<span style="font-size:9px">Add Open(T0)</span>`;
       }
     }
 
@@ -3466,11 +3466,12 @@ function renderDashSignals() {
     let entryRec = '';
     if (isSignal) {
       if (badGap && mid1) {
-        entryRec = `<span style="color:var(--acc2)">⚠️ Bad gap (${gapPct>=0?'+':''}${gapPct?.toFixed(1)}%) → Entry at Mid: $${mid1.toFixed(2)} only</span>`;
-      } else if (entryPrice) {
+        const gapStr = (gapPct !== null && gapPct !== undefined) ? `${gapPct>=0?'+':''}${gapPct.toFixed(1)}%` : '';
+        entryRec = `<span style="color:var(--acc2)">⚠️ Bad gap ${gapStr} → Entry at Mid: $${mid1.toFixed(2)} only</span>`;
+      } else if (entryPrice !== null && entryPrice !== undefined) {
         entryRec = `<span style="color:var(--acc)">✓ Entry at Open: $${entryPrice.toFixed(2)}</span>`;
       } else {
-        entryRec = `<span>Enter Open(T0) — add it to see gap check</span>`;
+        entryRec = `<span>Add Open(T0) to see gap check</span>`;
       }
     }
 
@@ -3483,7 +3484,7 @@ function renderDashSignals() {
       <div style="font-family:var(--mono);font-size:11px;font-weight:700;${isSignal?'color:var(--text)':isClvFail?'color:var(--acc3)':'color:var(--t2)'}">${label}</div>
       <div style="display:flex;gap:14px;font-family:var(--mono);font-size:10px;color:var(--t2);flex-wrap:wrap">
         <span>RSI: <span style="color:${parseFloat(rsi2)<10?'var(--acc)':parseFloat(rsi2)>90?'var(--acc2)':'var(--text)'};font-weight:700">${rsi2||'—'}</span></span>
-        <span>CLV: <span style="color:${clv<=0.3?'var(--acc)':clv>=0.7?'var(--acc2)':'var(--t2)'};font-weight:700">${clv!==null?clv.toFixed(2):'—'}</span></span>
+        <span>CLV: <span style="color:${clv!=null&&clv<=0.3?'var(--acc)':clv!=null&&clv>=0.7?'var(--acc2)':'var(--t2)'};font-weight:700">${clv!=null?clv.toFixed(2):'—'}</span></span>
         <span>Trend: ${trendIcon}</span>
       </div>
       ${isSignal ? `<div style="font-family:var(--mono);font-size:10px;margin-top:6px">${entryRec}</div>` : ''}
