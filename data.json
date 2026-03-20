@@ -880,6 +880,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "CARR",
+      "sector": "Industrials",
+      "cap": "49.27",
+      "atr": "3.36",
+      "earningsDate": "2026-04-23",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1773990832924
+    },
+    {
       "ticker": "ARM",
       "sector": "Technology",
       "cap": "136.32",
