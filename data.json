@@ -880,6 +880,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "TLN",
+      "sector": "Utilities",
+      "cap": "15.54",
+      "atr": "4.98",
+      "earningsDate": "2026-04-30",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1773991265812
+    },
+    {
       "ticker": "SYF",
       "sector": "Financial",
       "cap": "22.77",
