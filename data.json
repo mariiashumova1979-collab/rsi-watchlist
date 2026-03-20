@@ -1755,7 +1755,8 @@
       "CARR_sma200": 62.12,
       "CARR_close3": 56.98,
       "SYF_rsi2": 90.15,
-      "SYF_close1": 65.51
+      "SYF_close1": 65.51,
+      "SYF_low1": 64.68
     }
   }
 }
