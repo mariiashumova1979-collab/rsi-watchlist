@@ -3124,9 +3124,9 @@ function computeSignal(w, scan) {
   
   // LONG SIGNAL
   if (longRsi && longTrend && longCandles && longClv) {
-    // Check gap for LONG: bad if Open(T0) < Close(T-1) (gapped down into position)
+    // Check gap for LONG: bad if Open(T0) > Close(T-1) (gapped up - price moved away)
     if (hasOpen) {
-      badGap = o0 < c1;  // Gap down is bad for LONG entry
+      badGap = o0 > c1;  // Gap up is bad for LONG entry
       if (badGap && mid1) {
         entryPrice = mid1;
         entryType = 'MID';
@@ -3140,9 +3140,9 @@ function computeSignal(w, scan) {
   
   // SHORT SIGNAL
   if (shortRsi && shortTrend && shortCandles && shortClv) {
-    // Check gap for SHORT: bad if Open(T0) > Close(T-1) (gapped up into position)
+    // Check gap for SHORT: bad if Open(T0) < Close(T-1) (gapped down - price moved in our favor already)
     if (hasOpen) {
-      badGap = o0 > c1;  // Gap up is bad for SHORT entry
+      badGap = o0 < c1;  // Gap down is bad for SHORT entry (missed the move)
       if (badGap && mid1) {
         entryPrice = mid1;
         entryType = 'MID';
