@@ -262,12 +262,15 @@ tr:hover td{background:rgba(126,232,162,.02)}
 
 /* RSI INPUT IN TABLE */
 .rsi-inp{
-  width:60px;padding:4px 6px;border-radius:5px;
+  width:70px;padding:5px 6px;border-radius:5px;
   background:var(--bg4);border:1px solid var(--line);
   color:var(--text);font-family:var(--mono);font-size:11px;
-  text-align:center;outline:none;transition:border-color .2s
+  text-align:center;outline:none;transition:border-color .2s;
+  -moz-appearance:textfield
 }
-.rsi-inp:focus{border-color:var(--acc)}
+.rsi-inp::-webkit-outer-spin-button,
+.rsi-inp::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.rsi-inp:focus{border-color:var(--acc);background:var(--bg3)}
 
 /* RSI MINI BAR */
 .rsi-bar-wrap{display:flex;align-items:center;gap:6px}
@@ -3256,15 +3259,21 @@ function renderRsiScan() {
       gapHtml = `<span style="color:${gapColor};font-size:9px">${gapPct >= 0 ? '+' : ''}${gapPct.toFixed(1)}% ${gapIcon}</span>`;
     }
 
-    // Entry price display
+    // Entry price display - show Mid(T-1) even before Open(T0) is entered
     let entryHtml = '—';
-    if (sig === 'LONG_SIGNAL' || sig === 'SHORT_SIGNAL') {
-      if (entryType === 'MID' && mid1) {
-        entryHtml = `<span style="color:var(--acc3);font-weight:700">$${mid1.toFixed(2)}</span><br><span style="font-size:8px;color:var(--acc2)">Mid only!</span>`;
-      } else if (entryPrice !== null && entryPrice !== undefined) {
-        entryHtml = `<span style="color:var(--acc);font-weight:700">$${entryPrice.toFixed(2)}</span><br><span style="font-size:8px">Open OK</span>`;
+    if (mid1 != null) {
+      // Always show Mid as forecast entry
+      if (sig === 'LONG_SIGNAL' || sig === 'SHORT_SIGNAL') {
+        if (entryType === 'MID') {
+          entryHtml = `<span style="color:var(--acc3);font-weight:700">$${mid1.toFixed(2)}</span><br><span style="font-size:8px;color:var(--acc2)">Mid only!</span>`;
+        } else if (entryPrice != null) {
+          entryHtml = `<span style="color:var(--acc);font-weight:700">$${entryPrice.toFixed(2)}</span><br><span style="font-size:8px">Open ✓</span>`;
+        } else {
+          entryHtml = `<span style="color:var(--t2)">$${mid1.toFixed(2)}</span><br><span style="font-size:8px">Mid est.</span>`;
+        }
       } else {
-        entryHtml = `<span style="font-size:9px">Add Open(T0)</span>`;
+        // Not a signal yet, but show Mid as estimate
+        entryHtml = `<span style="color:var(--t3);font-size:10px">$${mid1.toFixed(2)}</span>`;
       }
     }
 
@@ -3294,53 +3303,61 @@ function renderRsiScan() {
     return `<tr style="${rowBg}">
       <td style="font-weight:700;font-size:11px">${w.ticker}${hasPosition ? ' <span style="color:var(--acc4);font-size:8px">●</span>' : ''}</td>
       <td>
-        <input class="rsi-inp" type="number" min="0" max="100" step="0.1" style="width:45px;${rsiColor ? 'color:'+rsiColor : ''}"
+        <input class="rsi-inp" type="number" min="0" max="100" step="0.1" style="width:50px;${rsiColor ? 'color:'+rsiColor : ''}"
           value="${rsi2}" placeholder="—"
+          onclick="this.select()" onfocus="this.select()"
           onchange="updateRsiScan('${w.ticker}','rsi2',this.value)"
           ${inactive ? 'disabled style="opacity:.4"' : ''}>
       </td>
       <td>
-        <input class="rsi-inp" type="number" step="0.01" style="width:60px"
+        <input class="rsi-inp" type="number" step="0.01"
           value="${close1}" placeholder="—"
+          onclick="this.select()" onfocus="this.select()"
           onchange="updateRsiScan('${w.ticker}','close1',this.value)"
           ${inactive ? 'disabled style="opacity:.4"' : ''}>
       </td>
       <td>
-        <input class="rsi-inp" type="number" step="0.01" style="width:60px"
+        <input class="rsi-inp" type="number" step="0.01"
           value="${low1}" placeholder="—"
+          onclick="this.select()" onfocus="this.select()"
           onchange="updateRsiScan('${w.ticker}','low1',this.value)"
           ${inactive ? 'disabled style="opacity:.4"' : ''}>
       </td>
       <td>
-        <input class="rsi-inp" type="number" step="0.01" style="width:60px"
+        <input class="rsi-inp" type="number" step="0.01"
           value="${high1}" placeholder="—"
+          onclick="this.select()" onfocus="this.select()"
           onchange="updateRsiScan('${w.ticker}','high1',this.value)"
           ${inactive ? 'disabled style="opacity:.4"' : ''}>
       </td>
       <td style="font-family:var(--mono);font-size:10px">${clvHtml}</td>
       <td>
-        <input class="rsi-inp" type="number" step="0.01" style="width:60px"
+        <input class="rsi-inp" type="number" step="0.01"
           value="${open0}" placeholder="—"
+          onclick="this.select()" onfocus="this.select()"
           onchange="updateRsiScan('${w.ticker}','open0',this.value)"
           ${inactive ? 'disabled style="opacity:.4"' : ''}>
       </td>
       <td style="font-family:var(--mono);font-size:9px">${gapHtml}</td>
       <td>
-        <input class="rsi-inp" type="number" step="0.01" style="width:60px"
+        <input class="rsi-inp" type="number" step="0.01"
           value="${sma200}" placeholder="—"
+          onclick="this.select()" onfocus="this.select()"
           onchange="updateRsiScan('${w.ticker}','sma200',this.value)"
           ${inactive ? 'disabled style="opacity:.4"' : ''}>
         ${trendIcon}
       </td>
       <td>
-        <input class="rsi-inp" type="number" step="0.01" style="width:55px"
+        <input class="rsi-inp" type="number" step="0.01" style="width:60px"
           value="${close2}" placeholder="—"
+          onclick="this.select()" onfocus="this.select()"
           onchange="updateRsiScan('${w.ticker}','close2',this.value)"
           ${inactive ? 'disabled style="opacity:.4"' : ''}>
       </td>
       <td>
-        <input class="rsi-inp" type="number" step="0.01" style="width:55px"
+        <input class="rsi-inp" type="number" step="0.01" style="width:60px"
           value="${close3}" placeholder="—"
+          onclick="this.select()" onfocus="this.select()"
           onchange="updateRsiScan('${w.ticker}','close3',this.value)"
           ${inactive ? 'disabled style="opacity:.4"' : ''}>
       </td>
