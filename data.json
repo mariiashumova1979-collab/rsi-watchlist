@@ -880,6 +880,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "SYF",
+      "sector": "Financial",
+      "cap": "22.77",
+      "atr": "3.51",
+      "earningsDate": "2026-04-28",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1773991044615
+    },
+    {
       "ticker": "CARR",
       "sector": "Industrials",
       "cap": "49.27",
