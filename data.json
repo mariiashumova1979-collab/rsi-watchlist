@@ -1736,7 +1736,8 @@
       "ARM_rsi2": 95.91,
       "ARM_close1": 129.82,
       "BX_rsi2": 89.26,
-      "BX_close1": 113.47
+      "BX_close1": 113.47,
+      "CARR_rsi2": 93.91
     }
   }
 }
