@@ -22,7 +22,7 @@
     },
     {
       "id": "1773925029584",
-      "createdAt": 1773925029584,
+      "createdAt": 1774012622433,
       "ticker": "ARM",
       "type": "SHORT",
       "entryDate": "2026-03-19",
@@ -34,11 +34,14 @@
       "rsi2": "",
       "atrPct": "4.57",
       "trend": "",
-      "status": "OPEN",
-      "exitPrice": 0,
-      "exitReason": "",
-      "commission": 0,
-      "notes": ""
+      "status": "CLOSED",
+      "exitPrice": 133.19,
+      "exitReason": "STOP",
+      "commission": 4,
+      "notes": "",
+      "pnlNet": -77.8,
+      "pnlPct": -6.92,
+      "result": "LOSS"
     },
     {
       "id": "1773841756641",
