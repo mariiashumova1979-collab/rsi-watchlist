@@ -1,6 +1,26 @@
 {
   "trades": [
     {
+      "id": "1774018024281",
+      "createdAt": 1774018024281,
+      "ticker": "CARR",
+      "type": "SHORT",
+      "entryDate": "2026-03-20",
+      "entry": 59.36,
+      "shares": 20,
+      "stop": "62.35",
+      "target1": "56.99",
+      "target2": "54.61",
+      "rsi2": "",
+      "atrPct": "3.36",
+      "trend": "",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "commission": 0,
+      "notes": ""
+    },
+    {
       "id": "1774017920430",
       "createdAt": 1774017920430,
       "ticker": "TLN",
