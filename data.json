@@ -1741,7 +1741,8 @@
       "CARR_close1": 58.97,
       "CARR_low1": 56.57,
       "CARR_high1": 59.25,
-      "CARR_close2": 57.61
+      "CARR_close2": 57.61,
+      "CARR_sma200": 62.12
     }
   }
 }
