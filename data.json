@@ -1722,7 +1722,8 @@
       "JD_close3": 28.54,
       "JD_sma200": 31.1,
       "CRWD_sma200": 468.5,
-      "_migration_done": true
+      "_migration_done": true,
+      "ARM_rsi2": 95.91
     }
   }
 }
