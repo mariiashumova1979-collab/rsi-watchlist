@@ -1740,7 +1740,8 @@
       "CARR_rsi2": 93.91,
       "CARR_close1": 58.97,
       "CARR_low1": 56.57,
-      "CARR_high1": 59.25
+      "CARR_high1": 59.25,
+      "CARR_close2": 57.61
     }
   }
 }
