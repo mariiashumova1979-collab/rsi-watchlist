@@ -923,6 +923,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "MRSH",
+      "sector": "Financial",
+      "cap": "85.44",
+      "atr": "2.51",
+      "earningsDate": "2026-04-16",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1774125645975
+    },
+    {
       "ticker": "WFC",
       "sector": "Financial",
       "cap": "239.45",
