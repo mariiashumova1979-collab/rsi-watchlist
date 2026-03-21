@@ -923,6 +923,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "APO",
+      "sector": "Financial",
+      "cap": "64.76",
+      "atr": "4.57",
+      "earningsDate": "2026-04-30",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1774125770238
+    },
+    {
       "ticker": "WFC",
       "sector": "Financial",
       "cap": "239.45",
