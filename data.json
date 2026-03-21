@@ -923,6 +923,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "WFC",
+      "sector": "Financial",
+      "cap": "239.45",
+      "atr": "3.21",
+      "earningsDate": "2026-04-14",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1774125544464
+    },
+    {
       "ticker": "TLN",
       "sector": "Utilities",
       "cap": "15.54",
