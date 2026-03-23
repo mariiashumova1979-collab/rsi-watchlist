@@ -82,7 +82,7 @@
     },
     {
       "id": "1773927250347",
-      "createdAt": 1773927250347,
+      "createdAt": 1774285603283,
       "ticker": "BX",
       "type": "SHORT",
       "entryDate": "2026-03-19",
@@ -94,11 +94,14 @@
       "rsi2": "",
       "atrPct": "4.82",
       "trend": "",
-      "status": "OPEN",
-      "exitPrice": 0,
-      "exitReason": "",
-      "commission": 0,
-      "notes": ""
+      "status": "CLOSED",
+      "exitPrice": 109.62,
+      "exitReason": "RSI",
+      "commission": 4,
+      "notes": "",
+      "pnlNet": 21.74,
+      "pnlPct": 1.77,
+      "result": "WIN"
     },
     {
       "id": "1773925029584",
