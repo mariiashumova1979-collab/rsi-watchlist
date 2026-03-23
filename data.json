@@ -62,7 +62,7 @@
     },
     {
       "id": "1774017920430",
-      "createdAt": 1774017920430,
+      "createdAt": 1774285632172,
       "ticker": "TLN",
       "type": "SHORT",
       "entryDate": "2026-03-20",
@@ -74,11 +74,14 @@
       "rsi2": "",
       "atrPct": "4.98",
       "trend": "",
-      "status": "OPEN",
-      "exitPrice": 0,
-      "exitReason": "",
-      "commission": 0,
-      "notes": ""
+      "status": "CLOSED",
+      "exitPrice": 314.94,
+      "exitReason": "RSI",
+      "commission": 4,
+      "notes": "",
+      "pnlNet": 56.9,
+      "pnlPct": 5.66,
+      "result": "WIN"
     },
     {
       "id": "1773927250347",
