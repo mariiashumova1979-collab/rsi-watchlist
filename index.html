@@ -700,6 +700,56 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
       </div>
 
       <div class="card">
+        <div class="sh">📊 Tradernet (Freedom24)</div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--t2);margin-bottom:12px;line-height:1.7">
+          Подключение к брокерскому счёту для получения данных
+        </div>
+        
+        <!-- Step 1: Login/Password -->
+        <div id="tn_step1">
+          <div class="fgrid" style="margin-bottom:12px">
+            <div class="fg">
+              <label>Email</label>
+              <input type="email" id="tv_login" placeholder="user@example.com" style="font-family:var(--mono);font-size:11px">
+            </div>
+            <div class="fg">
+              <label>Пароль</label>
+              <input type="password" id="tv_password" placeholder="••••••••" style="font-family:var(--mono);font-size:11px">
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center">
+            <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--t2);cursor:pointer">
+              <input type="checkbox" id="tv_remember" checked style="width:14px;height:14px"> Запомнить
+            </label>
+            <button class="btn btn-p btn-s" onclick="tnAuthStep1()">🔐 ВОЙТИ</button>
+          </div>
+        </div>
+        
+        <!-- Step 2: SMS Code -->
+        <div id="tn_step2" style="display:none">
+          <div style="background:var(--bg3);border-radius:8px;padding:12px;margin-bottom:12px;border:1px solid var(--acc3)">
+            <div style="font-size:11px;color:var(--acc3);margin-bottom:8px">📱 Введите код из SMS</div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input type="text" id="tv_sms" placeholder="123456" maxlength="10" 
+                style="font-family:var(--mono);font-size:16px;font-weight:700;text-align:center;width:120px;letter-spacing:2px"
+                onkeypress="if(event.key==='Enter')tnAuthStep2()">
+              <button class="btn btn-p btn-s" onclick="tnAuthStep2()">✓ ПОДТВЕРДИТЬ</button>
+              <button class="btn btn-s" onclick="tnCancelSms()" style="background:var(--bg4)">✕</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Logged in state -->
+        <div id="tn_logged" style="display:none">
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <button class="btn btn-g btn-s" onclick="tnLogout()">ВЫХОД</button>
+          </div>
+        </div>
+        
+        <div id="tvStatus" style="font-family:var(--mono);font-size:10px;color:var(--t2);min-height:18px"></div>
+      </div>
+
+      <div class="card">
         <div class="sh">Finnhub API — живые цены</div>
         <div style="font-family:var(--mono);font-size:10px;color:var(--t2);margin-bottom:12px;line-height:1.7">
           Получайте текущие цены и RSI прямо в журнале.<br>
@@ -1847,6 +1897,285 @@ async function testFinnhub() {
   }
 }
 
+// ═══════════════════════════════════════════════════════════
+// TRADERNET (Freedom24) AUTH
+// ═══════════════════════════════════════════════════════════
+const TN_API_URL = 'https://tradernet.com/api/';
+
+let tnSession = null;
+let tnAuthPending = null; // For SMS flow: { authCodeId, login, rememberMe }
+
+function loadTnSession() {
+  const saved = localStorage.getItem('tn_session');
+  if (saved) {
+    try {
+      tnSession = JSON.parse(saved);
+      updateTnUI();
+    } catch(e) {}
+  }
+}
+
+function saveTnSession() {
+  if (tnSession) {
+    localStorage.setItem('tn_session', JSON.stringify(tnSession));
+  } else {
+    localStorage.removeItem('tn_session');
+  }
+}
+
+function updateTnUI() {
+  const step1 = document.getElementById('tn_step1');
+  const step2 = document.getElementById('tn_step2');
+  const logged = document.getElementById('tn_logged');
+  const loginInput = document.getElementById('tv_login');
+  const el = document.getElementById('tvStatus');
+  
+  if (tnSession && tnSession.sid) {
+    // Logged in
+    if (step1) step1.style.display = 'none';
+    if (step2) step2.style.display = 'none';
+    if (logged) logged.style.display = '';
+    if (loginInput) loginInput.value = tnSession.login || '';
+    if (el) {
+      const accType = tnSession.real ? '🟢 Real' : '🟡 Demo';
+      el.innerHTML = `✓ <b>${tnSession.accountTitle || 'Подключен'}</b> · ${accType} · ${tnSession.reception || ''}`;
+      el.style.color = 'var(--acc)';
+    }
+  } else if (tnAuthPending) {
+    // Waiting for SMS
+    if (step1) step1.style.display = 'none';
+    if (step2) step2.style.display = '';
+    if (logged) logged.style.display = 'none';
+    document.getElementById('tv_sms')?.focus();
+  } else {
+    // Not logged in
+    if (step1) step1.style.display = '';
+    if (step2) step2.style.display = 'none';
+    if (logged) logged.style.display = 'none';
+  }
+}
+
+// Step 1: Login + Password
+async function tnAuthStep1() {
+  const login = document.getElementById('tv_login').value.trim();
+  const password = document.getElementById('tv_password').value;
+  const rememberMe = document.getElementById('tv_remember').checked ? 1 : 0;
+  const el = document.getElementById('tvStatus');
+  
+  if (!login || !password) {
+    el.textContent = '✗ Введите email и пароль';
+    el.style.color = 'var(--acc2)';
+    return;
+  }
+  
+  el.textContent = '⏳ Авторизация...';
+  el.style.color = 'var(--acc3)';
+  
+  try {
+    const params = {
+      cmd: 'authByLogin',
+      params: {
+        login: login,
+        password: password,
+        rememberMe: rememberMe,
+        getAccounts: true,
+        userId: null
+      }
+    };
+    
+    const response = await fetch(TN_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: 'q=' + encodeURIComponent(JSON.stringify(params)),
+      credentials: 'include'
+    });
+    
+    const data = await response.json();
+    console.log('Tradernet Step1 response:', data);
+    
+    // Check for error
+    if (data.code && data.code !== 0) {
+      throw new Error(data.errMsg || 'Ошибка (code: ' + data.code + ')');
+    }
+    
+    // Check if SMS required
+    if (data.authCodeId || data.needSms || data.smsRequired) {
+      // SMS verification required
+      tnAuthPending = {
+        authCodeId: data.authCodeId || data.id,
+        login: login,
+        rememberMe: rememberMe,
+        userId: data.userId || null
+      };
+      
+      el.textContent = '📱 SMS код отправлен на телефон';
+      el.style.color = 'var(--acc3)';
+      
+      updateTnUI();
+      return;
+    }
+    
+    // Direct login success
+    if (!data.success || !data.logged) {
+      throw new Error(data.errMsg || 'Не удалось войти');
+    }
+    
+    tnSession = {
+      sid: data.SID,
+      userId: data.userId,
+      login: login,
+      real: data.real,
+      accountType: data.account_type,
+      accountTitle: data.account_title,
+      reception: data.reception_title,
+      authAt: Date.now()
+    };
+    
+    saveTnSession();
+    document.getElementById('tv_password').value = '';
+    
+    el.textContent = `✓ ${data.account_title || 'Успешно'}`;
+    el.style.color = 'var(--acc)';
+    
+    updateTnUI();
+    
+  } catch(e) {
+    console.error('Tradernet auth error:', e);
+    el.textContent = '✗ ' + e.message;
+    el.style.color = 'var(--acc2)';
+  }
+}
+
+// Step 2: SMS Code
+async function tnAuthStep2() {
+  const smsCode = document.getElementById('tv_sms').value.trim();
+  const el = document.getElementById('tvStatus');
+  
+  if (!smsCode) {
+    el.textContent = '✗ Введите код из SMS';
+    el.style.color = 'var(--acc2)';
+    return;
+  }
+  
+  if (!tnAuthPending) {
+    el.textContent = '✗ Сессия истекла, начните заново';
+    el.style.color = 'var(--acc2)';
+    tnCancelSms();
+    return;
+  }
+  
+  el.textContent = '⏳ Проверка кода...';
+  el.style.color = 'var(--acc3)';
+  
+  try {
+    const params = {
+      cmd: 'authBySms',
+      params: {
+        authCodeId: tnAuthPending.authCodeId,
+        sms: smsCode,
+        rememberMe: tnAuthPending.rememberMe,
+        getAccounts: true,
+        userId: tnAuthPending.userId
+      }
+    };
+    
+    const response = await fetch(TN_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: 'q=' + encodeURIComponent(JSON.stringify(params)),
+      credentials: 'include'
+    });
+    
+    const data = await response.json();
+    console.log('Tradernet Step2 response:', data);
+    
+    // Check for error
+    if (data.code && data.code !== 0) {
+      throw new Error(data.errMsg || 'Неверный код (code: ' + data.code + ')');
+    }
+    
+    if (!data.success || !data.logged) {
+      throw new Error(data.errMsg || 'Не удалось подтвердить');
+    }
+    
+    tnSession = {
+      sid: data.SID,
+      userId: data.userId,
+      login: tnAuthPending.login,
+      real: data.real,
+      accountType: data.account_type,
+      accountTitle: data.account_title,
+      reception: data.reception_title,
+      authAt: Date.now()
+    };
+    
+    tnAuthPending = null;
+    saveTnSession();
+    
+    document.getElementById('tv_password').value = '';
+    document.getElementById('tv_sms').value = '';
+    
+    el.textContent = `✓ ${data.account_title || 'Успешно'}`;
+    el.style.color = 'var(--acc)';
+    
+    updateTnUI();
+    
+  } catch(e) {
+    console.error('Tradernet SMS auth error:', e);
+    el.textContent = '✗ ' + e.message;
+    el.style.color = 'var(--acc2)';
+  }
+}
+
+function tnCancelSms() {
+  tnAuthPending = null;
+  document.getElementById('tv_sms').value = '';
+  document.getElementById('tvStatus').textContent = '';
+  updateTnUI();
+}
+
+function tnLogout() {
+  tnSession = null;
+  tnAuthPending = null;
+  saveTnSession();
+  updateTnUI();
+  document.getElementById('tvStatus').textContent = 'Вы вышли из аккаунта';
+  document.getElementById('tvStatus').style.color = 'var(--t2)';
+}
+
+// Legacy function name for compatibility
+function tvAuth() { tnAuthStep1(); }
+function tvLogout() { tnLogout(); }
+function updateTnStatus() { updateTnUI(); }
+
+// Tradernet API call helper
+async function tnApiCall(cmd, params = {}) {
+  if (!tnSession || !tnSession.sid) {
+    throw new Error('Не авторизован в Tradernet');
+  }
+  
+  const payload = {
+    cmd: cmd,
+    params: params,
+    sid: tnSession.sid
+  };
+  
+  const response = await fetch(TN_API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'q=' + encodeURIComponent(JSON.stringify(payload)),
+    credentials: 'include'
+  });
+  
+  const data = await response.json();
+  
+  if (data.code && data.code !== 0) {
+    throw new Error(data.errMsg || 'API Error');
+  }
+  
+  return data;
+}
+
 
 // Track manually overridden fields so auto-calc doesn't overwrite them
 const manualFields = new Set();
@@ -2607,6 +2936,7 @@ function renderDash() {
         <div style="display:flex;gap:16px;margin-top:10px;flex-wrap:wrap;font-family:var(--mono);font-size:11px">
           <span>Entry: <span style="color:var(--text);font-weight:700">$${entry||'—'}</span></span>
           <span>Stop: <span class="r">$${stop||'—'}</span> <span style="color:var(--t3)">(−${stopPct||'?'}%)</span></span>
+          ${atrPct ? `<span>Target: <span class="g">$${(entry * (1 + dir * atrPct * 2 / 100)).toFixed(2)}</span> <span style="color:var(--t3)">(+${(atrPct * 2).toFixed(1)}%)</span></span>` : ''}
           ${atrPct ? `<span>ATR: <span style="color:var(--acc3)">${atrPct}%</span></span>` : ''}
           ${shares ? `<span>Shares: <span style="color:var(--text)">${shares}</span></span>` : ''}
         </div>
@@ -3726,7 +4056,7 @@ async function init() {
 
   try { document.getElementById('hdrDate').textContent = today(); } catch {}
 
-  loadSetsUI(); loadGhUI(); loadFhKeyUI(); initChecklist(); renderHolidays();
+  loadSetsUI(); loadGhUI(); loadFhKeyUI(); loadTnSession(); initChecklist(); renderHolidays();
   renderDash(); renderTrades(); renderWL(); renderQ(); renderRsiScan();
 
   // Load regime (SPY vs SMA200)
