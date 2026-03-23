@@ -1906,7 +1906,8 @@
       "CRWD_sma200": 468.5,
       "_migration_done": true,
       "BX_rsi2": 26.75,
-      "BX_close1": 110.43
+      "BX_close1": 110.43,
+      "CARR_rsi2": 50.46
     }
   }
 }
