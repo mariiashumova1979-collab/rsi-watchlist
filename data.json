@@ -1,6 +1,26 @@
 {
   "trades": [
     {
+      "id": "1774273773746",
+      "createdAt": 1774273773746,
+      "ticker": "WFC",
+      "type": "SHORT",
+      "entryDate": "2026-03-23",
+      "entry": 78.48,
+      "shares": 0,
+      "stop": "82.26",
+      "target1": "75.34",
+      "target2": "72.20",
+      "rsi2": "",
+      "atrPct": "3.21",
+      "trend": "",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "commission": 0,
+      "notes": ""
+    },
+    {
       "id": "1774273209201",
       "createdAt": 1774273226020,
       "ticker": "APO",
