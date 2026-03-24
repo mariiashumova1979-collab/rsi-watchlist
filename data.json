@@ -969,6 +969,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "MTD",
+      "sector": "Healthcare",
+      "cap": "25.18",
+      "atr": "2.97",
+      "earningsDate": "2026-04-30",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1774331942764
+    },
+    {
       "ticker": "AGJ",
       "sector": "Financial",
       "cap": "55.76",
