@@ -3047,6 +3047,7 @@ function renderDash() {
         <div style="display:flex;gap:16px;margin-top:10px;flex-wrap:wrap;font-family:var(--mono);font-size:11px">
           <span>Entry: <span style="color:var(--text);font-weight:700">$${entry||'—'}</span></span>
           <span>Stop: <span class="r">$${stop||'—'}</span> <span style="color:var(--t3)">(−${stopPct||'?'}%)</span></span>
+          ${atrPct ? `<span>0.5×ATR: <span style="color:var(--acc3)">$${(entry * (1 + dir * atrPct * 0.5 / 100)).toFixed(2)}</span> <span style="color:var(--t3)">(${dir > 0 ? '+' : ''}${(atrPct * 0.5).toFixed(1)}%)</span></span>` : ''}
           ${shares ? `<span>Shares: <span style="color:var(--text)">${shares}</span></span>` : ''}
         </div>
 
