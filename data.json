@@ -1973,6 +1973,37 @@
       "APO_close3": 111.2,
       "APO_open0": 114.48,
       "WFC_open0": 79.49
+    },
+    "2026-03-24": {
+      "APO_close2": 112,
+      "APO_close3": 111.37,
+      "APO_sma200": 133.96,
+      "WFC_close2": 77.6,
+      "WFC_close3": 76.39,
+      "WFC_sma200": 84.02,
+      "TLN_close2": 302.97,
+      "TLN_sma200": 361.27,
+      "SYF_sma200": 73.03,
+      "CARR_close2": 58.07,
+      "CARR_sma200": 62.12,
+      "ARM_sma200": 138.09,
+      "BX_close2": 110.43,
+      "BX_sma200": 152.25,
+      "LMT_sma200": 505.54,
+      "HON_sma200": 210.2,
+      "AMGN_sma200": 315.66,
+      "LLY_sma200": 890.03,
+      "IBM_sma200": 279.21,
+      "MRK_sma200": 93.88,
+      "NTAP_sma200": 109.02,
+      "CPNG_sma200": 26.85,
+      "ABBV_sma200": 214.78,
+      "AAPL_sma200": 245.85,
+      "PANW_sma200": 190.23,
+      "DKNG_sma200": 35.97,
+      "JD_sma200": 31.1,
+      "CRWD_sma200": 468.5,
+      "_migration_done": true
     }
   }
 }
