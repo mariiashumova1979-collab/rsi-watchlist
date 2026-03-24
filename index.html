@@ -2837,68 +2837,162 @@ function renderDash() {
       const stopPct  = stop && entry ? Math.abs((stop - entry) / entry * 100).toFixed(1) : null;
 
       // ══════════════════════════════════════════════════════════
-      // RSI(2) SYSTEM EXIT RULES
-      // Morning T0: Check T-1,T-2,T-3 → Entry Open(T0)
-      // Hold: T0, T1, T2, T3
-      // Exit: RSI signal OR Stop OR T4 close
+      // EXIT RULES (no ATR dependency)
+      // 1. MAX PROFIT RULE: (MaxPnL − OpenPnL) ≥ 2% → EXIT на Open
+      // 2. GAP RULE: Open ≥ Close(T-1) × 1.01 → EXIT на Open
+      // 3. RSI RULE: RSI(2) < 50 (LONG) / > 50 (SHORT) → EXIT на Open(Tn+1)
+      // 4. TIME RULE: Day = T4 → EXIT на Close(T4)
+      // 5. else → HOLD
       // ══════════════════════════════════════════════════════════
       const hints = [];
       
-      // Check RSI(2) exit condition
+      // Get current close price from scan (Close T-1 = yesterday's close)
+      const currentClose = todayScan[t.ticker + '_close1'];
+      const closeVal = currentClose !== undefined ? parseFloat(currentClose) : null;
+      
+      // Get today's open from scan
+      const currentOpen = todayScan[t.ticker + '_open0'];
+      const openVal = currentOpen !== undefined ? parseFloat(currentOpen) : null;
+      
+      // Get high from T-1 for MaxPnL calculation
+      const currentHigh = todayScan[t.ticker + '_high1'];
+      const highVal = currentHigh !== undefined ? parseFloat(currentHigh) : null;
+      
+      // Calculate PnL at Open (OpenPnL)
+      let openPnl = null;
+      if (openVal && entry) {
+        openPnl = dir * (openVal - entry) / entry * 100;
+      }
+      
+      // Calculate MaxPnL (based on High T-1 for LONG, Low T-1 for SHORT)
+      const currentLow = todayScan[t.ticker + '_low1'];
+      const lowVal = currentLow !== undefined ? parseFloat(currentLow) : null;
+      let maxPnl = null;
+      if (entry) {
+        if (t.type === 'LONG' && highVal) {
+          maxPnl = (highVal - entry) / entry * 100;
+        } else if (t.type === 'SHORT' && lowVal) {
+          maxPnl = (entry - lowVal) / entry * 100;
+        }
+      }
+      
+      // RSI(2) exit condition
       const rsiExitCondition = rsi2Val !== null && (t.type === 'LONG' ? rsi2Val > 50 : rsi2Val < 50);
       const rsiExitText = t.type === 'LONG' ? 'RSI(2) > 50' : 'RSI(2) < 50';
       
-      // T4 = exit at close
+      // Gap calculation
+      let gapPct = null;
+      let gapExitCondition = false;
+      if (openVal && closeVal) {
+        // For LONG: gap up is exit signal (Open ≥ Close × 1.01)
+        // For SHORT: gap down is exit signal (Open ≤ Close × 0.99)
+        if (t.type === 'LONG') {
+          gapExitCondition = openVal >= closeVal * 1.01;
+        } else {
+          gapExitCondition = openVal <= closeVal * 0.99;
+        }
+        gapPct = (openVal - closeVal) / closeVal * 100;
+      }
+      
+      // Target price (2% from entry)
+      const target2Pct = entry * (1 + dir * 0.02);
+      
+      // ═══════════════════════════════════════════════════════════
+      // RULE 4: TIME RULE - T4 = mandatory exit at close
+      // ═══════════════════════════════════════════════════════════
       if (tDay >= 4) {
         hints.push({
           icon: '🚨',
-          text: `T${tDay} — EXIT AT CLOSE TODAY`,
-          color: 'var(--acc2)', urgency: 3
+          text: `T${tDay} — EXIT AT CLOSE (Time Rule)`,
+          color: 'var(--acc2)', urgency: 5
         });
       }
       
-      // RSI(2) exit signal
+      // ═══════════════════════════════════════════════════════════
+      // RULE 1: MAX PROFIT RULE - (MaxPnL − OpenPnL) ≥ 2% → EXIT
+      // ═══════════════════════════════════════════════════════════
+      if (maxPnl !== null && openPnl !== null) {
+        const profitGiveBack = maxPnl - openPnl;
+        if (profitGiveBack >= 2) {
+          hints.push({
+            icon: '📉',
+            text: `PROFIT GIVEBACK: Max ${maxPnl.toFixed(1)}% − Open ${openPnl.toFixed(1)}% = ${profitGiveBack.toFixed(1)}% ≥ 2% → EXIT on Open`,
+            color: 'var(--acc2)', urgency: 4
+          });
+        }
+      }
+      
+      // ═══════════════════════════════════════════════════════════
+      // RULE 2: GAP RULE - Open ≥ Close(T-1) × 1.01 → EXIT
+      // ═══════════════════════════════════════════════════════════
+      if (gapExitCondition) {
+        hints.push({
+          icon: '📈',
+          text: `GAP ${gapPct >= 0 ? '+' : ''}${gapPct.toFixed(1)}% ≥ 1% → EXIT on Open (Gap Rule)`,
+          color: 'var(--acc)', urgency: 4
+        });
+      }
+      
+      // ═══════════════════════════════════════════════════════════
+      // RULE 3: RSI RULE - RSI(2) crosses 50 → EXIT on Open(Tn+1)
+      // ═══════════════════════════════════════════════════════════
       if (rsiExitCondition) {
         hints.push({
           icon: '✅',
-          text: `EXIT SIGNAL: ${rsiExitText} (current: ${rsi2Val.toFixed(1)}) — close position`,
-          color: 'var(--acc)', urgency: 2
+          text: `${rsiExitText} → EXIT on Open tomorrow (RSI Rule)`,
+          color: 'var(--acc)', urgency: 3
         });
       }
       
-      // Day-based hints (T0=entry, T1-T3=hold, T4 close=exit)
-      if (tDay === 0) {
-        hints.push({ icon: '🚀', text: 'T0 — Entry day. Stop must be set!', color: 'var(--acc4)', urgency: 1 });
-      } else if (tDay === 1) {
-        hints.push({ icon: '👁', text: 'T1 — Hold. Check RSI(2) for exit signal', color: 'var(--acc4)', urgency: 0 });
-      } else if (tDay === 2) {
-        hints.push({ icon: '👁', text: 'T2 — Hold. Check RSI(2) for exit signal', color: 'var(--acc4)', urgency: 0 });
-      } else if (tDay === 3) {
-        hints.push({ icon: '📅', text: 'T3 — Last hold day. Tomorrow T4 = exit at close', color: 'var(--acc3)', urgency: 1 });
+      // ═══════════════════════════════════════════════════════════
+      // RULE 5: HOLD
+      // ═══════════════════════════════════════════════════════════
+      if (!hints.some(h => h.urgency >= 3)) {
+        if (tDay === 0) {
+          hints.push({ icon: '🚀', text: 'T0 — Entry day → HOLD', color: 'var(--acc4)', urgency: 0 });
+        } else if (tDay <= 3) {
+          hints.push({ icon: '💎', text: `T${tDay} — No exit signal → HOLD`, color: 'var(--t2)', urgency: 0 });
+        }
       }
       
-      // Current RSI(2) display
-      if (rsi2Val !== null && !rsiExitCondition) {
-        const rsiColor = rsi2Val < 20 ? 'var(--acc)' : rsi2Val > 80 ? 'var(--acc2)' : 'var(--t2)';
+      // Status info
+      if (openPnl !== null) {
+        const pnlColor = openPnl >= 2 ? 'var(--acc)' : openPnl >= 0 ? 'var(--acc3)' : 'var(--acc2)';
         hints.push({
           icon: '📊',
+          text: `Open PnL: ${openPnl >= 0 ? '+' : ''}${openPnl.toFixed(1)}%${maxPnl !== null ? ` | Max: +${maxPnl.toFixed(1)}%` : ''}`,
+          color: pnlColor, urgency: 0
+        });
+      } else if (closeVal && entry) {
+        const closePnl = dir * (closeVal - entry) / entry * 100;
+        hints.push({
+          icon: '📊',
+          text: `Close(T-1) PnL: ${closePnl >= 0 ? '+' : ''}${closePnl.toFixed(1)}% — enter Open(T0) to check rules`,
+          color: 'var(--t2)', urgency: 0
+        });
+      }
+      
+      // RSI status
+      if (rsi2Val !== null && !rsiExitCondition) {
+        hints.push({
+          icon: '📉',
           text: `RSI(2) = ${rsi2Val.toFixed(1)} — waiting for ${rsiExitText}`,
-          color: rsiColor, urgency: 0
+          color: 'var(--t2)', urgency: 0
         });
       } else if (rsi2Val === null) {
         hints.push({
           icon: '❓',
-          text: `RSI(2) not entered — update in Watchlist tab`,
+          text: `Enter RSI(2) in Watchlist tab`,
           color: 'var(--acc3)', urgency: 1
         });
       }
-
-      // Stop reminder
-      if (stop) {
+      
+      // Missing data warnings
+      if (closeVal === null || openVal === null) {
         hints.push({
-          icon: '🛑',
-          text: `Stop: $${stop.toFixed(2)} (−${stopPct}%) — GTC order active`,
-          color: 'var(--t2)', urgency: 0
+          icon: '❓',
+          text: `Enter Close(T-1) and Open(T0) in Watchlist`,
+          color: 'var(--acc3)', urgency: 1
         });
       }
 
@@ -2906,38 +3000,53 @@ function renderDash() {
       hints.sort((a,b) => b.urgency - a.urgency);
 
       const urgency = hints[0]?.urgency || 0;
-      const borderCol = urgency >= 3 ? 'var(--acc2)' : urgency >= 2 ? 'rgba(126,232,162,.6)' : urgency >= 1 ? 'rgba(255,200,90,.4)' : 'var(--line)';
+      const borderCol = urgency >= 4 ? 'var(--acc)' : urgency >= 3 ? 'var(--acc2)' : urgency >= 2 ? 'rgba(126,232,162,.6)' : urgency >= 1 ? 'rgba(255,200,90,.4)' : 'var(--line)';
       
       // T-day color: T0-T2 blue (hold), T3 yellow (last hold), T4+ red (exit)
       const tColor = tDay <= 2 ? 'd1' : tDay === 3 ? 'd3' : 'd5';
       const tLabel = `T${tDay}`;
       
+      // PnL badge
+      const pnlBadge = openPnl !== null 
+        ? `<span style="font-family:var(--mono);font-size:10px;padding:2px 6px;border-radius:4px;background:${openPnl >= 2 ? 'rgba(126,232,162,.2)' : openPnl >= 0 ? 'var(--bg4)' : 'rgba(255,107,138,.15)'};color:${openPnl >= 2 ? 'var(--acc)' : openPnl >= 0 ? 'var(--text)' : 'var(--acc2)'}">${openPnl >= 0 ? '+' : ''}${openPnl.toFixed(1)}%</span>`
+        : '';
+      
       // RSI(2) badge
       const rsiBadge = rsi2Val !== null 
-        ? `<span style="font-family:var(--mono);font-size:10px;padding:2px 6px;border-radius:4px;background:${rsiExitCondition ? 'rgba(126,232,162,.2)' : 'var(--bg4)'};color:${rsiExitCondition ? 'var(--acc)' : 'var(--t2)'}">RSI(2): ${rsi2Val.toFixed(1)}${rsiExitCondition ? ' ✓' : ''}</span>`
-        : '<span style="font-family:var(--mono);font-size:10px;padding:2px 6px;border-radius:4px;background:rgba(255,200,90,.15);color:var(--acc3)">RSI(2): ?</span>';
+        ? `<span style="font-family:var(--mono);font-size:10px;padding:2px 6px;border-radius:4px;background:${rsiExitCondition ? 'rgba(126,232,162,.2)' : 'var(--bg4)'};color:${rsiExitCondition ? 'var(--acc)' : 'var(--t2)'}">RSI: ${rsi2Val.toFixed(0)}${rsiExitCondition ? ' ✓' : ''}</span>`
+        : '<span style="font-family:var(--mono);font-size:10px;padding:2px 6px;border-radius:4px;background:rgba(255,200,90,.15);color:var(--acc3)">RSI: ?</span>';
+      
+      // Gap badge
+      const gapBadge = gapPct !== null 
+        ? `<span style="font-family:var(--mono);font-size:10px;padding:2px 6px;border-radius:4px;background:${gapExitCondition ? 'rgba(126,232,162,.2)' : 'var(--bg4)'};color:${gapExitCondition ? 'var(--acc)' : 'var(--t2)'}">Gap: ${gapPct >= 0 ? '+' : ''}${gapPct.toFixed(1)}%${gapExitCondition ? ' ✓' : ''}</span>`
+        : '';
 
       return `<div class="opc" style="border-color:${borderCol};margin-bottom:12px">
         <!-- Header row -->
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
-          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
             <span style="font-size:17px;font-weight:800">${t.ticker}</span>
             <span class="b ${t.type==='LONG'?'b-long':'b-short'}">${t.type}</span>
             <span class="db ${tColor}">${tLabel}</span>
+            ${pnlBadge}
             ${rsiBadge}
-            <span style="font-family:var(--mono);font-size:9px;color:var(--t2)">${t.entryDate||''}</span>
-            ${tDay >= 4 ? '<span style="font-family:var(--mono);font-size:9px;color:var(--acc2);font-weight:700;background:rgba(255,107,138,.15);padding:2px 6px;border-radius:4px">🚨 T4 EXIT</span>' : ''}
-            ${rsiExitCondition && tDay < 4 ? '<span style="font-family:var(--mono);font-size:9px;color:var(--acc);font-weight:700;background:rgba(126,232,162,.15);padding:2px 6px;border-radius:4px">✓ RSI EXIT</span>' : ''}
+            ${gapBadge}
           </div>
-          <button class="btn btn-g btn-s" onclick="openTrade('${t.id}')">✏ UPDATE</button>
+          <button class="btn btn-g btn-s" onclick="openTrade('${t.id}')">✏</button>
+        </div>
+        
+        <!-- Status badges -->
+        <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+          ${urgency >= 4 ? `<span style="font-family:var(--mono);font-size:9px;color:#fff;font-weight:700;background:var(--acc);padding:3px 8px;border-radius:4px">🎯 EXIT SIGNAL</span>` : ''}
+          ${urgency === 3 ? `<span style="font-family:var(--mono);font-size:9px;color:var(--acc);font-weight:700;background:rgba(126,232,162,.15);padding:3px 8px;border-radius:4px">✓ RSI EXIT</span>` : ''}
+          ${tDay >= 4 ? '<span style="font-family:var(--mono);font-size:9px;color:var(--acc2);font-weight:700;background:rgba(255,107,138,.15);padding:3px 8px;border-radius:4px">🚨 T4 EXIT</span>' : ''}
+          <span style="font-family:var(--mono);font-size:9px;color:var(--t2)">${t.entryDate||''}</span>
         </div>
 
         <!-- Price row -->
         <div style="display:flex;gap:16px;margin-top:10px;flex-wrap:wrap;font-family:var(--mono);font-size:11px">
           <span>Entry: <span style="color:var(--text);font-weight:700">$${entry||'—'}</span></span>
           <span>Stop: <span class="r">$${stop||'—'}</span> <span style="color:var(--t3)">(−${stopPct||'?'}%)</span></span>
-          ${atrPct ? `<span>Target: <span class="g">$${(entry * (1 + dir * atrPct * 2 / 100)).toFixed(2)}</span> <span style="color:var(--t3)">(+${(atrPct * 2).toFixed(1)}%)</span></span>` : ''}
-          ${atrPct ? `<span>ATR: <span style="color:var(--acc3)">${atrPct}%</span></span>` : ''}
           ${shares ? `<span>Shares: <span style="color:var(--text)">${shares}</span></span>` : ''}
         </div>
 
