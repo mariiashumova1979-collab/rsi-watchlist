@@ -969,6 +969,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "ZM",
+      "sector": "Technology",
+      "cap": "22.97",
+      "atr": "3.96",
+      "earningsDate": "2026-05-25",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1774340280479
+    },
+    {
       "ticker": "MTD",
       "sector": "Healthcare",
       "cap": "25.18",
