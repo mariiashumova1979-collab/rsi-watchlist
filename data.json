@@ -2023,7 +2023,8 @@
       "SCHW_rsi2": 92.56,
       "SCHW_close1": 95.3,
       "SCHW_low1": 93.99,
-      "SCHW_high1": 96.45
+      "SCHW_high1": 96.45,
+      "SCHW_sma200": 95.38
     }
   }
 }
