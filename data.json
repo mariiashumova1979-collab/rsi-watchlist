@@ -2120,7 +2120,8 @@
       "ALLY_low1": 38.83,
       "ALLY_high1": 39.85,
       "SF_rsi2": 91.5,
-      "SF_close1": 72.18
+      "SF_close1": 72.18,
+      "SF_low1": 71.62
     }
   }
 }
