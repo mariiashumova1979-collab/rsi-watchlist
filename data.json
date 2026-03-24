@@ -969,6 +969,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "AGJ",
+      "sector": "Financial",
+      "cap": "55.76",
+      "atr": "3.18",
+      "earningsDate": "2026-04-23",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1774331773748
+    },
+    {
       "ticker": "SCHW",
       "sector": "Financial",
       "cap": "166.99",
