@@ -22,7 +22,7 @@
     },
     {
       "id": "1774273209201",
-      "createdAt": 1774273226020,
+      "createdAt": 1774372297509,
       "ticker": "APO",
       "type": "SHORT",
       "entryDate": "2026-03-23",
@@ -34,11 +34,14 @@
       "rsi2": "",
       "atrPct": "4.57",
       "trend": "",
-      "status": "OPEN",
-      "exitPrice": 0,
-      "exitReason": "",
-      "commission": 0,
-      "notes": ""
+      "status": "CLOSED",
+      "exitPrice": 108.63,
+      "exitReason": "RSI",
+      "commission": 4,
+      "notes": "",
+      "pnlNet": 38.9,
+      "pnlPct": 3.14,
+      "result": "WIN"
     },
     {
       "id": "1774018024281",
