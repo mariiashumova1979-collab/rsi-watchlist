@@ -969,6 +969,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "SF",
+      "sector": "Financial",
+      "cap": "11.17",
+      "atr": "3.45",
+      "earningsDate": "2026-04-29",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1774340757231
+    },
+    {
       "ticker": "ALLY",
       "sector": "Financial",
       "cap": "12.12",
