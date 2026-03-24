@@ -969,6 +969,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "FNH",
+      "sector": "Financial",
+      "cap": "10.83",
+      "atr": "2.94",
+      "earningsDate": "2026-04-22",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1774340942181
+    },
+    {
       "ticker": "SF",
       "sector": "Financial",
       "cap": "11.17",
