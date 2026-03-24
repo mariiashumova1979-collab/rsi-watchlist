@@ -969,6 +969,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "ALLY",
+      "sector": "Financial",
+      "cap": "12.12",
+      "atr": "3.47",
+      "earningsDate": "2026-04-17",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1774340627250
+    },
+    {
       "ticker": "FCNCA",
       "sector": "Financial",
       "cap": "21.9",
