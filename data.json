@@ -2229,7 +2229,8 @@
       "BAC_rsi2": 95.89,
       "BAC_close1": 48.14,
       "BAC_low1": 47.02,
-      "BAC_high1": 48.46
+      "BAC_high1": 48.46,
+      "BAC_sma200": 50.71
     }
   }
 }
