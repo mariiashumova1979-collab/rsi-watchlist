@@ -2786,6 +2786,35 @@ function renderDash() {
   const awNet = wins.length ? (wins.reduce((a,t)=>a+(t.pnlNet||0),0)/wins.length) : 0;
   const alNet = loss.length ? (loss.reduce((a,t)=>a+(t.pnlNet||0),0)/loss.length) : 0;
 
+  // ═══════════════════════════════════════════════════════════
+  // POSITION SIZING: NewSizeToday = (C - O) / (H - N)
+  // C = весь капитал
+  // O = уже открытый капитал
+  // H = max hold в днях
+  // N = количество занятых возрастных слоёв (T0, T1, T2, T3, T4)
+  // ═══════════════════════════════════════════════════════════
+  const C = parseFloat(cache.settings?.portfolio) || 0;
+  const H = parseInt(cache.settings?.maxDays) || 4;
+  
+  // O = сумма (entry × shares) по открытым позициям
+  const O = op.reduce((sum, t) => {
+    const entry = parseFloat(t.entry) || 0;
+    const shares = parseInt(t.shares) || 0;
+    return sum + (entry * shares);
+  }, 0);
+  
+  // N = количество уникальных T-слоёв
+  const occupiedLayers = new Set();
+  op.forEach(t => {
+    const tDay = getTradingDayNumber(t.entryDate);
+    occupiedLayers.add(tDay);
+  });
+  const N = occupiedLayers.size;
+  
+  // NewSizeToday
+  const availableSlots = H - N;
+  const newSizeToday = availableSlots > 0 ? (C - O) / availableSlots : 0;
+
   // Holiday warning for dashboard
   let holidayAlert = '';
   const todayStr = today();
@@ -2805,11 +2834,16 @@ function renderDash() {
     </div>`;
   }
 
+  // Position sizing info
+  const layersInfo = [...occupiedLayers].sort((a,b)=>a-b).map(d=>`T${d}`).join(', ') || '—';
+  const slotsLeft = Math.max(0, H - N);
+  
   document.getElementById('statsGrid').innerHTML = holidayAlert + `
     <div class="stat" style="--sc:var(--acc4)"><div class="stat-l">Всего сделок</div><div class="stat-v">${tr.length}</div><div class="stat-s">${op.length} открытых</div></div>
     <div class="stat" style="--sc:var(--acc)"><div class="stat-l">% выигрышей</div><div class="stat-v g">${wr}%</div><div class="stat-s">${wins.length}W / ${loss.length}L</div></div>
     <div class="stat" style="--sc:var(--acc3)"><div class="stat-l">Средний выигрыш</div><div class="stat-v g">+${aw}%</div><div class="stat-s">$${awNet>=0?'+':''}${awNet.toFixed(0)} · Убыток: ${al}% ($${alNet.toFixed(0)})</div></div>
-    <div class="stat" style="--sc:${parseFloat(tot)>=0?'var(--acc)':'var(--acc2)'}"><div class="stat-l">Суммарный P&L</div><div class="stat-v ${parseFloat(tot)>=0?'g':'r'}">${parseFloat(tot)>0?'+':''}${tot}%</div><div class="stat-s">${totNet>=0?'+':''}$${totNet.toFixed(0)} по закрытым</div></div>`;
+    <div class="stat" style="--sc:${parseFloat(tot)>=0?'var(--acc)':'var(--acc2)'}"><div class="stat-l">Суммарный P&L</div><div class="stat-v ${parseFloat(tot)>=0?'g':'r'}">${parseFloat(tot)>0?'+':''}${tot}%</div><div class="stat-s">${totNet>=0?'+':''}$${totNet.toFixed(0)} по закрытым</div></div>
+    <div class="stat" style="--sc:var(--acc4);grid-column:span 2"><div class="stat-l">📊 Размер новой позиции</div><div class="stat-v" style="color:${slotsLeft > 0 ? 'var(--acc)' : 'var(--acc2)'}">$${newSizeToday.toLocaleString('en-US', {maximumFractionDigits:0})}</div><div class="stat-s">Слоты: ${layersInfo} · Свободно: ${slotsLeft}/${H} · Открыто: $${O.toLocaleString('en-US', {maximumFractionDigits:0})} из $${C.toLocaleString('en-US', {maximumFractionDigits:0})}</div></div>`;
 
   const opEl = document.getElementById('openPos');
   if (!op.length) {
@@ -3047,7 +3081,7 @@ function renderDash() {
         <div style="display:flex;gap:16px;margin-top:10px;flex-wrap:wrap;font-family:var(--mono);font-size:11px">
           <span>Entry: <span style="color:var(--text);font-weight:700">$${entry||'—'}</span></span>
           <span>Stop: <span class="r">$${stop||'—'}</span> <span style="color:var(--t3)">(−${stopPct||'?'}%)</span></span>
-          ${atrPct ? `<span>0.5×ATR: <span style="color:var(--acc3)">$${(entry * (1 + dir * atrPct * 0.5 / 100)).toFixed(2)}</span> <span style="color:var(--t3)">(${dir > 0 ? '+' : ''}${(atrPct * 0.5).toFixed(1)}%)</span></span>` : ''}
+          ${atrPct && rsi2Val !== null && rsi2Val < 50 ? `<span>0.5×ATR: <span style="color:var(--acc3)">$${(entry * (1 + dir * atrPct * 0.5 / 100)).toFixed(2)}</span> <span style="color:var(--t3)">(${dir > 0 ? '+' : ''}${(atrPct * 0.5).toFixed(1)}%)</span></span>` : ''}
           ${shares ? `<span>Shares: <span style="color:var(--text)">${shares}</span></span>` : ''}
         </div>
 
