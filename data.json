@@ -972,6 +972,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "TMO",
+      "sector": "Healthcare",
+      "cap": "182.14",
+      "atr": "2.96",
+      "earningsDate": "2026-04-29",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1774423066406
+    },
+    {
       "ticker": "BAC",
       "sector": "Financial",
       "cap": "345.49",
