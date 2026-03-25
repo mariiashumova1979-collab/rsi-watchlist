@@ -1,6 +1,26 @@
 {
   "trades": [
     {
+      "id": "1774445401874",
+      "createdAt": 1774445401874,
+      "ticker": "TMO",
+      "type": "SHORT",
+      "entryDate": "2026-03-25",
+      "entry": 495.39,
+      "shares": 2,
+      "stop": "517.39",
+      "target1": "475.57",
+      "target2": "455.76",
+      "rsi2": "",
+      "atrPct": "2.96",
+      "trend": "",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "commission": 0,
+      "notes": ""
+    },
+    {
       "id": "1774445018697",
       "createdAt": 1774445018697,
       "ticker": "BAC",
