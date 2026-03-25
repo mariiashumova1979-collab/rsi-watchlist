@@ -2193,7 +2193,8 @@
       "JD_sma200": 31.1,
       "CRWD_sma200": 468.5,
       "_migration_done": true,
-      "CARR_rsi2": 72.74
+      "CARR_rsi2": 72.74,
+      "CARR_close1": 58.58
     }
   }
 }
