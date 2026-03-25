@@ -972,6 +972,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "BAC",
+      "sector": "Financial",
+      "cap": "345.49",
+      "atr": "2.81",
+      "earningsDate": "2026-04-15",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1774422922909
+    },
+    {
       "ticker": "JPM",
       "sector": "Financial",
       "cap": "788.61",
