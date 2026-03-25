@@ -972,6 +972,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "JPM",
+      "sector": "Financial",
+      "cap": "788.61",
+      "atr": "2.53",
+      "earningsDate": "2026-04-14",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1774422753284
+    },
+    {
       "ticker": "FNH",
       "sector": "Financial",
       "cap": "10.83",
