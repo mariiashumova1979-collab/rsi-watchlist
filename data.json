@@ -2210,7 +2210,8 @@
       "WFC_rsi2": 98.9,
       "WFC_close1": 79.61,
       "JPM_rsi2": 91.99,
-      "JPM_close1": 292.4
+      "JPM_close1": 292.4,
+      "JPM_low1": 285.37
     }
   }
 }
