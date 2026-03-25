@@ -2225,7 +2225,8 @@
       "JPM_high1": 295.48,
       "JPM_sma200": 301.57,
       "JPM_close2": 289.91,
-      "JPM_close3": 286.56
+      "JPM_close3": 286.56,
+      "BAC_rsi2": 95.89
     }
   }
 }
