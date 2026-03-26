@@ -125,7 +125,7 @@
     },
     {
       "id": "1774018024281",
-      "createdAt": 1774018024281,
+      "createdAt": 1774533138855,
       "ticker": "CARR",
       "type": "SHORT",
       "entryDate": "2026-03-20",
@@ -137,11 +137,14 @@
       "rsi2": "",
       "atrPct": "3.36",
       "trend": "",
-      "status": "OPEN",
-      "exitPrice": 0,
+      "status": "CLOSED",
+      "exitPrice": 59.236,
       "exitReason": "",
-      "commission": 0,
-      "notes": ""
+      "commission": 5,
+      "notes": "",
+      "pnlNet": -2.52,
+      "pnlPct": -0.21,
+      "result": "LOSS"
     },
     {
       "id": "1774017920430",
