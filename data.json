@@ -2359,7 +2359,8 @@
       "TMO_close1": 490.77,
       "TMO_low1": 482.96,
       "TMO_high1": 499.95,
-      "JPM_rsi2": 96.5
+      "JPM_rsi2": 96.5,
+      "JPM_close1": 295.42
     }
   }
 }
