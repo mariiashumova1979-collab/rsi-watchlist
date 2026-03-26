@@ -1012,6 +1012,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "PDD",
+      "sector": "Consumer Defensive",
+      "cap": "142.85",
+      "atr": "3.28",
+      "earningsDate": "2026-04-29",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1774504530445
+    },
+    {
       "ticker": "TMO",
       "sector": "Healthcare",
       "cap": "182.14",
