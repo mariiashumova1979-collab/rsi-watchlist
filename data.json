@@ -2396,7 +2396,8 @@
       "MTD_close3": 1239.07,
       "_migration_done": true,
       "TEL_rsi2": 93.04,
-      "TEL_close1": 210.02
+      "TEL_close1": 210.02,
+      "TEL_low1": 206.28
     }
   }
 }
