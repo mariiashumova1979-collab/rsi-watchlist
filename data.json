@@ -1012,6 +1012,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "COF",
+      "sector": "Financial",
+      "cap": "115.2",
+      "atr": "3.53",
+      "earningsDate": "2026-04-21",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1774504666637
+    },
+    {
       "ticker": "PDD",
       "sector": "Consumer Defensive",
       "cap": "142.85",
