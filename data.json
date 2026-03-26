@@ -1,6 +1,26 @@
 {
   "trades": [
     {
+      "id": "1774533117207",
+      "createdAt": 1774533117207,
+      "ticker": "CI",
+      "type": "SHORT",
+      "entryDate": "2026-03-26",
+      "entry": 270.35,
+      "shares": 6,
+      "stop": "281.18",
+      "target1": "259.54",
+      "target2": "248.72",
+      "rsi2": "",
+      "atrPct": "2.67",
+      "trend": "",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "commission": 0,
+      "notes": ""
+    },
+    {
       "id": "1774532993220",
       "createdAt": 1774532993220,
       "ticker": "TEL",
