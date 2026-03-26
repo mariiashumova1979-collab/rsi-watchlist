@@ -2344,7 +2344,8 @@
       "CRWD_sma200": 468.5,
       "_migration_done": true,
       "CARR_rsi2": 89.16,
-      "CARR_close1": 59.25
+      "CARR_close1": 59.25,
+      "CARR_low1": 58.43
     }
   }
 }
