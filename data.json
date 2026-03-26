@@ -1,6 +1,26 @@
 {
   "trades": [
     {
+      "id": "1774532993220",
+      "createdAt": 1774532993220,
+      "ticker": "TEL",
+      "type": "SHORT",
+      "entryDate": "2026-03-26",
+      "entry": 208.43,
+      "shares": 7,
+      "stop": "220.65",
+      "target1": "200.09",
+      "target2": "191.76",
+      "rsi2": "",
+      "atrPct": "3.91",
+      "trend": "",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "commission": 0,
+      "notes": ""
+    },
+    {
       "id": "1774445401874",
       "createdAt": 1774445401874,
       "ticker": "TMO",
@@ -1362,7 +1382,8 @@
     "stopPct": 4,
     "target1": 4,
     "target2": 8,
-    "maxDays": 5
+    "maxDays": 5,
+    "finnhubKey": "d65uv7pr01qiish15ra0d65uv7pr01qiish15rag"
   },
   "regime": {
     "spyTrend": "BELOW",
