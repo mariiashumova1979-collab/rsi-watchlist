@@ -1055,6 +1055,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "LPLA",
+      "sector": "Financial",
+      "cap": "24.32",
+      "atr": "4.04",
+      "earningsDate": "2026-04-23",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1774595924806
+    },
+    {
       "ticker": "PRU",
       "sector": "Financial",
       "cap": "33.15",
