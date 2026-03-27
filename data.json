@@ -2625,7 +2625,8 @@
       "STE_low1": 221.99,
       "STE_high1": 226.26,
       "HUM_rsi2": 95.09,
-      "HUM_close1": 175.14
+      "HUM_close1": 175.14,
+      "HUM_low1": 172.51
     }
   }
 }
