@@ -1055,6 +1055,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "HUM",
+      "sector": "Healthcare",
+      "cap": "21.03",
+      "atr": "3.8",
+      "earningsDate": "2026-04-29",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1774599539932
+    },
+    {
       "ticker": "STE",
       "sector": "Healthcare",
       "cap": "21.91",
