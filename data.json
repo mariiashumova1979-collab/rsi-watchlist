@@ -2574,7 +2574,8 @@
       "PRU_low1": 94.42,
       "PRU_high1": 96.48,
       "MTD_rsi2": 98,
-      "MTD_close1": 1270
+      "MTD_close1": 1270,
+      "MTD_low1": 1255.69
     }
   }
 }
