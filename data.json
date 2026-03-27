@@ -2517,7 +2517,8 @@
       "WFC_high1": 80.3,
       "BAC_rsi2": 50.18,
       "BAC_close1": 48.24,
-      "BAC_low1": 48.03
+      "BAC_low1": 48.03,
+      "BAC_high1": 48.87
     }
   }
 }
