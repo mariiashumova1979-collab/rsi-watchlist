@@ -2594,7 +2594,8 @@
       "LPLA_sma200": 353.12,
       "LPLA_close2": 300.68,
       "LPLA_close3": 300.17,
-      "FCNCA_rsi2": 99.04
+      "FCNCA_rsi2": 99.04,
+      "FCNCA_close1": 1896.78
     }
   }
 }
