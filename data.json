@@ -2596,7 +2596,8 @@
       "LPLA_close3": 300.17,
       "FCNCA_rsi2": 99.04,
       "FCNCA_close1": 1896.78,
-      "FCNCA_low1": 1858.55
+      "FCNCA_low1": 1858.55,
+      "FCNCA_high1": 1902.82
     }
   }
 }
