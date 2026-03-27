@@ -2572,7 +2572,8 @@
       "PRU_rsi2": 93.31,
       "PRU_close1": 95.27,
       "PRU_low1": 94.42,
-      "PRU_high1": 96.48
+      "PRU_high1": 96.48,
+      "MTD_rsi2": 98
     }
   }
 }
