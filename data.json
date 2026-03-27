@@ -2541,7 +2541,8 @@
       "CI_close1": 272.08,
       "CI_low1": 269.85,
       "CI_high1": 273.11,
-      "ORLY_rsi2": 91.75
+      "ORLY_rsi2": 91.75,
+      "ORLY_close1": 92.27
     }
   }
 }
