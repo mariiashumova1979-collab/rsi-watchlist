@@ -2590,7 +2590,8 @@
       "LPLA_rsi2": 95.16,
       "LPLA_close1": 303.72,
       "LPLA_low1": 298.68,
-      "LPLA_high1": 305.83
+      "LPLA_high1": 305.83,
+      "LPLA_sma200": 353.12
     }
   }
 }
