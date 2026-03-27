@@ -1471,8 +1471,7 @@
     "stopPct": 4,
     "target1": 4,
     "target2": 8,
-    "maxDays": 5,
-    "finnhubKey": "d65uv7pr01qiish15ra0d65uv7pr01qiish15rag"
+    "maxDays": 4
   },
   "regime": {
     "spyTrend": "BELOW",
