@@ -1055,6 +1055,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "PRU",
+      "sector": "Financial",
+      "cap": "33.15",
+      "atr": "2.6",
+      "earningsDate": "2026-05-05",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1774595743251
+    },
+    {
       "ticker": "MDLZ",
       "sector": "Consumer Cyclical",
       "cap": "73.81",
