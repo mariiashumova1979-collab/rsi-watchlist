@@ -2523,7 +2523,8 @@
       "TMO_close1": 488.85,
       "TMO_low1": 485.82,
       "TMO_high1": 496.26,
-      "TEL_rsi2": 35.6
+      "TEL_rsi2": 35.6,
+      "TEL_close1": 203.2
     }
   }
 }
