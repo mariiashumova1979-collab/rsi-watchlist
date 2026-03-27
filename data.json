@@ -22,7 +22,7 @@
     },
     {
       "id": "1774532993220",
-      "createdAt": 1774532993220,
+      "createdAt": 1774629238444,
       "ticker": "TEL",
       "type": "SHORT",
       "entryDate": "2026-03-26",
@@ -34,11 +34,14 @@
       "rsi2": "",
       "atrPct": "3.91",
       "trend": "",
-      "status": "OPEN",
-      "exitPrice": 0,
-      "exitReason": "",
-      "commission": 0,
-      "notes": ""
+      "status": "CLOSED",
+      "exitPrice": 203.81,
+      "exitReason": "RSI",
+      "commission": 4,
+      "notes": "",
+      "pnlNet": 28.34,
+      "pnlPct": 1.94,
+      "result": "WIN"
     },
     {
       "id": "1774445401874",
