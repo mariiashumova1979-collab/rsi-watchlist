@@ -2586,7 +2586,8 @@
       "MTD_rsi2": 98,
       "MTD_close1": 1270,
       "MTD_low1": 1255.69,
-      "MTD_high1": 1284.61
+      "MTD_high1": 1284.61,
+      "LPLA_rsi2": 95.16
     }
   }
 }
