@@ -1055,6 +1055,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "STE",
+      "sector": "Healthcare",
+      "cap": "21.91",
+      "atr": "2.71",
+      "earningsDate": "2026-05-20",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1774599431617
+    },
+    {
       "ticker": "LPLA",
       "sector": "Financial",
       "cap": "24.32",
