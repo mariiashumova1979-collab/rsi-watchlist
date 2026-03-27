@@ -2610,7 +2610,8 @@
       "FCNCA_high1": 1902.82,
       "FCNCA_sma200": 1949.85,
       "FCNCA_close2": 1874.89,
-      "STE_rsi2": 95.04
+      "STE_rsi2": 95.04,
+      "STE_close1": 223.43
     }
   }
 }
