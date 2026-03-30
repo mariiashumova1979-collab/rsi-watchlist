@@ -65,7 +65,7 @@
     },
     {
       "id": "1774445018697",
-      "createdAt": 1774445018697,
+      "createdAt": 1774885028819,
       "ticker": "BAC",
       "type": "SHORT",
       "entryDate": "2026-03-25",
@@ -77,11 +77,14 @@
       "rsi2": "",
       "atrPct": "2.81",
       "trend": "",
-      "status": "OPEN",
-      "exitPrice": 0,
-      "exitReason": "",
-      "commission": 0,
-      "notes": ""
+      "status": "CLOSED",
+      "exitPrice": 47.498,
+      "exitReason": "RSI",
+      "commission": 6,
+      "notes": "",
+      "pnlNet": 24.56,
+      "pnlPct": 1.87,
+      "result": "WIN"
     },
     {
       "id": "1774273773746",
