@@ -2746,7 +2746,8 @@
       "CRWD_sma200": 468.5,
       "_migration_done": true,
       "CI_rsi2": 19.84,
-      "CI_close1": 261.96
+      "CI_close1": 261.96,
+      "CI_low1": 259.82
     }
   }
 }
