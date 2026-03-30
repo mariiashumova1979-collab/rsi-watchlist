@@ -2,7 +2,7 @@
   "trades": [
     {
       "id": "1774533117207",
-      "createdAt": 1774533117207,
+      "createdAt": 1774897615546,
       "ticker": "CI",
       "type": "SHORT",
       "entryDate": "2026-03-26",
@@ -14,11 +14,14 @@
       "rsi2": "",
       "atrPct": "2.67",
       "trend": "",
-      "status": "OPEN",
-      "exitPrice": 0,
-      "exitReason": "",
-      "commission": 0,
-      "notes": ""
+      "status": "CLOSED",
+      "exitPrice": 259.88,
+      "exitReason": "RSI",
+      "commission": 4,
+      "notes": "",
+      "pnlNet": 58.82,
+      "pnlPct": 3.63,
+      "result": "WIN"
     },
     {
       "id": "1774532993220",
