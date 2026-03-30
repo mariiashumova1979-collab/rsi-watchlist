@@ -1061,6 +1061,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "KHC",
+      "sector": "Consumer Defensive",
+      "cap": "26.09",
+      "atr": "2.83",
+      "earningsDate": "2026-05-06",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1774858017501
+    },
+    {
       "ticker": "HUM",
       "sector": "Healthcare",
       "cap": "21.03",
