@@ -45,7 +45,7 @@
     },
     {
       "id": "1774445401874",
-      "createdAt": 1774445401874,
+      "createdAt": 1774885069586,
       "ticker": "TMO",
       "type": "SHORT",
       "entryDate": "2026-03-25",
@@ -57,11 +57,14 @@
       "rsi2": "",
       "atrPct": "2.96",
       "trend": "",
-      "status": "OPEN",
-      "exitPrice": 0,
-      "exitReason": "",
-      "commission": 0,
-      "notes": ""
+      "status": "CLOSED",
+      "exitPrice": 481.32,
+      "exitReason": "RSI",
+      "commission": 4,
+      "notes": "",
+      "pnlNet": 24.14,
+      "pnlPct": 2.44,
+      "result": "WIN"
     },
     {
       "id": "1774445018697",
