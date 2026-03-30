@@ -2752,7 +2752,8 @@
       "TMO_rsi2": 11.33,
       "TMO_close1": 473.36,
       "TMO_low1": 471.83,
-      "TMO_high1": 490.75
+      "TMO_high1": 490.75,
+      "BAC_rsi2": 14.6
     }
   }
 }
