@@ -2787,14 +2787,15 @@ function renderDash() {
   const alNet = loss.length ? (loss.reduce((a,t)=>a+(t.pnlNet||0),0)/loss.length) : 0;
 
   // ═══════════════════════════════════════════════════════════
-  // POSITION SIZING: NewSizeToday = (C - O) / (H - N)
+  // POSITION SIZING: NewSizeToday = (C - O) / availableSlots
   // C = весь капитал
   // O = уже открытый капитал
-  // H = max hold в днях
-  // N = количество занятых возрастных слоёв (T0, T1, T2, T3, T4)
+  // H = max slots (10 по умолчанию)
+  // N = количество открытых позиций (кроме T4, которые закроются сегодня)
+  // availableSlots = H - N + T4_count (T4 освободятся сегодня)
   // ═══════════════════════════════════════════════════════════
   const C = parseFloat(cache.settings?.portfolio) || 0;
-  const H = parseInt(cache.settings?.maxDays) || 4;
+  const H = 10; // Фиксированно 10 слотов
   
   // O = сумма (entry × shares) по открытым позициям
   const O = op.reduce((sum, t) => {
@@ -2803,17 +2804,23 @@ function renderDash() {
     return sum + (entry * shares);
   }, 0);
   
-  // N = количество уникальных T-слоёв
-  const occupiedLayers = new Set();
+  // Считаем позиции и T4
+  let occupiedSlots = 0;
+  let t4Count = 0;
   op.forEach(t => {
     const tDay = getTradingDayNumber(t.entryDate);
-    occupiedLayers.add(tDay);
+    if (tDay >= 4) {
+      t4Count++; // T4 закроется сегодня — освободит слот
+    } else {
+      occupiedSlots++;
+    }
   });
-  const N = occupiedLayers.size;
+  
+  // Свободные слоты = всего - занятые (T4 не считаем как занятые)
+  const freeSlots = H - occupiedSlots;
   
   // NewSizeToday
-  const availableSlots = H - N;
-  const newSizeToday = availableSlots > 0 ? (C - O) / availableSlots : 0;
+  const newSizeToday = freeSlots > 0 ? (C - O) / freeSlots : 0;
 
   // Holiday warning for dashboard
   let holidayAlert = '';
@@ -2835,15 +2842,12 @@ function renderDash() {
   }
 
   // Position sizing info
-  const layersInfo = [...occupiedLayers].sort((a,b)=>a-b).map(d=>`T${d}`).join(', ') || '—';
-  const slotsLeft = Math.max(0, H - N);
-  
   document.getElementById('statsGrid').innerHTML = holidayAlert + `
     <div class="stat" style="--sc:var(--acc4)"><div class="stat-l">Всего сделок</div><div class="stat-v">${tr.length}</div><div class="stat-s">${op.length} открытых</div></div>
     <div class="stat" style="--sc:var(--acc)"><div class="stat-l">% выигрышей</div><div class="stat-v g">${wr}%</div><div class="stat-s">${wins.length}W / ${loss.length}L</div></div>
     <div class="stat" style="--sc:var(--acc3)"><div class="stat-l">Средний выигрыш</div><div class="stat-v g">+${aw}%</div><div class="stat-s">$${awNet>=0?'+':''}${awNet.toFixed(0)} · Убыток: ${al}% ($${alNet.toFixed(0)})</div></div>
     <div class="stat" style="--sc:${parseFloat(tot)>=0?'var(--acc)':'var(--acc2)'}"><div class="stat-l">Суммарный P&L</div><div class="stat-v ${parseFloat(tot)>=0?'g':'r'}">${parseFloat(tot)>0?'+':''}${tot}%</div><div class="stat-s">${totNet>=0?'+':''}$${totNet.toFixed(0)} по закрытым</div></div>
-    <div class="stat" style="--sc:var(--acc4);grid-column:span 2"><div class="stat-l">📊 Размер новой позиции</div><div class="stat-v" style="color:${slotsLeft > 0 ? 'var(--acc)' : 'var(--acc2)'}">$${newSizeToday.toLocaleString('en-US', {maximumFractionDigits:0})}</div><div class="stat-s">Слоты: ${layersInfo} · Свободно: ${slotsLeft}/${H} · Открыто: $${O.toLocaleString('en-US', {maximumFractionDigits:0})} из $${C.toLocaleString('en-US', {maximumFractionDigits:0})}</div></div>`;
+    <div class="stat" style="--sc:var(--acc4);grid-column:span 2"><div class="stat-l">📊 Размер новой позиции</div><div class="stat-v" style="color:${freeSlots > 0 ? 'var(--acc)' : 'var(--acc2)'}">$${newSizeToday.toLocaleString('en-US', {maximumFractionDigits:0})}</div><div class="stat-s">Слоты: ${occupiedSlots}/${H}${t4Count ? ` (+${t4Count} T4 закроются)` : ''} · Свободно: ${freeSlots} · Лимит: $${O.toLocaleString('en-US', {maximumFractionDigits:0})}/$${C.toLocaleString('en-US', {maximumFractionDigits:0})}</div></div>`;
 
   const opEl = document.getElementById('openPos');
   if (!op.length) {
