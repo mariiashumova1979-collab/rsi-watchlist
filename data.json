@@ -2827,7 +2827,8 @@
       "_migration_done": true,
       "KHC_rsi2": 93.74,
       "MDLZ_rsi2": 93.74,
-      "MDLZ_close1": 58.25
+      "MDLZ_close1": 58.25,
+      "MDLZ_low1": 58.21
     }
   }
 }
