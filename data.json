@@ -1070,6 +1070,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "WY",
+      "sector": "Financial",
+      "cap": "17.2",
+      "atr": "2.67",
+      "earningsDate": "2026-04-30",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1774932138011
+    },
+    {
       "ticker": "FOX",
       "sector": "Consumer Cyclical",
       "cap": "24.04",
