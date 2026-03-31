@@ -1070,6 +1070,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "CHTR",
+      "sector": "Consumer Cyclical",
+      "cap": "31.4",
+      "atr": "3.57",
+      "earningsDate": "2026-04-24",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1774931575601
+    },
+    {
       "ticker": "KHC",
       "sector": "Consumer Defensive",
       "cap": "26.09",
