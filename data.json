@@ -2859,7 +2859,8 @@
       "KHC_high1": 22.45,
       "KHC_sma200": 25.27,
       "KHC_close3": 21.56,
-      "FOX_rsi2": 95.65
+      "FOX_rsi2": 95.65,
+      "FOX_close1": 53.78
     }
   }
 }
