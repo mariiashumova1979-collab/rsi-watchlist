@@ -1,6 +1,26 @@
 {
   "trades": [
     {
+      "id": "1774967155968",
+      "createdAt": 1774967155968,
+      "ticker": "KHC",
+      "type": "SHORT",
+      "entryDate": "2026-03-31",
+      "entry": 22.46,
+      "shares": 55,
+      "stop": "23.41",
+      "target1": "21.56",
+      "target2": "20.66",
+      "rsi2": "",
+      "atrPct": "2.83",
+      "trend": "",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "commission": 0,
+      "notes": ""
+    },
+    {
       "id": "1774533117207",
       "createdAt": 1774897615546,
       "ticker": "CI",
