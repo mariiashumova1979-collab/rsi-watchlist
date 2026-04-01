@@ -2787,15 +2787,16 @@ function renderDash() {
   const alNet = loss.length ? (loss.reduce((a,t)=>a+(t.pnlNet||0),0)/loss.length) : 0;
 
   // ═══════════════════════════════════════════════════════════
-  // POSITION SIZING: NewSizeToday = (C - O) / availableSlots
-  // C = весь капитал
-  // O = уже открытый капитал
-  // H = max slots (10 по умолчанию)
-  // N = количество открытых позиций (кроме T4, которые закроются сегодня)
-  // availableSlots = H - N + T4_count (T4 освободятся сегодня)
+  // POSITION SIZING
+  // 4 слота (T0-T3) × 2 позиции = 8 максимум
+  // Единица слота = C / 8
+  // freeCapacity = C - O + (свободные слоты в T1,T2,T3) × единица
+  // NewSizeToday = freeCapacity / 8
   // ═══════════════════════════════════════════════════════════
   const C = parseFloat(cache.settings?.portfolio) || 0;
-  const H = 10; // Фиксированно 10 слотов
+  const maxPerSlot = 2;
+  const maxPositions = 8; // 4 слота × 2
+  const slotUnit = C / maxPositions; // $1250 при $10k
   
   // O = сумма (entry × shares) по открытым позициям
   const O = op.reduce((sum, t) => {
@@ -2804,23 +2805,30 @@ function renderDash() {
     return sum + (entry * shares);
   }, 0);
   
-  // Считаем позиции и T4
-  let occupiedSlots = 0;
-  let t4Count = 0;
+  // Считаем занятость по слотам T0-T3
+  const slotOccupancy = { 0: 0, 1: 0, 2: 0, 3: 0 };
   op.forEach(t => {
     const tDay = getTradingDayNumber(t.entryDate);
-    if (tDay >= 4) {
-      t4Count++; // T4 закроется сегодня — освободит слот
-    } else {
-      occupiedSlots++;
+    if (tDay >= 0 && tDay <= 3) {
+      slotOccupancy[tDay]++;
     }
+    // T4+ не считаем — закроются сегодня
   });
   
-  // Свободные слоты = всего - занятые (T4 не считаем как занятые)
-  const freeSlots = H - occupiedSlots;
+  const totalOccupied = slotOccupancy[0] + slotOccupancy[1] + slotOccupancy[2] + slotOccupancy[3];
   
-  // NewSizeToday
-  const newSizeToday = freeSlots > 0 ? (C - O) / freeSlots : 0;
+  // Свободные места в слотах T0, T1, T2, T3
+  const freeInT0 = maxPerSlot - slotOccupancy[0];
+  const freeInT1 = maxPerSlot - slotOccupancy[1];
+  const freeInT2 = maxPerSlot - slotOccupancy[2];
+  const freeInT3 = maxPerSlot - slotOccupancy[3];
+  const totalFreeSlots = freeInT0 + freeInT1 + freeInT2 + freeInT3;
+  
+  // freeCapacity = C - O + свободные_слоты × единица
+  const freeCapacity = C - O + totalFreeSlots * slotUnit;
+  
+  // NewSizeToday = freeCapacity / 8
+  const newSizeToday = freeCapacity / maxPositions;
 
   // Holiday warning for dashboard
   let holidayAlert = '';
@@ -2842,12 +2850,14 @@ function renderDash() {
   }
 
   // Position sizing info
+  const slotInfo = `T0:${slotOccupancy[0]} T1:${slotOccupancy[1]} T2:${slotOccupancy[2]} T3:${slotOccupancy[3]}`;
+  
   document.getElementById('statsGrid').innerHTML = holidayAlert + `
     <div class="stat" style="--sc:var(--acc4)"><div class="stat-l">Всего сделок</div><div class="stat-v">${tr.length}</div><div class="stat-s">${op.length} открытых</div></div>
     <div class="stat" style="--sc:var(--acc)"><div class="stat-l">% выигрышей</div><div class="stat-v g">${wr}%</div><div class="stat-s">${wins.length}W / ${loss.length}L</div></div>
     <div class="stat" style="--sc:var(--acc3)"><div class="stat-l">Средний выигрыш</div><div class="stat-v g">+${aw}%</div><div class="stat-s">$${awNet>=0?'+':''}${awNet.toFixed(0)} · Убыток: ${al}% ($${alNet.toFixed(0)})</div></div>
     <div class="stat" style="--sc:${parseFloat(tot)>=0?'var(--acc)':'var(--acc2)'}"><div class="stat-l">Суммарный P&L</div><div class="stat-v ${parseFloat(tot)>=0?'g':'r'}">${parseFloat(tot)>0?'+':''}${tot}%</div><div class="stat-s">${totNet>=0?'+':''}$${totNet.toFixed(0)} по закрытым</div></div>
-    <div class="stat" style="--sc:var(--acc4);grid-column:span 2"><div class="stat-l">📊 Размер новой позиции</div><div class="stat-v" style="color:${freeSlots > 0 ? 'var(--acc)' : 'var(--acc2)'}">$${newSizeToday.toLocaleString('en-US', {maximumFractionDigits:0})}</div><div class="stat-s">Слоты: ${occupiedSlots}/${H}${t4Count ? ` (+${t4Count} T4 закроются)` : ''} · Свободно: ${freeSlots} · Лимит: $${O.toLocaleString('en-US', {maximumFractionDigits:0})}/$${C.toLocaleString('en-US', {maximumFractionDigits:0})}</div></div>`;
+    <div class="stat" style="--sc:var(--acc4);grid-column:span 2"><div class="stat-l">📊 Размер новой позиции</div><div class="stat-v" style="color:${freeInT0 > 0 ? 'var(--acc)' : 'var(--acc2)'}">$${newSizeToday.toLocaleString('en-US', {maximumFractionDigits:0})}</div><div class="stat-s">${slotInfo} · Занято: ${totalOccupied}/8 · Свободно: ${totalFreeSlots} · $${O.toLocaleString('en-US', {maximumFractionDigits:0})}/$${C.toLocaleString('en-US', {maximumFractionDigits:0})}</div></div>`;
 
   const opEl = document.getElementById('openPos');
   if (!op.length) {
@@ -3058,6 +3068,11 @@ function renderDash() {
       const gapBadge = gapPct !== null 
         ? `<span style="font-family:var(--mono);font-size:10px;padding:2px 6px;border-radius:4px;background:${gapExitCondition ? 'rgba(126,232,162,.2)' : 'var(--bg4)'};color:${gapExitCondition ? 'var(--acc)' : 'var(--t2)'}">Gap: ${gapPct >= 0 ? '+' : ''}${gapPct.toFixed(1)}%${gapExitCondition ? ' ✓' : ''}</span>`
         : '';
+      
+      // ATR badge
+      const atrBadge = atrPct 
+        ? `<span style="font-family:var(--mono);font-size:10px;padding:2px 6px;border-radius:4px;background:var(--bg4);color:var(--acc3)">ATR: ${atrPct}%</span>`
+        : '';
 
       return `<div class="opc" style="border-color:${borderCol};margin-bottom:12px">
         <!-- Header row -->
@@ -3066,6 +3081,7 @@ function renderDash() {
             <span style="font-size:17px;font-weight:800">${t.ticker}</span>
             <span class="b ${t.type==='LONG'?'b-long':'b-short'}">${t.type}</span>
             <span class="db ${tColor}">${tLabel}</span>
+            ${atrBadge}
             ${pnlBadge}
             ${rsiBadge}
             ${gapBadge}
