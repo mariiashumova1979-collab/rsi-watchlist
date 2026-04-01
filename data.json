@@ -1090,6 +1090,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "NFLX",
+      "sector": "Technology",
+      "cap": "405.96",
+      "atr": "2.91",
+      "earningsDate": "2026-04-16",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1775023782680
+    },
+    {
       "ticker": "WY",
       "sector": "Financial",
       "cap": "17.2",
