@@ -2980,7 +2980,8 @@
       "BX_close2": 111.6,
       "BX_close3": 108.07,
       "MELI_rsi2": 91.69,
-      "MELI_close1": 1729.02
+      "MELI_close1": 1729.02,
+      "MELI_low1": 1631.02
     }
   }
 }
