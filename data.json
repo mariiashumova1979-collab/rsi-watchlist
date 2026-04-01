@@ -2983,7 +2983,8 @@
       "MELI_close1": 1729.02,
       "MELI_low1": 1631.02,
       "MELI_high1": 1741.64,
-      "MELI_sma200": 2165.05
+      "MELI_sma200": 2165.05,
+      "MELI_close2": 1619.2
     }
   }
 }
