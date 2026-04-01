@@ -2964,7 +2964,8 @@
       "NFLX_close2": 92.97,
       "NFLX_close3": 93.43,
       "BX_rsi2": 91.85,
-      "BX_close1": 114.99
+      "BX_close1": 114.99,
+      "BX_low1": 111.89
     }
   }
 }
