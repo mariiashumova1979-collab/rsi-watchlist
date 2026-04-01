@@ -2957,7 +2957,8 @@
       "KHC_rsi2": 97.77,
       "KHC_close1": 22.49,
       "NFLX_rsi2": 91.52,
-      "NFLX_close1": 96.15
+      "NFLX_close1": 96.15,
+      "NFLX_low1": 93.03
     }
   }
 }
