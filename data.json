@@ -1533,14 +1533,15 @@
   "quarterly": {},
   "checklist": {},
   "settings": {
-    "portfolio": 10200,
+    "portfolio": 10000,
     "riskPct": 1.5,
     "maxPos": 0,
     "maxPosPct": 40,
     "stopPct": 4,
     "target1": 4,
     "target2": 8,
-    "maxDays": 4
+    "maxDays": 4,
+    "finnhubKey": "d65uv7pr01qiish15ra0d65uv7pr01qiish15rag"
   },
   "regime": {
     "spyTrend": "BELOW",
