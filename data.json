@@ -1,6 +1,26 @@
 {
   "trades": [
     {
+      "id": "1775043673736",
+      "createdAt": 1775043673736,
+      "ticker": "MELI",
+      "type": "SHORT",
+      "entryDate": "2026-04-01",
+      "entry": 1743.99,
+      "shares": 1,
+      "stop": "1844.44",
+      "target1": "1674.23",
+      "target2": "1604.47",
+      "rsi2": "",
+      "atrPct": "3.84",
+      "trend": "",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "commission": 0,
+      "notes": ""
+    },
+    {
       "id": "1774967155968",
       "createdAt": 1774967155968,
       "ticker": "KHC",
@@ -1560,7 +1580,8 @@
     "stopPct": 4,
     "target1": 4,
     "target2": 8,
-    "maxDays": 4
+    "maxDays": 4,
+    "finnhubKey": "d65uv7pr01qiish15ra0d65uv7pr01qiish15rag"
   },
   "regime": {
     "spyTrend": "BELOW",
