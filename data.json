@@ -1090,6 +1090,26 @@
   ],
   "watchlist": [
     {
+      "ticker": "MELI",
+      "sector": "Consumer Cyclical",
+      "cap": "87.66",
+      "atr": "3.84",
+      "earningsDate": "2026-05-07",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1775024089406
+    },
+    {
+      "ticker": "NFLX",
+      "sector": "Technology",
+      "cap": "405.96",
+      "atr": "2.91",
+      "earningsDate": "2026-04-16",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1775023782680
+    },
+    {
       "ticker": "WY",
       "sector": "Financial",
       "cap": "17.2",
@@ -1533,15 +1553,14 @@
   "quarterly": {},
   "checklist": {},
   "settings": {
-    "portfolio": 10000,
+    "portfolio": 11900,
     "riskPct": 1.5,
     "maxPos": 0,
     "maxPosPct": 40,
     "stopPct": 4,
     "target1": 4,
     "target2": 8,
-    "maxDays": 4,
-    "finnhubKey": "d65uv7pr01qiish15ra0d65uv7pr01qiish15rag"
+    "maxDays": 4
   },
   "regime": {
     "spyTrend": "BELOW",
@@ -2928,7 +2947,7 @@
       "SYF_sma200": 73.11,
       "CARR_sma200": 61.99,
       "ARM_sma200": 138.09,
-      "BX_sma200": 152.25,
+      "BX_sma200": 150.94,
       "LMT_sma200": 505.54,
       "HON_sma200": 210.2,
       "AMGN_sma200": 315.66,
@@ -2943,7 +2962,29 @@
       "DKNG_sma200": 35.97,
       "JD_sma200": 31.1,
       "CRWD_sma200": 468.5,
-      "_migration_done": true
+      "_migration_done": true,
+      "KHC_rsi2": 97.77,
+      "KHC_close1": 22.49,
+      "NFLX_rsi2": 91.52,
+      "NFLX_close1": 96.15,
+      "NFLX_low1": 93.03,
+      "NFLX_high1": 96.26,
+      "NFLX_sma200": 107.38,
+      "NFLX_close2": 92.97,
+      "NFLX_close3": 93.43,
+      "BX_rsi2": 91.85,
+      "BX_close1": 114.99,
+      "BX_low1": 111.89,
+      "BX_high1": 115.64,
+      "BX_close2": 111.6,
+      "BX_close3": 108.07,
+      "MELI_rsi2": 91.69,
+      "MELI_close1": 1729.02,
+      "MELI_low1": 1631.02,
+      "MELI_high1": 1741.64,
+      "MELI_sma200": 2165.05,
+      "MELI_close2": 1619.2,
+      "MELI_close3": 1599.52
     }
   }
 }
