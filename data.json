@@ -2959,7 +2959,8 @@
       "NFLX_rsi2": 91.52,
       "NFLX_close1": 96.15,
       "NFLX_low1": 93.03,
-      "NFLX_high1": 96.26
+      "NFLX_high1": 96.26,
+      "NFLX_sma200": 107.38
     }
   }
 }
