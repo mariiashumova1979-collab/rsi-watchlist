@@ -1,6 +1,26 @@
 {
   "trades": [
     {
+      "id": "1775045009413",
+      "createdAt": 1775045009413,
+      "ticker": "BX",
+      "type": "SHORT",
+      "entryDate": "2026-04-01",
+      "entry": 116.49,
+      "shares": 14,
+      "stop": "123.48",
+      "target1": "111.83",
+      "target2": "107.17",
+      "rsi2": "",
+      "atrPct": "4.82",
+      "trend": "",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "commission": 0,
+      "notes": ""
+    },
+    {
       "id": "1775043673736",
       "createdAt": 1775043673736,
       "ticker": "MELI",
