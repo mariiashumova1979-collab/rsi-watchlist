@@ -1130,6 +1130,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "BA",
+      "sector": "Technology",
+      "cap": "162.82",
+      "atr": "3.49",
+      "earningsDate": "2026-04-29",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1775104262725
+    },
+    {
       "ticker": "MELI",
       "sector": "Consumer Cyclical",
       "cap": "87.66",
