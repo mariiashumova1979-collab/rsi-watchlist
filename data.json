@@ -1130,6 +1130,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "PSA",
+      "sector": "Financial",
+      "cap": "47.54",
+      "atr": "2.79",
+      "earningsDate": "2026-05-05",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1775104476674
+    },
+    {
       "ticker": "SHW",
       "sector": "Basic Materials",
       "cap": "80.7",
