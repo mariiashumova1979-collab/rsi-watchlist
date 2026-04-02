@@ -1,6 +1,26 @@
 {
   "trades": [
     {
+      "id": "1775141155223",
+      "createdAt": 1775141155223,
+      "ticker": "ROK",
+      "type": "SHORT",
+      "entryDate": "2026-04-02",
+      "entry": 366.4,
+      "shares": 5,
+      "stop": "383.82",
+      "target1": "351.74",
+      "target2": "337.09",
+      "rsi2": "",
+      "atrPct": "3.17",
+      "trend": "",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "commission": 0,
+      "notes": ""
+    },
+    {
       "id": "1775137270705",
       "createdAt": 1775137270705,
       "ticker": "PSA",
