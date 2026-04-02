@@ -1130,6 +1130,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "SHW",
+      "sector": "Basic Materials",
+      "cap": "80.7",
+      "atr": "2.83",
+      "earningsDate": "2026-04-28",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1775104359411
+    },
+    {
       "ticker": "BA",
       "sector": "Technology",
       "cap": "162.82",
