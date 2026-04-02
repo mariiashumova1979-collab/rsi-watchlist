@@ -62,7 +62,7 @@
     },
     {
       "id": "1774967155968",
-      "createdAt": 1774967155968,
+      "createdAt": 1775137394973,
       "ticker": "KHC",
       "type": "SHORT",
       "entryDate": "2026-03-31",
@@ -74,11 +74,14 @@
       "rsi2": "",
       "atrPct": "2.83",
       "trend": "",
-      "status": "OPEN",
-      "exitPrice": 0,
-      "exitReason": "",
-      "commission": 0,
-      "notes": ""
+      "status": "CLOSED",
+      "exitPrice": 22.448,
+      "exitReason": "RSI",
+      "commission": 6,
+      "notes": "",
+      "pnlNet": -5.34,
+      "pnlPct": -0.43,
+      "result": "LOSS"
     },
     {
       "id": "1774533117207",
