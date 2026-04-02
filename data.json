@@ -1130,6 +1130,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "ROK",
+      "sector": "Industrials",
+      "cap": "41.45",
+      "atr": "3.17",
+      "earningsDate": "2026-05-05",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1775104741504
+    },
+    {
       "ticker": "PSA",
       "sector": "Financial",
       "cap": "47.54",
