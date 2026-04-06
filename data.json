@@ -3333,7 +3333,8 @@
       "JD_sma200": 31.1,
       "CRWD_sma200": 468.5,
       "_migration_done": true,
-      "BX_rsi2": 43.6
+      "BX_rsi2": 43.6,
+      "BX_close1": 113.05
     }
   }
 }
