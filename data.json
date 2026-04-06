@@ -1,46 +1,6 @@
 {
   "trades": [
     {
-      "id": "1775480025860",
-      "createdAt": 1775480025860,
-      "ticker": "IBM",
-      "type": "SHORT",
-      "entryDate": "2026-04-06",
-      "entry": 247.99,
-      "shares": 5,
-      "stop": "260.64",
-      "target1": "238.07",
-      "target2": "228.15",
-      "rsi2": "",
-      "atrPct": "3.4",
-      "trend": "",
-      "status": "OPEN",
-      "exitPrice": 0,
-      "exitReason": "",
-      "commission": 0,
-      "notes": ""
-    },
-    {
-      "id": "1775478192763",
-      "createdAt": 1775478192763,
-      "ticker": "UNH",
-      "type": "SHORT",
-      "entryDate": "2026-04-06",
-      "entry": 277.49,
-      "shares": 4,
-      "stop": "289.48",
-      "target1": "266.39",
-      "target2": "255.29",
-      "rsi2": "",
-      "atrPct": "2.88",
-      "trend": "",
-      "status": "OPEN",
-      "exitPrice": 0,
-      "exitReason": "",
-      "commission": 0,
-      "notes": ""
-    },
-    {
       "id": "1775141155223",
       "createdAt": 1775141155223,
       "ticker": "ROK",
@@ -1213,16 +1173,6 @@
   ],
   "watchlist": [
     {
-      "ticker": "UNH",
-      "sector": "Healthcare",
-      "cap": "251.66",
-      "atr": "2.88",
-      "earningsDate": "2026-04-21",
-      "cooldownDate": "",
-      "notes": "",
-      "addedAt": 1775456089833
-    },
-    {
       "ticker": "ROK",
       "sector": "Industrials",
       "cap": "41.45",
@@ -1563,6 +1513,16 @@
       "addedAt": 1773990832924
     },
     {
+      "ticker": "ARM",
+      "sector": "Technology",
+      "cap": "136.32",
+      "atr": "4.57",
+      "earningsDate": "2026-05-06",
+      "cooldownDate": "2026-04-19",
+      "notes": "",
+      "addedAt": 1773912660462
+    },
+    {
       "ticker": "BX",
       "sector": "Financial",
       "cap": "138.76",
@@ -1651,6 +1611,16 @@
       "cooldownDate": "",
       "notes": "",
       "addedAt": 1773731118350
+    },
+    {
+      "ticker": "ABBV",
+      "sector": "Healthcare",
+      "cap": "388.43",
+      "atr": "2.73",
+      "earningsDate": "2026-04-24",
+      "cooldownDate": "2026-04-18",
+      "notes": "",
+      "addedAt": 1773645504509
     },
     {
       "ticker": "AAPL",
@@ -3327,7 +3297,7 @@
       "ROK_sma200": 369.25,
       "PSA_sma200": 284.83,
       "MELI_sma200": 2165.05,
-      "NFLX_sma200": 107.13,
+      "NFLX_sma200": 107.38,
       "KHC_sma200": 25.27,
       "HUM_sma200": 244.68,
       "LPLA_sma200": 353.12,
@@ -3352,7 +3322,7 @@
       "HON_sma200": 210.2,
       "AMGN_sma200": 315.66,
       "LLY_sma200": 890.03,
-      "IBM_sma200": 277.57,
+      "IBM_sma200": 279.21,
       "MRK_sma200": 93.88,
       "NTAP_sma200": 109.02,
       "CPNG_sma200": 26.85,
@@ -3362,38 +3332,7 @@
       "DKNG_sma200": 35.97,
       "JD_sma200": 31.1,
       "CRWD_sma200": 468.5,
-      "_migration_done": true,
-      "BX_rsi2": 43.6,
-      "BX_close1": 113.05,
-      "BX_low1": 108.8,
-      "BX_high1": 114.98,
-      "MELI_rsi2": 73.06,
-      "MELI_close1": 1715.52,
-      "MELI_low1": 1684.09,
-      "MELI_high1": 1737.99,
-      "PSA_rsi2": 96.55,
-      "PSA_close1": 280.35,
-      "ROK_rsi2": 62.06,
-      "ROK_close1": 365.02,
-      "NFLX_rsi2": 91.27,
-      "NFLX_close1": 98.66,
-      "NFLX_low1": 95.17,
-      "NFLX_high1": 98.71,
-      "NFLX_close2": 95.55,
-      "NFLX_close3": 96.15,
-      "UNH_rsi2": 91.42,
-      "UNH_close1": 277.26,
-      "UNH_low1": 271.53,
-      "UNH_high1": 279.04,
-      "UNH_sma200": 312.56,
-      "UNH_close2": 273.98,
-      "UNH_close3": 270.59,
-      "IBM_rsi2": 94.28,
-      "IBM_close1": 248.16,
-      "IBM_low1": 241.49,
-      "IBM_high1": 248.21,
-      "IBM_close2": 243.14,
-      "IBM_close3": 242.43
+      "_migration_done": true
     }
   }
 }
