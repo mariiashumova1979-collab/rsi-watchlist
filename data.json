@@ -1,6 +1,26 @@
 {
   "trades": [
     {
+      "id": "1775478192763",
+      "createdAt": 1775478192763,
+      "ticker": "UNH",
+      "type": "SHORT",
+      "entryDate": "2026-04-06",
+      "entry": 277.49,
+      "shares": 4,
+      "stop": "289.48",
+      "target1": "266.39",
+      "target2": "255.29",
+      "rsi2": "",
+      "atrPct": "2.88",
+      "trend": "",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "commission": 0,
+      "notes": ""
+    },
+    {
       "id": "1775141155223",
       "createdAt": 1775141155223,
       "ticker": "ROK",
