@@ -1,6 +1,26 @@
 {
   "trades": [
     {
+      "id": "1775507300369",
+      "createdAt": 1775507300369,
+      "ticker": "IBM",
+      "type": "SHORT",
+      "entryDate": "2026-04-06",
+      "entry": 247.99,
+      "shares": 5,
+      "stop": "260.64",
+      "target1": "238.07",
+      "target2": "228.15",
+      "rsi2": "",
+      "atrPct": "3.4",
+      "trend": "",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "commission": 0,
+      "notes": ""
+    },
+    {
       "id": "1775507268194",
       "createdAt": 1775507268194,
       "ticker": "UNH",
