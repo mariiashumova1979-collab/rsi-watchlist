@@ -1173,6 +1173,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "UNH",
+      "sector": "Healthcare",
+      "cap": "251.66",
+      "atr": "2.88",
+      "earningsDate": "2026-04-21",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1775456089833
+    },
+    {
       "ticker": "ROK",
       "sector": "Industrials",
       "cap": "41.45",
