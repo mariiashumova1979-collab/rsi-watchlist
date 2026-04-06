@@ -82,7 +82,7 @@
     },
     {
       "id": "1775045009413",
-      "createdAt": 1775502309519,
+      "createdAt": 1775507428871,
       "ticker": "BX",
       "type": "SHORT",
       "entryDate": "2026-04-01",
@@ -96,7 +96,7 @@
       "trend": "",
       "status": "CLOSED",
       "exitPrice": 111.62,
-      "exitReason": "",
+      "exitReason": "RSI",
       "commission": 5,
       "notes": "",
       "pnlNet": 63.18,
