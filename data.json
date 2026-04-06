@@ -3335,7 +3335,8 @@
       "_migration_done": true,
       "BX_rsi2": 43.6,
       "BX_close1": 113.05,
-      "BX_low1": 108.8
+      "BX_low1": 108.8,
+      "BX_high1": 114.98
     }
   }
 }
