@@ -3486,7 +3486,8 @@
       "WFC_rsi2": 94.87,
       "WFC_close1": 81.85,
       "WFC_low1": 80.76,
-      "WFC_high1": 81.87
+      "WFC_high1": 81.87,
+      "WFC_close2": 80.6
     }
   }
 }
