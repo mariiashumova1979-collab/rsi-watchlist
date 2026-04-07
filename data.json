@@ -3460,7 +3460,8 @@
       "PSA_rsi2": 96.94,
       "PSA_close1": 280.89,
       "PSA_low1": 278.99,
-      "PSA_high1": 282.09
+      "PSA_high1": 282.09,
+      "PSA_close2": 280.35
     }
   }
 }
