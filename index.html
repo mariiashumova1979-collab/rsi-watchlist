@@ -3998,12 +3998,16 @@ function renderDashSignals() {
     if (isSignal) {
       if (badGap && mid1 != null) {
         const gapStr = (gapPct != null) ? `${gapPct>=0?'+':''}${gapPct.toFixed(1)}%` : '';
-        entryRec = `<span style="color:var(--acc2)">⚠️ Bad gap ${gapStr} → Entry at Mid: $${mid1.toFixed(2)} only</span>`;
+        entryRec = `<span style="color:var(--acc2)">⚠️ Bad gap ${gapStr} → Entry at Mid: <b>$${mid1.toFixed(2)}</b> only</span>`;
       } else if (entryPrice != null) {
-        entryRec = `<span style="color:var(--acc)">✓ Entry at Open: $${entryPrice.toFixed(2)}</span>`;
+        entryRec = `<span style="color:var(--acc)">✓ Entry at Open: <b>$${entryPrice.toFixed(2)}</b></span>`;
+      } else if (mid1 != null) {
+        entryRec = `<span style="color:var(--acc3)">📍 Mid entry: <b>$${mid1.toFixed(2)}</b> — add Open(T0) for gap check</span>`;
       } else {
-        entryRec = `<span>Add Open(T0) to see gap check</span>`;
+        entryRec = `<span>Add Low/High T-1 to calculate entry</span>`;
       }
+    } else if (mid1 != null) {
+      entryRec = `<span style="color:var(--t2);font-size:9px">Mid: $${mid1.toFixed(2)}</span>`;
     }
 
     return `<div class="sig-card ${cls}">
@@ -4011,6 +4015,7 @@ function renderDashSignals() {
         <span style="font-size:17px;font-weight:800">${w.ticker}</span>
         <span style="font-family:var(--mono);font-size:9px;color:var(--t2)">${w.sector||''}</span>
         <span style="font-family:var(--mono);font-size:9px;color:var(--acc3)">ATR ${w.atr||'?'}%</span>
+        ${mid1 != null ? `<span style="font-family:var(--mono);font-size:10px;color:var(--text);font-weight:700">Mid: $${mid1.toFixed(2)}</span>` : ''}
       </div>
       <div style="font-family:var(--mono);font-size:11px;font-weight:700;${isSignal?'color:var(--text)':isClvFail?'color:var(--acc3)':'color:var(--t2)'}">${label}</div>
       <div style="display:flex;gap:14px;font-family:var(--mono);font-size:10px;color:var(--t2);flex-wrap:wrap">
@@ -4020,7 +4025,7 @@ function renderDashSignals() {
       </div>
       ${isSignal ? `<div style="font-family:var(--mono);font-size:10px;margin-top:6px">${entryRec}</div>` : ''}
       ${isSignal ? `<div style="font-family:var(--mono);font-size:9px;color:var(--t3);margin-top:4px">Stop ${stopPct}% | Exit: RSI ${isLong?'>50':'<50'} or T4</div>` : ''}
-      ${isSignal ? `<button class="btn btn-p btn-s" style="margin-top:8px" onclick="openTrade();setTimeout(()=>{document.getElementById('te_tk').value='${w.ticker}';document.getElementById('te_atr').value='${w.atr||''}';document.getElementById('te_en').value='${entryPrice||''}';tradeAutoCalc();},50)">+ NEW TRADE</button>` : ''}
+      ${isSignal ? `<button class="btn btn-p btn-s" style="margin-top:8px" onclick="openTrade();setTimeout(()=>{document.getElementById('te_tk').value='${w.ticker}';document.getElementById('te_atr').value='${w.atr||''}';document.getElementById('te_en').value='${entryPrice || mid1 || ''}';tradeAutoCalc();},50)">+ NEW TRADE</button>` : ''}
     </div>`;
   }).join('');
 }
