@@ -3447,7 +3447,8 @@
       "JD_sma200": 31.1,
       "CRWD_sma200": 468.5,
       "_migration_done": true,
-      "IBM_rsi2": 67.74
+      "IBM_rsi2": 67.74,
+      "IBM_close1": 246.74
     }
   }
 }
