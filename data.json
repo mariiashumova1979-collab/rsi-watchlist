@@ -22,7 +22,7 @@
     },
     {
       "id": "1775507268194",
-      "createdAt": 1775507268194,
+      "createdAt": 1775564226807,
       "ticker": "UNH",
       "type": "SHORT",
       "entryDate": "2026-04-06",
@@ -34,11 +34,14 @@
       "rsi2": "",
       "atrPct": "2.79",
       "trend": "",
-      "status": "OPEN",
-      "exitPrice": 0,
-      "exitReason": "",
-      "commission": 0,
-      "notes": ""
+      "status": "CLOSED",
+      "exitPrice": 301.01,
+      "exitReason": "STOP",
+      "commission": 4,
+      "notes": "",
+      "pnlNet": -98.08,
+      "pnlPct": -8.84,
+      "result": "LOSS"
     },
     {
       "id": "1775141155223",
