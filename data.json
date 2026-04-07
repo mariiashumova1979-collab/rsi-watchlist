@@ -3478,7 +3478,8 @@
       "NFLX_low1": 97.97,
       "NFLX_high1": 102.69,
       "BAC_rsi2": 95.76,
-      "BAC_close1": 50.06
+      "BAC_close1": 50.06,
+      "BAC_low1": 49.25
     }
   }
 }
