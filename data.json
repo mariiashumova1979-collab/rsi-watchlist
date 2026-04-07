@@ -3449,7 +3449,8 @@
       "_migration_done": true,
       "IBM_rsi2": 67.74,
       "IBM_close1": 246.74,
-      "IBM_low1": 244.74
+      "IBM_low1": 244.74,
+      "IBM_high1": 248.9
     }
   }
 }
