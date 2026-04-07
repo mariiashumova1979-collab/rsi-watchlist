@@ -1,6 +1,26 @@
 {
   "trades": [
     {
+      "id": "1775567296839",
+      "createdAt": 1775567296839,
+      "ticker": "BAC",
+      "type": "SHORT",
+      "entryDate": "2026-04-07",
+      "entry": 49.69,
+      "shares": 22,
+      "stop": "51.78",
+      "target1": "47.70",
+      "target2": "45.71",
+      "rsi2": "",
+      "atrPct": "2.81",
+      "trend": "",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "commission": 0,
+      "notes": ""
+    },
+    {
       "id": "1775507300369",
       "createdAt": 1775507300369,
       "ticker": "IBM",
