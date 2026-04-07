@@ -1,6 +1,26 @@
 {
   "trades": [
     {
+      "id": "1775567411507",
+      "createdAt": 1775567411507,
+      "ticker": "WFC",
+      "type": "SHORT",
+      "entryDate": "2026-04-07",
+      "entry": 81.31,
+      "shares": 13,
+      "stop": "85.23",
+      "target1": "78.06",
+      "target2": "74.81",
+      "rsi2": "",
+      "atrPct": "3.21",
+      "trend": "",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "commission": 0,
+      "notes": ""
+    },
+    {
       "id": "1775567296839",
       "createdAt": 1775567296839,
       "ticker": "BAC",
