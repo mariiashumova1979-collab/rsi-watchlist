@@ -1259,6 +1259,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "WAT",
+      "sector": "Healthcare",
+      "cap": "30.15",
+      "atr": "3.17",
+      "earningsDate": "2026-05-12",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1775642708165
+    },
+    {
       "ticker": "ELV",
       "sector": "Healthcare",
       "cap": "68.82",
