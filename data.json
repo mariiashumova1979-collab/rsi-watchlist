@@ -3666,7 +3666,8 @@
       "ICE_rsi2": 95.43,
       "ICE_close1": 166.3,
       "ICE_low1": 165.98,
-      "ICE_high1": 167.78
+      "ICE_high1": 167.78,
+      "ELV_rsi2": 98.43
     }
   }
 }
