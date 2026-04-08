@@ -1,6 +1,26 @@
 {
   "trades": [
     {
+      "id": "1775673132922",
+      "createdAt": 1775673132922,
+      "ticker": "CHTR",
+      "type": "SHORT",
+      "entryDate": "2026-04-08",
+      "entry": 221.36,
+      "shares": 4,
+      "stop": "233.21",
+      "target1": "212.51",
+      "target2": "203.65",
+      "rsi2": "",
+      "atrPct": "3.57",
+      "trend": "",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "commission": 0,
+      "notes": ""
+    },
+    {
       "id": "1775567411507",
       "createdAt": 1775567411507,
       "ticker": "WFC",
