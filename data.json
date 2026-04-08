@@ -1259,6 +1259,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "AVB",
+      "sector": "Financial",
+      "cap": "23.5",
+      "atr": "2.01",
+      "earningsDate": "2026-04-27",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1775646630374
+    },
+    {
       "ticker": "WAT",
       "sector": "Healthcare",
       "cap": "30.15",
