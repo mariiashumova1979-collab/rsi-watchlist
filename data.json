@@ -22,7 +22,7 @@
     },
     {
       "id": "1775567411507",
-      "createdAt": 1775567411507,
+      "createdAt": 1775680000359,
       "ticker": "WFC",
       "type": "SHORT",
       "entryDate": "2026-04-07",
@@ -34,11 +34,14 @@
       "rsi2": "",
       "atrPct": "3.21",
       "trend": "",
-      "status": "OPEN",
-      "exitPrice": 0,
-      "exitReason": "",
-      "commission": 0,
-      "notes": ""
+      "status": "CLOSED",
+      "exitPrice": 85.236,
+      "exitReason": "STOP",
+      "commission": 5,
+      "notes": "",
+      "pnlNet": -56.04,
+      "pnlPct": -5.3,
+      "result": "LOSS"
     },
     {
       "id": "1775567296839",
