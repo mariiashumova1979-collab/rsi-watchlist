@@ -3689,7 +3689,8 @@
       "CHTR_sma200": 253.08,
       "CHTR_close3": 219.79,
       "WAT_rsi2": 94.97,
-      "WAT_close1": 307.38
+      "WAT_close1": 307.38,
+      "WAT_low1": 299.56
     }
   }
 }
