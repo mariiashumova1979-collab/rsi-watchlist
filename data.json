@@ -3621,7 +3621,8 @@
       "NVDA_close2": 177.64,
       "NVDA_close3": 177.39,
       "PANW_rsi2": 91.95,
-      "PANW_close1": 169.87
+      "PANW_close1": 169.87,
+      "PANW_low1": 160.25
     }
   }
 }
