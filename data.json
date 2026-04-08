@@ -1259,6 +1259,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "CHKP",
+      "sector": "Technology",
+      "cap": "15.47",
+      "atr": "3.17",
+      "earningsDate": "2026-04-29",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1775647867967
+    },
+    {
       "ticker": "CDW",
       "sector": "Technology",
       "cap": "15.96",
