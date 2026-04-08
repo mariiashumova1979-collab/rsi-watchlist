@@ -1259,6 +1259,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "ICE",
+      "sector": "Financial",
+      "cap": "94.44",
+      "atr": "2.24",
+      "earningsDate": "2026-04-30",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1775629778067
+    },
+    {
       "ticker": "NVDA",
       "sector": "Technology",
       "cap": "433333",
