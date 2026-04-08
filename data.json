@@ -3696,7 +3696,8 @@
       "WAT_close2": 304.09,
       "WAT_close3": 304.24,
       "HUM_rsi2": 98.95,
-      "HUM_close1": 197.15
+      "HUM_close1": 197.15,
+      "HUM_low1": 190.05
     }
   }
 }
