@@ -1259,6 +1259,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "CNC",
+      "sector": "Healthcare",
+      "cap": "17.86",
+      "atr": "4.28",
+      "earningsDate": "2026-04-28",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1775647358505
+    },
+    {
       "ticker": "ZBH",
       "sector": "Healthcare",
       "cap": "17.88",
