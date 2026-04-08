@@ -3591,7 +3591,8 @@
       "_migration_done": true,
       "MELI_rsi2": 88.02,
       "MELI_close1": 1742.3,
-      "MELI_low1": 1691.91
+      "MELI_low1": 1691.91,
+      "MELI_high1": 1744.91
     }
   }
 }
