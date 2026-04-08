@@ -3671,7 +3671,8 @@
       "ELV_close1": 311.83,
       "ELV_low1": 309.01,
       "ELV_high1": 318.98,
-      "CHTR_rsi2": 93.88
+      "CHTR_rsi2": 93.88,
+      "CHTR_close1": 223.8
     }
   }
 }
