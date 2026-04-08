@@ -3598,7 +3598,8 @@
       "ROK_rsi2": 81.59,
       "ROK_close1": 369.37,
       "IBM_rsi2": 40.75,
-      "IBM_close1": 245.07
+      "IBM_close1": 245.07,
+      "IBM_low1": 241.1
     }
   }
 }
