@@ -3644,7 +3644,8 @@
       "CRWD_close2": 398.61,
       "CRWD_close3": 399.12,
       "ICE_rsi2": 95.43,
-      "ICE_close1": 166.3
+      "ICE_close1": 166.3,
+      "ICE_low1": 165.98
     }
   }
 }
