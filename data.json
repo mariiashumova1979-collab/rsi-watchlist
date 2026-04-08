@@ -108,7 +108,7 @@
     },
     {
       "id": "1775141155223",
-      "createdAt": 1775141155223,
+      "createdAt": 1775679932600,
       "ticker": "ROK",
       "type": "SHORT",
       "entryDate": "2026-04-02",
@@ -120,11 +120,14 @@
       "rsi2": "",
       "atrPct": "3.17",
       "trend": "",
-      "status": "OPEN",
-      "exitPrice": 0,
-      "exitReason": "",
-      "commission": 0,
-      "notes": ""
+      "status": "CLOSED",
+      "exitPrice": 392.42,
+      "exitReason": "STOP",
+      "commission": 4,
+      "notes": "",
+      "pnlNet": -134.1,
+      "pnlPct": -7.32,
+      "result": "LOSS"
     },
     {
       "id": "1775137270705",
