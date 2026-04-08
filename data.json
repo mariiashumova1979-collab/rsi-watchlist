@@ -1259,6 +1259,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "ELV",
+      "sector": "Healthcare",
+      "cap": "68.82",
+      "atr": "3.1",
+      "earningsDate": "2026-04-22",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1775642180981
+    },
+    {
       "ticker": "EMR",
       "sector": "Technology",
       "cap": "75.71",
