@@ -1259,6 +1259,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "NVDA",
+      "sector": "Technology",
+      "cap": "433333",
+      "atr": "3",
+      "earningsDate": "2026-05-20",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1775629321942
+    },
+    {
       "ticker": "UNH",
       "sector": "Healthcare",
       "cap": "255.38",
