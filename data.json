@@ -3590,7 +3590,8 @@
       "CRWD_sma200": 468.5,
       "_migration_done": true,
       "MELI_rsi2": 88.02,
-      "MELI_close1": 1742.3
+      "MELI_close1": 1742.3,
+      "MELI_low1": 1691.91
     }
   }
 }
