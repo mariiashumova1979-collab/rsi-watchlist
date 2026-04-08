@@ -128,7 +128,7 @@
     },
     {
       "id": "1775137270705",
-      "createdAt": 1775137270705,
+      "createdAt": 1775679897283,
       "ticker": "PSA",
       "type": "SHORT",
       "entryDate": "2026-04-02",
@@ -140,11 +140,14 @@
       "rsi2": "",
       "atrPct": "2.79",
       "trend": "",
-      "status": "OPEN",
-      "exitPrice": 0,
-      "exitReason": "",
-      "commission": 0,
-      "notes": ""
+      "status": "CLOSED",
+      "exitPrice": 284.12,
+      "exitReason": "STOP",
+      "commission": 4,
+      "notes": "",
+      "pnlNet": -56.8,
+      "pnlPct": -3.44,
+      "result": "LOSS"
     },
     {
       "id": "1775045009413",
