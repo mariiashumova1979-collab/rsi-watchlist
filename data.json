@@ -3794,7 +3794,8 @@
       "CHKP_low1": 146.34,
       "CHKP_high1": 149.42,
       "EHC_rsi2": 98.6,
-      "EHC_close1": 105.67
+      "EHC_close1": 105.67,
+      "EHC_low1": 105.14
     }
   }
 }
