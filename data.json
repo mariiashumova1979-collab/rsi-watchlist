@@ -1259,6 +1259,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "ZBH",
+      "sector": "Healthcare",
+      "cap": "17.88",
+      "atr": "2.37",
+      "earningsDate": "2026-05-05",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1775646775714
+    },
+    {
       "ticker": "AVB",
       "sector": "Financial",
       "cap": "23.5",
