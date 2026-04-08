@@ -3615,7 +3615,8 @@
       "BAC_close1": 50.28,
       "NVDA_rsi2": 91.13,
       "NVDA_close1": 178.1,
-      "NVDA_low1": 173.66
+      "NVDA_low1": 173.66,
+      "NVDA_high1": 178.23
     }
   }
 }
