@@ -987,13 +987,14 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
         <div class="fg"><label>Причина выхода</label>
           <select id="te_er">
             <option value="">—</option>
-            <option value="TARGET1">Цель 1 (+4%)</option>
-            <option value="TARGET2">Цель 2 (+8%)</option>
-            <option value="STOP">Стоп-лосс (−4%)</option>
-            <option value="BREAKEVEN">Breakeven (после частичн.)</option>
-            <option value="TIME">День 5 (время)</option>
-            <option value="RSI">RSI сигнал</option>
-            <option value="REGIME">Смена режима</option>
+            <option value="MAX_PROFIT">Max Profit Rule (−2% от макс.)</option>
+            <option value="GAP">Gap Rule (≥1%)</option>
+            <option value="RSI">RSI Rule (>50/<50)</option>
+            <option value="TIME">Time Rule (T4)</option>
+            <option value="AUCTION">T0 Auction Risk Rule</option>
+            <option value="STOP">Стоп-лосс</option>
+            <option value="BREAKEVEN">Breakeven</option>
+            <option value="MANUAL">Ручной выход</option>
           </select>
         </div>
         <div class="fg" id="pnl_preview_fg" style="display:none">
@@ -3101,9 +3102,15 @@ function renderDash() {
         <div style="display:flex;gap:16px;margin-top:10px;flex-wrap:wrap;font-family:var(--mono);font-size:11px">
           <span>Entry: <span style="color:var(--text);font-weight:700">$${entry||'—'}</span></span>
           <span>Stop: <span class="r">$${stop||'—'}</span> <span style="color:var(--t3)">(−${stopPct||'?'}%)</span></span>
-          ${atrPct && rsi2Val !== null && rsi2Val < 50 ? `<span>0.5×ATR: <span style="color:var(--acc3)">$${(entry * (1 + dir * atrPct * 0.5 / 100)).toFixed(2)}</span> <span style="color:var(--t3)">(${dir > 0 ? '+' : ''}${(atrPct * 0.5).toFixed(1)}%)</span></span>` : ''}
           ${shares ? `<span>Shares: <span style="color:var(--text)">${shares}</span></span>` : ''}
         </div>
+        
+        <!-- ATR levels row -->
+        ${atrPct ? `<div style="display:flex;gap:16px;margin-top:6px;flex-wrap:wrap;font-family:var(--mono);font-size:10px;color:var(--t2)">
+          <span>+0.25 ATR: <span class="g">$${(entry * (1 + dir * atrPct * 0.25 / 100)).toFixed(2)}</span></span>
+          <span>−0.5 ATR: <span class="r">$${(entry * (1 - dir * atrPct * 0.5 / 100)).toFixed(2)}</span></span>
+          ${rsi2Val !== null && rsi2Val < 50 ? `<span>+0.5 ATR: <span style="color:var(--acc3)">$${(entry * (1 + dir * atrPct * 0.5 / 100)).toFixed(2)}</span></span>` : ''}
+        </div>` : ''}
 
         <!-- Live price row -->
         ${(() => {
@@ -4010,6 +4017,12 @@ function renderDashSignals() {
       entryRec = `<span style="color:var(--t2);font-size:9px">Mid: $${mid1.toFixed(2)}</span>`;
     }
 
+    // Calculate position size based on ATR
+    // PositionSize = RiskPerTrade / ATR%
+    const riskPerTrade = 100; // Fixed $100 risk
+    const atrVal = parseFloat(w.atr) || 0;
+    const positionSizeByAtr = atrVal > 0 ? Math.round(riskPerTrade / (atrVal / 100)) : null;
+
     return `<div class="sig-card ${cls}">
       <div style="display:flex;align-items:center;gap:12px">
         <span style="font-size:17px;font-weight:800">${w.ticker}</span>
@@ -4024,6 +4037,7 @@ function renderDashSignals() {
         <span>Trend: ${trendIcon}</span>
       </div>
       ${isSignal ? `<div style="font-family:var(--mono);font-size:10px;margin-top:6px">${entryRec}</div>` : ''}
+      ${isSignal && positionSizeByAtr ? `<div style="font-family:var(--mono);font-size:10px;margin-top:4px;color:var(--acc4)">💰 Position: <b>$${positionSizeByAtr.toLocaleString()}</b> <span style="color:var(--t3)">(risk $${riskPerTrade} / ATR ${atrVal}%)</span></div>` : ''}
       ${isSignal ? `<div style="font-family:var(--mono);font-size:9px;color:var(--t3);margin-top:4px">Stop ${stopPct}% | Exit: RSI ${isLong?'>50':'<50'} or T4</div>` : ''}
       ${isSignal ? `<button class="btn btn-p btn-s" style="margin-top:8px" onclick="openTrade();setTimeout(()=>{document.getElementById('te_tk').value='${w.ticker}';document.getElementById('te_atr').value='${w.atr||''}';document.getElementById('te_en').value='${entryPrice || mid1 || ''}';tradeAutoCalc();},50)">+ NEW TRADE</button>` : ''}
     </div>`;
