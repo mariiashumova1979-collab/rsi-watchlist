@@ -1259,6 +1259,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "EMR",
+      "sector": "Technology",
+      "cap": "75.71",
+      "atr": "3.26",
+      "earningsDate": "2026-05-06",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1775641546338
+    },
+    {
       "ticker": "ICE",
       "sector": "Financial",
       "cap": "94.44",
