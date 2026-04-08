@@ -1259,6 +1259,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "EHC",
+      "sector": "Healthcare",
+      "cap": "10.51",
+      "atr": "2.98",
+      "earningsDate": "2026-04-29",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1775651440039
+    },
+    {
       "ticker": "CHKP",
       "sector": "Technology",
       "cap": "15.47",
