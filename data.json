@@ -3708,7 +3708,8 @@
       "HUM_rsi2": 98.95,
       "HUM_close1": 197.15,
       "HUM_low1": 190.05,
-      "HUM_high1": 203.5
+      "HUM_high1": 203.5,
+      "AVB_rsi2": 97.89
     }
   }
 }
