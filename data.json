@@ -3601,7 +3601,8 @@
       "IBM_close1": 245.07,
       "IBM_low1": 241.1,
       "IBM_high1": 245.07,
-      "BAC_rsi2": 96.25
+      "BAC_rsi2": 96.25,
+      "BAC_close1": 50.28
     }
   }
 }
