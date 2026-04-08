@@ -171,7 +171,7 @@
     },
     {
       "id": "1775043673736",
-      "createdAt": 1775043673736,
+      "createdAt": 1775679859926,
       "ticker": "MELI",
       "type": "SHORT",
       "entryDate": "2026-04-01",
@@ -183,11 +183,14 @@
       "rsi2": "",
       "atrPct": "3.84",
       "trend": "",
-      "status": "OPEN",
-      "exitPrice": 0,
-      "exitReason": "",
-      "commission": 0,
-      "notes": ""
+      "status": "CLOSED",
+      "exitPrice": 1824.01,
+      "exitReason": "TIME",
+      "commission": 4,
+      "notes": "",
+      "pnlNet": -84.02,
+      "pnlPct": -4.82,
+      "result": "LOSS"
     },
     {
       "id": "1774967155968",
