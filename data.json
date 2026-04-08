@@ -3694,7 +3694,8 @@
       "WAT_high1": 308.14,
       "WAT_sma200": 336.93,
       "WAT_close2": 304.09,
-      "WAT_close3": 304.24
+      "WAT_close3": 304.24,
+      "HUM_rsi2": 98.95
     }
   }
 }
