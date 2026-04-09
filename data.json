@@ -1300,6 +1300,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "DHR",
+      "sector": "Technology",
+      "cap": "138.73",
+      "atr": "2.53",
+      "earningsDate": "2026-04-21",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1775720789652
+    },
+    {
       "ticker": "BLK",
       "sector": "Financial",
       "cap": "163.41",
