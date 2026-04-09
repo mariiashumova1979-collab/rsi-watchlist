@@ -4128,7 +4128,8 @@
       "CDNS_close1": 289.5,
       "CDNS_low1": 285.42,
       "CDNS_high1": 291.35,
-      "CDNS_sma200": 321.56
+      "CDNS_sma200": 321.56,
+      "CDNS_close2": 279.48
     }
   }
 }
