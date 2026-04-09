@@ -1300,6 +1300,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "SNPS",
+      "sector": "Technology",
+      "cap": "78.57",
+      "atr": "3.7",
+      "earningsDate": "2026-05-20",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1775727353853
+    },
+    {
       "ticker": "CDNS",
       "sector": "Technology",
       "cap": "78.93",
