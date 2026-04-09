@@ -1300,6 +1300,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "AMZN",
+      "sector": "Consumer Cyclical",
+      "cap": "2380",
+      "atr": "2.82",
+      "earningsDate": "2026-04-23",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1775710287353
+    },
+    {
       "ticker": "BAH",
       "sector": "Communication",
       "cap": "10.14",
