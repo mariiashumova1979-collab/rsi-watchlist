@@ -1300,6 +1300,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "KKR",
+      "sector": "Financial",
+      "cap": "83.77",
+      "atr": "4.2",
+      "earningsDate": "2026-05-05",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1775723744363
+    },
+    {
       "ticker": "BN",
       "sector": "Financial",
       "cap": "94.07",
