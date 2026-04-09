@@ -1,6 +1,26 @@
 {
   "trades": [
     {
+      "id": "1775741871122",
+      "createdAt": 1775741871122,
+      "ticker": "ELV",
+      "type": "SHORT",
+      "entryDate": "2026-04-09",
+      "entry": 316.97,
+      "shares": 6,
+      "stop": "331.71",
+      "target1": "304.29",
+      "target2": "291.61",
+      "rsi2": "",
+      "atrPct": "3.1",
+      "trend": "",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "commission": 0,
+      "notes": ""
+    },
+    {
       "id": "1775741804761",
       "createdAt": 1775741804761,
       "ticker": "MDT",
