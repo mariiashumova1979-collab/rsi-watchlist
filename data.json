@@ -2,7 +2,7 @@
   "trades": [
     {
       "id": "1775741871122",
-      "createdAt": 1775741871122,
+      "createdAt": 1775767030383,
       "ticker": "ELV",
       "type": "SHORT",
       "entryDate": "2026-04-09",
@@ -14,11 +14,14 @@
       "rsi2": "",
       "atrPct": "3.1",
       "trend": "",
-      "status": "OPEN",
-      "exitPrice": 0,
-      "exitReason": "",
-      "commission": 0,
-      "notes": ""
+      "status": "CLOSED",
+      "exitPrice": 317.71,
+      "exitReason": "AUCTION",
+      "commission": 4,
+      "notes": "",
+      "pnlNet": -8.44,
+      "pnlPct": -0.44,
+      "result": "LOSS"
     },
     {
       "id": "1775741804761",
