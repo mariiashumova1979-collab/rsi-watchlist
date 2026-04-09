@@ -4156,7 +4156,8 @@
       "SNPS_close1": 410.16,
       "SNPS_low1": 405.6,
       "SNPS_high1": 415.16,
-      "MMM_low1": 147.02
+      "MMM_low1": 147.02,
+      "MMM_high1": 150.24
     }
   }
 }
