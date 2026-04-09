@@ -1300,6 +1300,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "BN",
+      "sector": "Financial",
+      "cap": "94.07",
+      "atr": "3.11",
+      "earningsDate": "2026-05-07",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1775723501110
+    },
+    {
       "ticker": "MDT",
       "sector": "Technology",
       "cap": "113.82",
