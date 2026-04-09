@@ -1300,6 +1300,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "MDT",
+      "sector": "Technology",
+      "cap": "113.82",
+      "atr": "2.05",
+      "earningsDate": "2026-05-20",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1775721129914
+    },
+    {
       "ticker": "SYK",
       "sector": "Technology",
       "cap": "130.12",
