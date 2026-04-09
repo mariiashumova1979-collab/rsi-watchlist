@@ -1300,6 +1300,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "AXP",
+      "sector": "Financial",
+      "cap": "217.2",
+      "atr": "2.77",
+      "earningsDate": "2026-04-23",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1775710655660
+    },
+    {
       "ticker": "V",
       "sector": "Financial",
       "cap": "588.88",
