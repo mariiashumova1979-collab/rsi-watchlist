@@ -1300,6 +1300,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "CDNS",
+      "sector": "Technology",
+      "cap": "78.93",
+      "atr": "3.26",
+      "earningsDate": "2026-04-27",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1775727194265
+    },
+    {
       "ticker": "KKR",
       "sector": "Financial",
       "cap": "83.77",
