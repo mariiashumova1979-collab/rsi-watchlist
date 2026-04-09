@@ -1300,6 +1300,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "V",
+      "sector": "Financial",
+      "cap": "588.88",
+      "atr": "2.16",
+      "earningsDate": "2026-04-28",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1775710488562
+    },
+    {
       "ticker": "META",
       "sector": "Technology",
       "cap": "1550",
