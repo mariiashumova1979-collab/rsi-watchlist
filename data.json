@@ -1300,6 +1300,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "META",
+      "sector": "Technology",
+      "cap": "1550",
+      "atr": "3.58",
+      "earningsDate": "2026-04-29",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1775710394182
+    },
+    {
       "ticker": "AMZN",
       "sector": "Consumer Cyclical",
       "cap": "2380",
