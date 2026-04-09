@@ -1300,6 +1300,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "SYK",
+      "sector": "Technology",
+      "cap": "130.12",
+      "atr": "2.55",
+      "earningsDate": "2026-04-30",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1775720971671
+    },
+    {
       "ticker": "DHR",
       "sector": "Technology",
       "cap": "138.73",
