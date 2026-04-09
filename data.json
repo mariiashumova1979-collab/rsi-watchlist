@@ -1300,6 +1300,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "MMM",
+      "sector": "Industrials",
+      "cap": "78.57",
+      "atr": "3.7",
+      "earningsDate": "2026-05-20",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1775727813649
+    },
+    {
       "ticker": "SNPS",
       "sector": "Technology",
       "cap": "78.57",
