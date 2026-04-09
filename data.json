@@ -3943,7 +3943,8 @@
       "_migration_done": true,
       "AMZN_rsi2": 98.02,
       "AMZN_close1": 221.25,
-      "AMZN_low1": 219.62
+      "AMZN_low1": 219.62,
+      "AMZN_high1": 226.1
     }
   }
 }
