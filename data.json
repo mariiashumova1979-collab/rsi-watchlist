@@ -4153,7 +4153,8 @@
       "MMM_rsi2": 96,
       "MMM_close1": 149.17,
       "SNPS_rsi2": 97.62,
-      "SNPS_close1": 410.16
+      "SNPS_close1": 410.16,
+      "SNPS_low1": 405.6
     }
   }
 }
