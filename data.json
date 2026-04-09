@@ -4074,7 +4074,8 @@
       "MDT_rsi2": 94.05,
       "MDT_close1": 88.65,
       "MDT_low1": 86.91,
-      "MDT_high1": 88.84
+      "MDT_high1": 88.84,
+      "MDT_sma200": 94.46
     }
   }
 }
