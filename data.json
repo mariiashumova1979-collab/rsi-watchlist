@@ -2,7 +2,7 @@
   "trades": [
     {
       "id": "1775830083789",
-      "createdAt": 1775830083789,
+      "createdAt": 1775850865954,
       "ticker": "AXP",
       "type": "SHORT",
       "entryDate": "2026-04-10",
@@ -14,11 +14,14 @@
       "rsi2": "",
       "atrPct": "2.77",
       "trend": "",
-      "status": "OPEN",
-      "exitPrice": 0,
-      "exitReason": "",
-      "commission": 0,
-      "notes": ""
+      "status": "CLOSED",
+      "exitPrice": 313.73,
+      "exitReason": "AUCTION",
+      "commission": 4,
+      "notes": "",
+      "pnlNet": 4.58,
+      "pnlPct": 0.24,
+      "result": "WIN"
     },
     {
       "id": "1775824375734",
