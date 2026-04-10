@@ -4322,7 +4322,8 @@
       "AXP_sma200": 335.63,
       "AXP_close3": 307.03,
       "DIS_rsi2": 92.95,
-      "DIS_close1": 99.79
+      "DIS_close1": 99.79,
+      "DIS_low1": 97.68
     }
   }
 }
