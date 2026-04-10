@@ -4306,7 +4306,8 @@
       "CRWD_sma200": 463.13,
       "_migration_done": true,
       "META_rsi2": 98.19,
-      "META_close1": 628.39
+      "META_close1": 628.39,
+      "META_low1": 623
     }
   }
 }
