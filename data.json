@@ -1,6 +1,26 @@
 {
   "trades": [
     {
+      "id": "1775830083789",
+      "createdAt": 1775830083789,
+      "ticker": "AXP",
+      "type": "SHORT",
+      "entryDate": "2026-04-10",
+      "entry": 315.16,
+      "shares": 6,
+      "stop": "328.25",
+      "target1": "302.55",
+      "target2": "289.95",
+      "rsi2": "",
+      "atrPct": "2.77",
+      "trend": "",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "commission": 0,
+      "notes": ""
+    },
+    {
       "id": "1775824375734",
       "createdAt": 1775824375734,
       "ticker": "DIS",
