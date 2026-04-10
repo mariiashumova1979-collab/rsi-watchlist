@@ -1,6 +1,26 @@
 {
   "trades": [
     {
+      "id": "1775824375734",
+      "createdAt": 1775824375734,
+      "ticker": "DIS",
+      "type": "SHORT",
+      "entryDate": "2026-04-10",
+      "entry": 99.8,
+      "shares": 0,
+      "stop": "103.17",
+      "target1": "95.81",
+      "target2": "91.82",
+      "rsi2": "",
+      "atrPct": "2.25",
+      "trend": "",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "commission": 0,
+      "notes": ""
+    },
+    {
       "id": "1775741871122",
       "createdAt": 1775767030383,
       "ticker": "ELV",
