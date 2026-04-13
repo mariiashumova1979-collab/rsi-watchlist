@@ -1,6 +1,26 @@
 {
   "trades": [
     {
+      "id": "1776087500406",
+      "createdAt": 1776087500406,
+      "ticker": "URI",
+      "type": "SHORT",
+      "entryDate": "2026-04-13",
+      "entry": 768.4,
+      "shares": 2,
+      "stop": "806.44",
+      "target1": "737.66",
+      "target2": "706.93",
+      "rsi2": "",
+      "atrPct": "3.3",
+      "trend": "",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "commission": 0,
+      "notes": ""
+    },
+    {
       "id": "1775830083789",
       "createdAt": 1775850865954,
       "ticker": "AXP",
