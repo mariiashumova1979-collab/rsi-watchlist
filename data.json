@@ -4499,7 +4499,8 @@
       "JD_sma200": 31.1,
       "CRWD_sma200": 463.13,
       "_migration_done": true,
-      "SHW_rsi2": 90.08
+      "SHW_rsi2": 90.08,
+      "SHW_close1": 336.11
     }
   }
 }
