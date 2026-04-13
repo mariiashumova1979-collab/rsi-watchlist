@@ -1389,6 +1389,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "URI",
+      "sector": "Financial",
+      "cap": "38.67",
+      "atr": "3.3",
+      "earningsDate": "2026-04-22",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1776064242401
+    },
+    {
       "ticker": "MMM",
       "sector": "Industrials",
       "cap": "78.57",
