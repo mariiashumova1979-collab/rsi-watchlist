@@ -4630,7 +4630,8 @@
       "NEE_rsi2": 9.47,
       "NEE_close1": 92.3,
       "NEE_low1": 91.93,
-      "NEE_high1": 94.04
+      "NEE_high1": 94.04,
+      "NEE_sma200": 81.8
     }
   }
 }
