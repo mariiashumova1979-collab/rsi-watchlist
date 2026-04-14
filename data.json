@@ -1,6 +1,26 @@
 {
   "trades": [
     {
+      "id": "1776173615278",
+      "createdAt": 1776173615278,
+      "ticker": "NEE",
+      "type": "LONG",
+      "entryDate": "2026-04-14",
+      "entry": 91.94,
+      "shares": 35,
+      "stop": "89.14",
+      "target1": "95.62",
+      "target2": "99.30",
+      "rsi2": "",
+      "atrPct": "2.03",
+      "trend": "",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "commission": 0,
+      "notes": ""
+    },
+    {
       "id": "1776173577086",
       "createdAt": 1776173577086,
       "ticker": "WMB",
