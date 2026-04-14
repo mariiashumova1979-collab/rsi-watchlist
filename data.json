@@ -4645,7 +4645,8 @@
       "NEE_close2": 94.08,
       "NEE_close3": 94.48,
       "VZ_rsi2": 0.03,
-      "VZ_close1": 45.42
+      "VZ_close1": 45.42,
+      "VZ_low1": 45.04
     }
   }
 }
