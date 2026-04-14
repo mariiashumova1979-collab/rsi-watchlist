@@ -1409,6 +1409,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "WMB",
+      "sector": "Industrials",
+      "cap": "87.48",
+      "atr": "2.54",
+      "earningsDate": "2026-05-04",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1776154668527
+    },
+    {
       "ticker": "VZ",
       "sector": "Communication",
       "cap": "191.57",
