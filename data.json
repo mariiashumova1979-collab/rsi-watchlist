@@ -1,6 +1,26 @@
 {
   "trades": [
     {
+      "id": "1776173577086",
+      "createdAt": 1776173577086,
+      "ticker": "WMB",
+      "type": "LONG",
+      "entryDate": "2026-04-14",
+      "entry": 71.29,
+      "shares": 36,
+      "stop": "68.57",
+      "target1": "74.14",
+      "target2": "76.99",
+      "rsi2": "",
+      "atrPct": "2.54",
+      "trend": "",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "commission": 0,
+      "notes": ""
+    },
+    {
       "id": "1776087500406",
       "createdAt": 1776087500406,
       "ticker": "URI",
