@@ -4662,7 +4662,8 @@
       "WMB_rsi2": 7.35,
       "WMB_close1": 71.54,
       "WMB_low1": 71.03,
-      "WMB_high1": 73.05
+      "WMB_high1": 73.05,
+      "WMB_sma200": 63.09
     }
   }
 }
