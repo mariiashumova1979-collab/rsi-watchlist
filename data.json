@@ -1409,6 +1409,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "VZ",
+      "sector": "Communication",
+      "cap": "191.57",
+      "atr": "2.26",
+      "earningsDate": "2026-04-27",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1776154560467
+    },
+    {
       "ticker": "NEE",
       "sector": "Utilities",
       "cap": "192.31",
