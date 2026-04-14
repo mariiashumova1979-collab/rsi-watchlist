@@ -4615,7 +4615,8 @@
       "_migration_done": true,
       "XOM_rsi2": 8.95,
       "XOM_close1": 152.64,
-      "XOM_low1": 151.28
+      "XOM_low1": 151.28,
+      "XOM_high1": 154.62
     }
   }
 }
