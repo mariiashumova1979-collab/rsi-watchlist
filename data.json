@@ -1409,6 +1409,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "NEE",
+      "sector": "Utilities",
+      "cap": "192.31",
+      "atr": "2.03",
+      "earningsDate": "2026-04-23",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1776154338132
+    },
+    {
       "ticker": "XOM",
       "sector": "Energy",
       "cap": "636.01",
