@@ -1449,6 +1449,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "OXY",
+      "sector": "Energy",
+      "cap": "54.62",
+      "atr": "4.47",
+      "earningsDate": "2026-05-05",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1776239401828
+    },
+    {
       "ticker": "MPLX",
       "sector": "Industrials",
       "cap": "55.85",
