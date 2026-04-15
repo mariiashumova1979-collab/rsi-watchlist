@@ -1449,6 +1449,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "SRE",
+      "sector": "Utilities",
+      "cap": "62.82",
+      "atr": "2.13",
+      "earningsDate": "2026-05-05",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1776239019418
+    },
+    {
       "ticker": "KMI",
       "sector": "Industrials",
       "cap": "70.42",
