@@ -1449,6 +1449,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "MO",
+      "sector": "Consumer Cyclical",
+      "cap": "109.71",
+      "atr": "2.28",
+      "earningsDate": "2026-04-30",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1776238643208
+    },
+    {
       "ticker": "COP",
       "sector": "Energy",
       "cap": "145.2",
