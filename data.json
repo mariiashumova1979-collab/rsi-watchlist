@@ -4855,7 +4855,8 @@
       "KMI_rsi2": 1.07,
       "KMI_close1": 31.65,
       "KMI_low1": 31.36,
-      "KMI_high1": 32
+      "KMI_high1": 32,
+      "SRE_rsi2": 9.33
     }
   }
 }
