@@ -1449,6 +1449,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "MSFT",
+      "sector": "Technology",
+      "cap": "2920",
+      "atr": "2.28",
+      "earningsDate": "2026-04-29",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1776239890921
+    },
+    {
       "ticker": "OXY",
       "sector": "Energy",
       "cap": "54.62",
