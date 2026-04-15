@@ -4813,7 +4813,8 @@
       "COP_high1": 122.28,
       "COP_sma200": 99.55,
       "COP_close2": 123.62,
-      "COP_close3": 122.55
+      "COP_close3": 122.55,
+      "MO_rsi2": 8.11
     }
   }
 }
