@@ -1449,6 +1449,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "COP",
+      "sector": "Energy",
+      "cap": "145.2",
+      "atr": "3.47",
+      "earningsDate": "2026-04-30",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1776238501317
+    },
+    {
       "ticker": "WMB",
       "sector": "Industrials",
       "cap": "87.48",
