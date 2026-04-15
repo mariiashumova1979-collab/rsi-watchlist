@@ -4888,7 +4888,8 @@
       "MPLX_close3": 56.15,
       "MPLX_sma200": 53.24,
       "OXY_rsi2": 1.63,
-      "OXY_close1": 55.38
+      "OXY_close1": 55.38,
+      "OXY_low1": 55.1
     }
   }
 }
