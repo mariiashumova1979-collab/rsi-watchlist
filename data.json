@@ -4890,7 +4890,8 @@
       "OXY_rsi2": 1.63,
       "OXY_close1": 55.38,
       "OXY_low1": 55.1,
-      "OXY_high1": 57
+      "OXY_high1": 57,
+      "OXY_sma200": 46.28
     }
   }
 }
