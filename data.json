@@ -4841,7 +4841,8 @@
       "EOG_rsi2": 9.8,
       "EOG_close1": 133.59,
       "EOG_low1": 132.72,
-      "EOG_high1": 135.06
+      "EOG_high1": 135.06,
+      "KMI_rsi2": 1.07
     }
   }
 }
