@@ -4875,7 +4875,8 @@
       "MPLX_low1": 54.78,
       "MPLX_high1": 55.96,
       "MPLX_close2": 56.07,
-      "MPLX_close3": 56.15
+      "MPLX_close3": 56.15,
+      "MPLX_sma200": 53.24
     }
   }
 }
