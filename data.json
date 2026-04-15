@@ -4815,7 +4815,8 @@
       "COP_close2": 123.62,
       "COP_close3": 122.55,
       "MO_rsi2": 8.11,
-      "MO_close1": 65.62
+      "MO_close1": 65.62,
+      "MO_low1": 64.9
     }
   }
 }
