@@ -1449,6 +1449,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "KMI",
+      "sector": "Industrials",
+      "cap": "70.42",
+      "atr": "2.45",
+      "earningsDate": "2026-04-22",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1776238815413
+    },
+    {
       "ticker": "EOG",
       "sector": "Energy",
       "cap": "71.57",
