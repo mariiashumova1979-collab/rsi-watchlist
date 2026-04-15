@@ -1449,6 +1449,16 @@
   ],
   "watchlist": [
     {
+      "ticker": "EOG",
+      "sector": "Energy",
+      "cap": "71.57",
+      "atr": "3.37",
+      "earningsDate": "2026-05-05",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1776238730674
+    },
+    {
       "ticker": "MO",
       "sector": "Consumer Cyclical",
       "cap": "109.71",
