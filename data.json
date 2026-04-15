@@ -1,6 +1,26 @@
 {
   "trades": [
     {
+      "id": "1776255613535",
+      "createdAt": 1776255613535,
+      "ticker": "META",
+      "type": "SHORT",
+      "entryDate": "2026-04-15",
+      "entry": 663.23,
+      "shares": 2,
+      "stop": "698.85",
+      "target1": "636.70",
+      "target2": "610.17",
+      "rsi2": "",
+      "atrPct": "3.58",
+      "trend": "",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "commission": 0,
+      "notes": ""
+    },
+    {
       "id": "1776255568118",
       "createdAt": 1776255568118,
       "ticker": "MSFT",
