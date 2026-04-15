@@ -4771,7 +4771,8 @@
       "JD_sma200": 31.1,
       "CRWD_sma200": 463.13,
       "_migration_done": true,
-      "WMB_rsi2": 6.51
+      "WMB_rsi2": 6.51,
+      "WMB_close1": 71
     }
   }
 }
