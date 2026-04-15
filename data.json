@@ -4870,7 +4870,8 @@
       "SRE_close1": 96.16,
       "SRE_low1": 95.09,
       "SRE_high1": 96.27,
-      "MPLX_rsi2": 7.8
+      "MPLX_rsi2": 7.8,
+      "MPLX_close1": 55.01
     }
   }
 }
