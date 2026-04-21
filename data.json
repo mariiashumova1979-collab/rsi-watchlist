@@ -7660,7 +7660,8 @@
           "JD_sma200": 31.1,
           "CRWD_sma200": 463.13,
           "_migration_done": true,
-          "NFLX_rsi2": 3.47
+          "NFLX_rsi2": 3.47,
+          "NFLX_close1": 94.83
         }
       },
       "config": {}
@@ -11800,7 +11801,8 @@
       "JD_sma200": 31.1,
       "CRWD_sma200": 463.13,
       "_migration_done": true,
-      "NFLX_rsi2": 3.47
+      "NFLX_rsi2": 3.47,
+      "NFLX_close1": 94.83
     }
   },
   "quarterly": {},
