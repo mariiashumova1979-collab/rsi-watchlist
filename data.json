@@ -3501,7 +3501,7 @@
       "PSA_sma200": 284.83,
       "SHW_sma200": 343.14,
       "MELI_sma200": 2165.05,
-      "NFLX_sma200": 107.38,
+      "NFLX_sma200": 105.52,
       "CHTR_sma200": 253.08,
       "KHC_sma200": 25.27,
       "HUM_sma200": 244.68,
@@ -3537,7 +3537,13 @@
       "DKNG_sma200": 35.97,
       "JD_sma200": 31.1,
       "CRWD_sma200": 463.13,
-      "_migration_done": true
+      "_migration_done": true,
+      "NFLX_rsi2": 3.47,
+      "NFLX_close1": 94.83,
+      "NFLX_low1": 93.54,
+      "NFLX_high1": 97.6,
+      "NFLX_open0": 94,
+      "NFLX_sma200_20": 107.25
     }
   },
   "strategies": {
@@ -7665,7 +7671,8 @@
           "NFLX_low1": 93.54,
           "NFLX_high1": 97.6,
           "NFLX_open0": 94,
-          "NFLX_sma200_20": 107.25
+          "NFLX_sma200_20": 107.25,
+          "NFLX_close2": 97.31
         }
       },
       "config": {}
@@ -11810,7 +11817,8 @@
       "NFLX_low1": 93.54,
       "NFLX_high1": 97.6,
       "NFLX_open0": 94,
-      "NFLX_sma200_20": 107.25
+      "NFLX_sma200_20": 107.25,
+      "NFLX_close2": 97.31
     }
   },
   "quarterly": {},
