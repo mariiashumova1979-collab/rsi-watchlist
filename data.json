@@ -65,7 +65,7 @@
     },
     {
       "id": "1776173577086",
-      "createdAt": 1776173577086,
+      "createdAt": 1776800004916,
       "ticker": "WMB",
       "type": "LONG",
       "entryDate": "2026-04-14",
@@ -77,7 +77,7 @@
       "rsi2": "",
       "atrPct": "2.54",
       "trend": "",
-      "status": "OPEN",
+      "status": "CLOSED",
       "exitPrice": 0,
       "exitReason": "",
       "commission": 0,
