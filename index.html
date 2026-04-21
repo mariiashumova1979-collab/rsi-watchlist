@@ -632,53 +632,33 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
 <div class="tab" id="tab-quarterly">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;flex-wrap:wrap;gap:12px">
     <div>
-      <div style="font-size:22px;font-weight:800">Квартальный обзор</div>
+      <div style="font-size:22px;font-weight:800">Квартальные результаты</div>
       <div style="font-family:var(--mono);font-size:10px;color:var(--t2);margin-top:3px" id="qLabel"></div>
     </div>
     <div style="display:flex;gap:8px">
       <button class="btn btn-g btn-s" onclick="qOff--; renderQ()">← ПРЕД</button>
       <button class="btn btn-g btn-s" onclick="qOff++; renderQ()">СЛЕД →</button>
-      <button class="btn btn-p btn-s" onclick="saveQ()">СОХРАНИТЬ</button>
     </div>
   </div>
-  <div class="g2">
-    <div>
-      <div class="card">
-        <div class="sh">Результаты</div>
-        <div class="fgrid">
-          <div class="fg"><label>Всего сделок</label><input type="number" id="q_t"></div>
-          <div class="fg"><label>% выигрышей</label><input type="number" id="q_wr" min="0" max="100" step=".1"></div>
-          <div class="fg"><label>Доходность %</label><input type="number" id="q_r" step=".1"></div>
-          <div class="fg"><label>Макс просадка %</label><input type="number" id="q_d" step=".1"></div>
-          <div class="fg"><label>Средний выигрыш %</label><input type="number" id="q_aw" step=".1"></div>
-          <div class="fg"><label>Средний убыток %</label><input type="number" id="q_al" step=".1"></div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="sh">Пересмотр списка</div>
-        <div class="cl" id="q-cl"></div>
-        <div class="fgrid" style="margin-top:14px">
-          <div class="fg"><label>Удалённые акции</label><input type="text" id="q_rem" placeholder="RIVN, NIO..."></div>
-          <div class="fg"><label>Добавленные акции</label><input type="text" id="q_add" placeholder="SOFI, AFRM..."></div>
-        </div>
-        <div class="fg" style="margin-top:14px">
-          <label>Размер позиции</label>
-          <select id="q_ps">
-            <option value="100">100% — нормальный</option>
-            <option value="50">50% — осторожный</option>
-            <option value="10">10% — сброс дисциплины</option>
-          </select>
-        </div>
-      </div>
-    </div>
-    <div>
-      <div class="card">
-        <div class="sh">Анализ квартала</div>
-        <div class="fg" style="margin-bottom:12px"><label>Что работало хорошо</label><textarea id="q_gd" placeholder="..."></textarea></div>
-        <div class="fg" style="margin-bottom:12px"><label>Что улучшить</label><textarea id="q_im" placeholder="..."></textarea></div>
-        <div class="fg" style="margin-bottom:12px"><label>Нарушения правил</label><textarea id="q_vl" placeholder="..."></textarea></div>
-        <div class="fg"><label>Изменения на следующий квартал</label><textarea id="q_ch" placeholder="..."></textarea></div>
-      </div>
+  
+  <div id="qStats" class="stats" style="margin-bottom:24px"></div>
+  
+  <div class="card">
+    <div class="sh">Сделки за квартал</div>
+    <div class="tw">
+      <table>
+        <thead><tr>
+          <th>Дата</th>
+          <th>Тикер</th>
+          <th>Тип</th>
+          <th>Вход</th>
+          <th>Выход</th>
+          <th>P&L %</th>
+          <th>P&L $</th>
+          <th>Причина</th>
+        </tr></thead>
+        <tbody id="qTradesTbody"></tbody>
+      </table>
     </div>
   </div>
 </div>
@@ -1291,20 +1271,24 @@ async function loadFromStorage() {
     if (res.ok) {
       const text = await res.text();
       const trimmed = text.trim();
+      // GitHub is accessible — switch to github mode
+      storageMode = 'github';
+      fetchGhSha(token); // get SHA for writes, non-blocking
+      
       if (trimmed && trimmed !== '{}' && trimmed !== '') {
         const data = JSON.parse(trimmed);
-        storageMode = 'github';
         try { localStorage.setItem(LS_KEY, trimmed); } catch {}
-        fetchGhSha(token); // get SHA for writes, non-blocking
         return data;
       }
+      // File is empty but GitHub is connected — return local data but keep github mode
+      return localData;
     }
   } catch(e) {
     if (e.name !== 'AbortError') console.warn('GitHub load:', e.message);
   }
 
   // 3. Fallback to local
-  storageMode = localData ? 'local' : 'local';
+  storageMode = 'local';
   return localData;
 }
 
@@ -2862,6 +2846,10 @@ function renderDash() {
       const currentOpen = todayScan[t.ticker + '_open0'];
       const openVal = currentOpen !== undefined ? parseFloat(currentOpen) : null;
       
+      // Get SMA200 from scan
+      const currentSma200 = todayScan[t.ticker + '_sma200'];
+      const sma200Val = currentSma200 !== undefined && currentSma200 !== '' ? parseFloat(currentSma200) : null;
+      
       // Get high from T-1 for MaxPnL calculation
       const currentHigh = todayScan[t.ticker + '_high1'];
       const highVal = currentHigh !== undefined ? parseFloat(currentHigh) : null;
@@ -3061,14 +3049,15 @@ function renderDash() {
         <div style="display:flex;gap:16px;margin-top:10px;flex-wrap:wrap;font-family:var(--mono);font-size:11px">
           <span>Entry: <span style="color:var(--text);font-weight:700">$${entry||'—'}</span></span>
           <span>Stop: <span class="r">$${stop||'—'}</span> <span style="color:var(--t3)">(−${stopPct||'?'}%)</span></span>
+          ${sma200Val ? `<span>MA200: <span style="color:${closeVal && closeVal > sma200Val ? 'var(--acc)' : 'var(--acc2)'}">$${sma200Val.toFixed(2)}</span></span>` : ''}
           ${shares ? `<span>Shares: <span style="color:var(--text)">${shares}</span></span>` : ''}
         </div>
         
         <!-- ATR levels row -->
         ${atrPct ? `<div style="display:flex;gap:16px;margin-top:6px;flex-wrap:wrap;font-family:var(--mono);font-size:10px;color:var(--t2)">
-          <span>+0.25 ATR: <span class="g">$${(entry * (1 + dir * atrPct * 0.25 / 100)).toFixed(2)}</span></span>
+          <span>Цель 1: <span class="g">$${(entry * (1 + dir * atrPct / 100)).toFixed(2)}</span> <span style="color:var(--t3)">(+${atrPct}%)</span></span>
+          <span>Цель 2: <span class="g">$${(entry * (1 + dir * atrPct * 2 / 100)).toFixed(2)}</span> <span style="color:var(--t3)">(+${(atrPct * 2).toFixed(1)}%)</span></span>
           <span>−0.5 ATR: <span class="r">$${(entry * (1 - dir * atrPct * 0.5 / 100)).toFixed(2)}</span></span>
-          ${rsi2Val !== null && rsi2Val < 50 ? `<span>+0.5 ATR: <span style="color:var(--acc3)">$${(entry * (1 + dir * atrPct * 0.5 / 100)).toFixed(2)}</span></span>` : ''}
         </div>` : ''}
 
         <!-- Live price row -->
@@ -4087,38 +4076,70 @@ function qLbl(off=0){
   return `Q${q} ${d.getFullYear()} · ${m[q-1][0]} – ${m[q-1][1]}`;
 }
 
+function getQuarterDates(off=0) {
+  const d = new Date();
+  d.setMonth(d.getMonth() + off * 3);
+  const q = Math.floor(d.getMonth() / 3);
+  const year = d.getFullYear();
+  const startMonth = q * 3;
+  const start = new Date(year, startMonth, 1);
+  const end = new Date(year, startMonth + 3, 0); // Last day of quarter
+  return { start, end };
+}
+
 function renderQ() {
-  const key = qKey(qOff);
   document.getElementById('qLabel').textContent = qLbl(qOff);
-  const data = (cache.quarterly||{})[key]||{};
-  ['t','wr','r','d','aw','al','rem','add','gd','im','vl','ch'].forEach(f=>{ const el=document.getElementById('q_'+f); if(el) el.value=data[f]||''; });
-  document.getElementById('q_ps').value = data.ps||'100';
-  const saved = data.checks||{};
-  document.getElementById('q-cl').innerHTML = Q_CHECKS.map((txt,i)=>{
-    const chk = saved[i]||false;
-    return `<div class="ci ${chk?'chk':''}" onclick="toggleQCl(${i},this)">
-      <div class="cbox"></div><div class="cit">${txt}</div>
-    </div>`;
-  }).join('');
-}
-
-async function toggleQCl(i,el) {
-  el.classList.toggle('chk');
-  const key=qKey(qOff);
-  if(!cache.quarterly[key]) cache.quarterly[key]={};
-  if(!cache.quarterly[key].checks) cache.quarterly[key].checks={};
-  cache.quarterly[key].checks[i]=el.classList.contains('chk');
-  scheduleSave();
-}
-
-async function saveQ() {
-  const key=qKey(qOff);
-  if(!cache.quarterly[key]) cache.quarterly[key]={};
-  const d = cache.quarterly[key];
-  ['t','wr','r','d','aw','al','rem','add','gd','im','vl','ch'].forEach(f=>{ const el=document.getElementById('q_'+f); if(el) d[f]=el.value; });
-  d.ps = document.getElementById('q_ps').value;
-  scheduleSave(); const ok = true;
-  if(ok) toast('Квартал сохранён ✓');
+  
+  const { start, end } = getQuarterDates(qOff);
+  const startStr = start.toISOString().split('T')[0];
+  const endStr = end.toISOString().split('T')[0];
+  
+  // Filter trades for this quarter (by exit date for closed, entry date for open)
+  const qTrades = cache.trades.filter(t => {
+    const date = t.status === 'CLOSED' ? t.exitDate : t.entryDate;
+    return date && date >= startStr && date <= endStr;
+  });
+  
+  const closed = qTrades.filter(t => t.status === 'CLOSED' && t.pnlPct !== undefined);
+  const wins = closed.filter(t => t.result === 'WIN');
+  const losses = closed.filter(t => t.result === 'LOSS');
+  
+  // Calculate stats
+  const totalTrades = closed.length;
+  const winRate = totalTrades ? (wins.length / totalTrades * 100).toFixed(1) : 0;
+  const avgWin = wins.length ? (wins.reduce((a, t) => a + t.pnlPct, 0) / wins.length).toFixed(2) : 0;
+  const avgLoss = losses.length ? (losses.reduce((a, t) => a + t.pnlPct, 0) / losses.length).toFixed(2) : 0;
+  const totalPnlPct = closed.reduce((a, t) => a + (t.pnlPct || 0), 0).toFixed(2);
+  const totalPnlNet = closed.reduce((a, t) => a + (t.pnlNet || 0), 0);
+  
+  // Render stats
+  document.getElementById('qStats').innerHTML = `
+    <div class="stat" style="--sc:var(--acc4)"><div class="stat-l">Сделок</div><div class="stat-v">${totalTrades}</div><div class="stat-s">${wins.length}W / ${losses.length}L</div></div>
+    <div class="stat" style="--sc:var(--acc)"><div class="stat-l">Win Rate</div><div class="stat-v g">${winRate}%</div></div>
+    <div class="stat" style="--sc:var(--acc3)"><div class="stat-l">Ср. выигрыш</div><div class="stat-v g">+${avgWin}%</div><div class="stat-s">Ср. убыток: ${avgLoss}%</div></div>
+    <div class="stat" style="--sc:${parseFloat(totalPnlPct)>=0?'var(--acc)':'var(--acc2)'}"><div class="stat-l">Итого P&L</div><div class="stat-v ${parseFloat(totalPnlPct)>=0?'g':'r'}">${parseFloat(totalPnlPct)>0?'+':''}${totalPnlPct}%</div><div class="stat-s">${totalPnlNet>=0?'+':''}$${totalPnlNet.toFixed(0)}</div></div>
+  `;
+  
+  // Render trades table
+  if (!closed.length) {
+    document.getElementById('qTradesTbody').innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--t2);padding:20px">Нет закрытых сделок за этот квартал</td></tr>';
+  } else {
+    document.getElementById('qTradesTbody').innerHTML = closed
+      .sort((a, b) => (b.exitDate || '').localeCompare(a.exitDate || ''))
+      .map(t => {
+        const pnlColor = t.pnlPct >= 0 ? 'var(--acc)' : 'var(--acc2)';
+        return `<tr>
+          <td style="font-family:var(--mono);font-size:10px">${t.exitDate || '—'}</td>
+          <td style="font-weight:700">${t.ticker}</td>
+          <td><span class="b ${t.type==='LONG'?'b-long':'b-short'}">${t.type}</span></td>
+          <td style="font-family:var(--mono)">$${parseFloat(t.entry||0).toFixed(2)}</td>
+          <td style="font-family:var(--mono)">$${parseFloat(t.exitPrice||0).toFixed(2)}</td>
+          <td style="font-family:var(--mono);color:${pnlColor};font-weight:700">${t.pnlPct>=0?'+':''}${t.pnlPct?.toFixed(2)||0}%</td>
+          <td style="font-family:var(--mono);color:${pnlColor}">${t.pnlNet>=0?'+':''}$${t.pnlNet?.toFixed(0)||0}</td>
+          <td style="font-family:var(--mono);font-size:10px;color:var(--t2)">${t.exitReason||'—'}</td>
+        </tr>`;
+      }).join('');
+  }
 }
 
 // ═══════════════════════════════════════════════════════════
