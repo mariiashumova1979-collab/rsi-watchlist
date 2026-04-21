@@ -1,6 +1,16 @@
 {
   "watchlist": [
     {
+      "ticker": "PCG",
+      "sector": "Utilities",
+      "cap": "37.32",
+      "atr": "2.06",
+      "earningsDate": "",
+      "cooldownDate": "2026-04-23",
+      "notes": "",
+      "addedAt": 1776804687567
+    },
+    {
       "ticker": "MSFT",
       "sector": "Technology",
       "cap": "2920",
