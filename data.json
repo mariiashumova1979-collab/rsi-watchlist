@@ -45,7 +45,7 @@
     },
     {
       "id": "1776173615278",
-      "createdAt": 1776173615278,
+      "createdAt": 1776799999947,
       "ticker": "NEE",
       "type": "LONG",
       "entryDate": "2026-04-14",
@@ -57,7 +57,7 @@
       "rsi2": "",
       "atrPct": "2.03",
       "trend": "",
-      "status": "OPEN",
+      "status": "CLOSED",
       "exitPrice": 0,
       "exitReason": "",
       "commission": 0,
