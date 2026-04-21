@@ -128,7 +128,7 @@
     },
     {
       "id": "1775824375734",
-      "createdAt": 1775824375734,
+      "createdAt": 1776800016180,
       "ticker": "DIS",
       "type": "SHORT",
       "entryDate": "2026-04-10",
@@ -140,7 +140,7 @@
       "rsi2": "",
       "atrPct": "2.25",
       "trend": "",
-      "status": "OPEN",
+      "status": "CLOSED",
       "exitPrice": 0,
       "exitReason": "",
       "commission": 0,
