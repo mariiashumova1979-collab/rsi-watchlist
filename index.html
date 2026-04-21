@@ -1199,8 +1199,8 @@ async function doSave() {
 
   setSyncState('syncing', 'СОХРАНЕНИЕ...');
   try {
-    // Get SHA if we don't have it
-    if (!ghFileSha) await fetchGhSha(token);
+    // Always get fresh SHA before saving to avoid conflicts
+    await fetchGhSha(token);
 
     const body = {
       message: 'journal ' + new Date().toISOString().slice(0,16),
@@ -1221,15 +1221,19 @@ async function doSave() {
       storageMode = 'github';
       setSyncState('synced', '🐙 GITHUB');
     } else if (res.status === 409 || res.status === 422) {
+      // SHA conflict — refetch and retry once
+      console.warn('SHA conflict, retrying...');
       await fetchGhSha(token);
-      setTimeout(doSave, 1000);
+      setTimeout(doSave, 500);
       return;
     } else {
+      const errText = await res.text();
+      console.warn('GitHub save error:', res.status, errText);
       throw new Error('HTTP ' + res.status);
     }
   } catch(e) {
-    storageMode = 'local';
-    setSyncState('synced', '💾 ЛОКАЛЬНО');
+    // Don't change storageMode — keep github if it was github
+    setSyncState('synced', storageMode === 'github' ? '⚠️ ОШИБКА' : '💾 ЛОКАЛЬНО');
     console.warn('GitHub save:', e.message);
   }
   updateStorageInfo();
@@ -1240,8 +1244,19 @@ async function fetchGhSha(token) {
     const res = await fetch(ghAPI(), {
       headers: { 'Authorization': 'Bearer ' + (token || getToken()), 'X-GitHub-Api-Version': '2022-11-28' }
     });
-    if (res.ok) { const d = await res.json(); ghFileSha = d.sha; }
-  } catch {}
+    if (res.ok) { 
+      const d = await res.json(); 
+      ghFileSha = d.sha;
+      return true;
+    } else if (res.status === 404) {
+      // File doesn't exist yet — will be created
+      ghFileSha = null;
+      return true;
+    }
+  } catch(e) {
+    console.warn('fetchGhSha error:', e.message);
+  }
+  return false;
 }
 
 // ── READ ───────────────────────────────────────────────────
