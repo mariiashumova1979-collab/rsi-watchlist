@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RSI Swing Journal</title>
+<title>Trading Journal | IBS Mean Reversion</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📈</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -378,6 +378,23 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
 .calcrow:last-child{border:none}
 .calcrow span:first-child{color:var(--t2);font-family:var(--mono);font-size:10px}
 .calcrow span:last-child{font-family:var(--mono);font-size:11px;font-weight:700}
+
+/* STRATEGY SELECTOR BUTTONS */
+.strat-btn{
+  padding:6px 12px;border-radius:6px;font-size:11px;font-weight:700;
+  cursor:pointer;border:1px solid var(--line);background:var(--bg2);
+  color:var(--t2);transition:all .15s;display:flex;align-items:center;gap:6px;
+  white-space:nowrap;
+}
+.strat-btn:hover{background:var(--bg3);color:var(--text)}
+.strat-btn.active{background:var(--bg4);color:var(--text);border-color:var(--acc)}
+.strat-btn .strat-icon{font-size:14px}
+.strat-btn .strat-count{
+  font-size:9px;padding:2px 6px;border-radius:10px;
+  background:var(--bg3);color:var(--t3);
+}
+.strat-btn.active .strat-count{background:rgba(126,232,162,.2);color:var(--acc)}
+.strat-btn.disabled{opacity:.4;cursor:not-allowed}
 </style>
 </head>
 <body>
@@ -396,10 +413,10 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
 
 <header>
   <div class="logo">
-    <div class="logo-mark">RSI</div>
+    <div class="logo-mark">IBS</div>
     <div>
-      <div class="logo-name">Swing Journal</div>
-      <div class="logo-ver">PURE RSI SYSTEM · CLOUD SYNC</div>
+      <div class="logo-name">Trading Journal</div>
+      <div class="logo-ver">IBS MEAN REVERSION · CLOUD SYNC</div>
     </div>
   </div>
   <div class="header-right">
@@ -411,6 +428,12 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
     <span style="font-family:var(--mono);font-size:10px;color:var(--t2)" id="hdrDate"></span>
   </div>
 </header>
+
+<!-- STRATEGY SELECTOR -->
+<div id="strategyBar" style="background:var(--bg);border-bottom:1px solid var(--line);padding:8px 24px;display:flex;align-items:center;gap:12px;overflow-x:auto">
+  <span style="font-family:var(--mono);font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:1px">Strategy:</span>
+  <div id="strategyTabs" style="display:flex;gap:6px"></div>
+</div>
 
 <nav>
   <div class="ntab active" onclick="goTab('dashboard')">📊 Дашборд</div>
@@ -573,10 +596,9 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
       </div>
     </div>
     <div style="font-family:var(--mono);font-size:9px;color:var(--t2);margin-bottom:12px;padding:10px 14px;background:var(--bg3);border-radius:8px;border:1px solid var(--line);line-height:1.7">
-      <b>LONG:</b> RSI(2)&lt;10 + &gt;SMA200 + 3 down closes + CLV≤0.3<br>
-      <b>SHORT:</b> RSI(2)&gt;90 + &lt;SMA200 + 3 up closes + CLV≥0.7<br>
-      <b>Gap check:</b> GapATR = (Close(T-1) − Open(T0)) / Close(T-1) / ATR%<br>
-      <span style="color:var(--acc3)">Bad gap (Open &lt; Close for LONG) → Entry at Mid(T-1) only</span>
+      <b>LONG:</b> RSI(2)&lt;10 + &gt;SMA200 + SMA200↑ + IBS&lt;0.20 + Range&lt;2×ATR<br>
+      <b>SHORT:</b> RSI(2)&gt;90 + &lt;SMA200 + SMA200↓ + IBS&gt;0.80 + Range&lt;2×ATR<br>
+      <b>Gap отмена:</b> ≥2% в нужную сторону → вход отменён
     </div>
     <div class="tw">
       <table>
@@ -586,14 +608,15 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
           <th>Close<br><span style="font-weight:400;font-size:9px">T-1</span></th>
           <th>Low<br><span style="font-weight:400;font-size:9px">T-1</span></th>
           <th>High<br><span style="font-weight:400;font-size:9px">T-1</span></th>
-          <th>CLV</th>
+          <th>IBS</th>
+          <th>Range%</th>
           <th>Open<br><span style="font-weight:400;font-size:9px">T0</span></th>
           <th>Gap</th>
           <th>SMA200</th>
+          <th>SMA↑↓</th>
           <th>Close<br><span style="font-weight:400;font-size:9px">T-2</span></th>
           <th>Close<br><span style="font-weight:400;font-size:9px">T-3</span></th>
           <th>Signal</th>
-          <th>Entry $</th>
         </tr></thead>
         <tbody id="rsiScanTbody"></tbody>
       </table>
@@ -1158,7 +1181,155 @@ function isTradingDay(dateStr) {
 }
 
 // In-memory cache
-const cache = { trades:[], watchlist:[], quarterly:{}, checklist:{}, settings:{}, regime:{}, rsiScans:{} };
+// ═══════════════════════════════════════════════════════════
+// DATA STRUCTURE (v2 - multi-strategy)
+// ═══════════════════════════════════════════════════════════
+const cache = { 
+  watchlist: [],           // Shared watchlist
+  marketData: {},          // { "2025-04-21": { "AAPL_close": 185.5, ... } }
+  strategies: {            // Per-strategy data
+    ibs_swing: {
+      trades: [],
+      scans: {},
+      config: {}
+    }
+  },
+  analytics: [],           // Event log for analysis
+  settings: {}, 
+  regime: {},
+  // Legacy fields (migrated to strategies.ibs_swing)
+  trades: [],
+  rsiScans: {},
+  quarterly: {},
+  checklist: {}
+};
+
+// Current strategy (for routing)
+let currentStrategy = 'ibs_swing';
+
+// Strategy registry
+const STRATEGIES = {
+  ibs_swing: {
+    id: 'ibs_swing',
+    name: 'IBS Mean Reversion',
+    icon: '📊',
+    color: 'var(--acc)',
+    description: 'Mean-reversion на откате в трендовой акции'
+  },
+  momentum: {
+    id: 'momentum',
+    name: 'Momentum',
+    icon: '🚀',
+    color: 'var(--acc4)',
+    description: 'Trend-following momentum'
+  },
+  breakout: {
+    id: 'breakout',
+    name: 'Breakout',
+    icon: '💥',
+    color: 'var(--acc3)',
+    description: 'Range breakout strategy'
+  },
+  options_flow: {
+    id: 'options_flow',
+    name: 'Options Flow',
+    icon: '🔮',
+    color: 'var(--acc5)',
+    description: 'Unusual options activity'
+  },
+  passive_etf: {
+    id: 'passive_etf',
+    name: 'Passive ETF',
+    icon: '📈',
+    color: 'var(--acc2)',
+    description: 'Long-term ETF portfolio'
+  }
+};
+
+// ═══════════════════════════════════════════════════════════
+// ANALYTICS: Event logging for analysis
+// ═══════════════════════════════════════════════════════════
+function logEvent(strategy, eventType, data) {
+  if (!cache.analytics) cache.analytics = [];
+  cache.analytics.push({
+    timestamp: new Date().toISOString(),
+    strategy: strategy,
+    event: eventType,
+    data: data
+  });
+  // Keep last 1000 events
+  if (cache.analytics.length > 1000) {
+    cache.analytics = cache.analytics.slice(-1000);
+  }
+}
+
+// Helper to get trades for current strategy
+function getStrategyTrades() {
+  // Use legacy trades for backward compatibility
+  return cache.trades || [];
+}
+
+// Helper to get scans for current strategy
+function getStrategyScans() {
+  return cache.rsiScans || {};
+}
+
+// ═══════════════════════════════════════════════════════════
+// STRATEGY NAVIGATION
+// ═══════════════════════════════════════════════════════════
+function renderStrategyTabs() {
+  const container = document.getElementById('strategyTabs');
+  if (!container) return;
+  
+  container.innerHTML = Object.values(STRATEGIES).map(s => {
+    const isActive = currentStrategy === s.id;
+    const isImplemented = s.id === 'ibs_swing';  // Only IBS is implemented
+    
+    // Count open trades for this strategy
+    let openCount = 0;
+    if (s.id === 'ibs_swing') {
+      openCount = (cache.trades || []).filter(t => t.status === 'OPEN' || t.status === 'PARTIAL').length;
+    }
+    
+    return `
+      <button class="strat-btn ${isActive ? 'active' : ''} ${!isImplemented ? 'disabled' : ''}" 
+              onclick="${isImplemented ? `switchStrategy('${s.id}')` : ''}"
+              title="${s.description}${!isImplemented ? ' (скоро)' : ''}"
+              style="${isActive ? `border-color:${s.color}` : ''}">
+        <span class="strat-icon">${s.icon}</span>
+        <span>${s.name}</span>
+        ${openCount > 0 ? `<span class="strat-count">${openCount}</span>` : ''}
+      </button>
+    `;
+  }).join('');
+}
+
+function switchStrategy(strategyId) {
+  if (!STRATEGIES[strategyId]) return;
+  if (currentStrategy === strategyId) return;
+  
+  currentStrategy = strategyId;
+  
+  // Log strategy switch
+  logEvent(strategyId, 'strategy_switch', { from: currentStrategy, to: strategyId });
+  
+  // Update UI
+  renderStrategyTabs();
+  
+  // Update header
+  const strategy = STRATEGIES[strategyId];
+  const logoMark = document.querySelector('.logo-mark');
+  const logoVer = document.querySelector('.logo-ver');
+  if (logoMark) logoMark.textContent = strategy.icon === '📊' ? 'IBS' : strategy.name.substring(0, 3).toUpperCase();
+  if (logoVer) logoVer.textContent = `${strategy.name.toUpperCase()} · CLOUD SYNC`;
+  
+  // Re-render content for new strategy
+  renderDash();
+  renderTrades();
+  renderRsiScan();
+  
+  toast(`${strategy.icon} ${strategy.name}`);
+}
 
 let saveTimer = null;
 function scheduleSave() { clearTimeout(saveTimer); saveTimer = setTimeout(doSave, 800); }
@@ -1374,16 +1545,62 @@ async function forceSync() { return syncFromGithub(); }
 
 function applyData(data) {
   if (!data) return;
-  if (Array.isArray(data.trades))    cache.trades    = data.trades;
+  
+  // ═══════════════════════════════════════════════════════════
+  // MIGRATION v2: Legacy → Multi-strategy structure
+  // ═══════════════════════════════════════════════════════════
+  
+  // Load new structure if exists
+  if (data.strategies) {
+    cache.strategies = data.strategies;
+  }
+  if (data.marketData) {
+    cache.marketData = data.marketData;
+  }
+  if (data.analytics) {
+    cache.analytics = data.analytics;
+  }
+  
+  // Migrate legacy trades[] → strategies.ibs_swing.trades[]
+  if (Array.isArray(data.trades) && data.trades.length > 0) {
+    if (!cache.strategies.ibs_swing) {
+      cache.strategies.ibs_swing = { trades: [], scans: {}, config: {} };
+    }
+    // If new structure is empty, migrate from legacy
+    if (cache.strategies.ibs_swing.trades.length === 0) {
+      cache.strategies.ibs_swing.trades = data.trades;
+    }
+    // Keep legacy for backward compatibility
+    cache.trades = data.trades;
+  }
+  
+  // Migrate legacy rsiScans → strategies.ibs_swing.scans AND marketData
+  if (data.rsiScans) {
+    cache.rsiScans = data.rsiScans;  // Keep legacy
+    
+    if (!cache.strategies.ibs_swing) {
+      cache.strategies.ibs_swing = { trades: [], scans: {}, config: {} };
+    }
+    cache.strategies.ibs_swing.scans = data.rsiScans;
+    
+    // Also copy to marketData for shared access
+    Object.keys(data.rsiScans).forEach(dateKey => {
+      if (!cache.marketData[dateKey]) {
+        cache.marketData[dateKey] = {};
+      }
+      Object.assign(cache.marketData[dateKey], data.rsiScans[dateKey]);
+    });
+  }
+  
+  // Load other shared data
   if (Array.isArray(data.watchlist)) cache.watchlist = data.watchlist;
   if (data.quarterly) cache.quarterly = data.quarterly;
   if (data.checklist) cache.checklist = data.checklist;
   if (data.settings)  { cache.settings = data.settings; if (!cache.settings.finnhubKey) cache.settings.finnhubKey = FINNHUB_KEY; }
   if (data.regime)    cache.regime    = data.regime;
-  if (data.rsiScans)  cache.rsiScans  = data.rsiScans;
   
   // ═══════════════════════════════════════════════════════════
-  // MIGRATION: RSI(7/14) → RSI(2) system
+  // MIGRATION: Watchlist cleanup
   // ═══════════════════════════════════════════════════════════
   
   // Migrate watchlist: beta → atr
@@ -2495,8 +2712,32 @@ async function saveTrade() {
     delete t.result;
   }
   
-  if(id) { const i=cache.trades.findIndex(x=>x.id===id); if(i>=0) cache.trades[i]=t; else cache.trades.unshift(t); }
-  else cache.trades.unshift(t);
+  if(id) { 
+    const i=cache.trades.findIndex(x=>x.id===id); 
+    if(i>=0) {
+      const oldStatus = cache.trades[i].status;
+      cache.trades[i]=t; 
+      // Log status change
+      if (oldStatus !== t.status) {
+        logEvent('ibs_swing', t.status === 'CLOSED' ? 'trade_close' : 'trade_update', {
+          id: t.id, ticker: t.ticker, type: t.type, 
+          entry: t.entry, exit: t.exitPrice, pnlPct: t.pnlPct, reason: t.exitReason
+        });
+      }
+    } else {
+      cache.trades.unshift(t);
+      logEvent('ibs_swing', 'trade_open', { id: t.id, ticker: t.ticker, type: t.type, entry: t.entry });
+    }
+  } else {
+    cache.trades.unshift(t);
+    logEvent('ibs_swing', 'trade_open', { id: t.id, ticker: t.ticker, type: t.type, entry: t.entry });
+  }
+  
+  // Sync to new structure
+  if (cache.strategies.ibs_swing) {
+    cache.strategies.ibs_swing.trades = cache.trades;
+  }
+  
   scheduleSave(); const ok = true;
   if(ok) { closeMo('moTrade'); renderTrades(); renderDash(); toast(id?'Сделка обновлена ✓':'Сделка добавлена ✓'); }
 }
@@ -3074,6 +3315,23 @@ function renderDash() {
           <span>Цель 2: <span class="g">$${(entry * (1 + dir * atrPct * 2 / 100)).toFixed(2)}</span> <span style="color:var(--t3)">(+${(atrPct * 2).toFixed(1)}%)</span></span>
           <span>−0.5 ATR: <span class="r">$${(entry * (1 - dir * atrPct * 0.5 / 100)).toFixed(2)}</span></span>
         </div>` : ''}
+        
+        <!-- Trailing stop row (after Target 1 hit) -->
+        ${t.partialExit || t.status === 'PARTIAL' ? (() => {
+          const lp = livePrices[t.ticker];
+          const currentClose = closeVal || lp?.price || entry;
+          // Trailing = Close - 1×ATR (for LONG), Close + 1×ATR (for SHORT)
+          const trailingStop = atrPct ? currentClose * (1 - dir * atrPct / 100) : entry;
+          const breakevenStop = entry;
+          // Use max of trailing and breakeven for LONG, min for SHORT
+          const effectiveStop = dir === 1 ? Math.max(trailingStop, breakevenStop) : Math.min(trailingStop, breakevenStop);
+          return `<div style="display:flex;gap:16px;margin-top:6px;flex-wrap:wrap;font-family:var(--mono);font-size:10px;padding:6px 10px;background:rgba(126,232,162,.08);border-radius:6px;border:1px solid rgba(126,232,162,.2)">
+            <span style="color:var(--acc);font-weight:700">✓ Target 1 HIT</span>
+            <span>B/E: <span style="color:var(--text)">$${breakevenStop.toFixed(2)}</span></span>
+            <span>Trailing: <span style="color:var(--acc3)">$${trailingStop.toFixed(2)}</span> <span style="color:var(--t3)">(Close − 1×ATR)</span></span>
+            <span>→ Стоп: <span class="g" style="font-weight:700">$${effectiveStop.toFixed(2)}</span></span>
+          </div>`;
+        })() : ''}
 
         <!-- Live price row -->
         ${(() => {
@@ -3512,21 +3770,21 @@ function migrateRsiData(todayDate) {
 
 function computeSignal(w, scan) {
   // ═══════════════════════════════════════════════════════════
-  // RSI(2) SWING SYSTEM — SIGNAL CHECK
+  // IBS MEAN REVERSION SYSTEM — SIGNAL CHECK
   // ═══════════════════════════════════════════════════════════
-  // LONG:  RSI(2) < 10 + Price > SMA200 + 3 down days + CLV ≤ 0.3
-  // SHORT: RSI(2) > 90 + Price < SMA200 + 3 up days + CLV ≥ 0.7
+  // LONG:  RSI(2) < 10 + Price > SMA200 + SMA200 растёт + IBS < 0.20 + Range < 2×ATR
+  // SHORT: RSI(2) > 90 + Price < SMA200 + SMA200 падает + IBS > 0.80 + Range < 2×ATR
   // 
-  // CLV = (Close(T-1) - Low(T-1)) / (High(T-1) - Low(T-1))
+  // IBS = (Close(T-1) - Low(T-1)) / (High(T-1) - Low(T-1))
+  // Range = High(T-1) - Low(T-1)
   // 
   // Gap Check (after signal confirmed):
-  // GapATR = (Close(T-1) - Open(T0)) / Close(T-1) / ATR%
-  // Bad gap for LONG: Open(T0) < Close(T-1) (gap down when buying)
-  // Bad gap for SHORT: Open(T0) > Close(T-1) (gap up when shorting)
-  // If bad gap → Entry at Mid(T-1) = (High + Low) / 2 only
+  // Gap > 2% в нужную сторону → отмена входа
+  // LONG:  Open(T0) ≥ Close(T-1) × 1.02 → отмена
+  // SHORT: Open(T0) ≤ Close(T-1) × 0.98 → отмена
   // ═══════════════════════════════════════════════════════════
   
-  const { rsi2, sma200, close1, low1, high1, open0, close2, close3 } = scan;
+  const { rsi2, sma200, sma200_20, close1, low1, high1, open0, close2, close3 } = scan;
   const atrPct = parseFloat(w.atr) || 0;
   
   // Need RSI(2) from T-1 to evaluate
@@ -3534,6 +3792,7 @@ function computeSignal(w, scan) {
   
   const rsi = parseFloat(rsi2);
   const sma = parseFloat(sma200);
+  const sma20 = parseFloat(sma200_20);  // SMA200 от 20 дней назад
   const c1 = parseFloat(close1);  // Close T-1
   const l1 = parseFloat(low1);    // Low T-1
   const h1 = parseFloat(high1);   // High T-1
@@ -3543,11 +3802,15 @@ function computeSignal(w, scan) {
   
   if (isNaN(rsi)) return { signal: 'none' };
   
-  // Calculate CLV = (Close - Low) / (High - Low)
+  // Calculate IBS (CLV) = (Close - Low) / (High - Low)
   let clv = null;
   if (!isNaN(c1) && !isNaN(l1) && !isNaN(h1) && h1 !== l1) {
     clv = (c1 - l1) / (h1 - l1);
   }
+  
+  // Calculate Range = High - Low
+  const range = (!isNaN(h1) && !isNaN(l1)) ? h1 - l1 : null;
+  const rangePct = (range && c1) ? (range / c1) * 100 : null;
   
   // Calculate Mid(T-1) for alternative entry
   const mid1 = (!isNaN(h1) && !isNaN(l1)) ? (h1 + l1) / 2 : null;
@@ -3556,6 +3819,7 @@ function computeSignal(w, scan) {
   let gapPct = null;
   let gapATR = null;
   let badGap = false;
+  let gapCancel = false;  // Gap > 2% — отмена входа
   
   if (!isNaN(c1) && !isNaN(o0) && c1 !== 0) {
     gapPct = ((o0 - c1) / c1) * 100;  // Gap as percentage
@@ -3567,63 +3831,81 @@ function computeSignal(w, scan) {
   // Check conditions
   const hasCandles = !isNaN(c1) && !isNaN(c2) && !isNaN(c3);
   const hasSma = !isNaN(sma);
+  const hasSma20 = !isNaN(sma20);
   const hasClv = clv !== null;
   const hasOpen = !isNaN(o0);
+  const hasRange = rangePct !== null && atrPct > 0;
   
   // LONG conditions
   const longRsi = rsi < 10;
   const longTrend = hasSma && c1 > sma;
+  const longSmaRising = hasSma && hasSma20 && sma > sma20;  // SMA200 растёт
   const longCandles = hasCandles && c1 < c2 && c2 < c3;  // 3 down days
-  const longClv = hasClv && clv <= 0.3;
+  const longClv = hasClv && clv < 0.20;  // IBS < 0.20
+  const longRange = hasRange && rangePct < (atrPct * 2);  // Range < 2×ATR
   
   // SHORT conditions  
   const shortRsi = rsi > 90;
   const shortTrend = hasSma && c1 < sma;
+  const shortSmaFalling = hasSma && hasSma20 && sma < sma20;  // SMA200 падает
   const shortCandles = hasCandles && c1 > c2 && c2 > c3;  // 3 up days
-  const shortClv = hasClv && clv >= 0.7;
+  const shortClv = hasClv && clv > 0.80;  // IBS > 0.80
+  const shortRange = hasRange && rangePct < (atrPct * 2);  // Range < 2×ATR
   
   // Determine entry price based on gap
   let entryPrice = null;
   let entryType = 'OPEN';  // Default: enter at Open(T0)
   
   // LONG SIGNAL
-  if (longRsi && longTrend && longCandles && longClv) {
-    // Check gap for LONG: bad if Open(T0) > Close(T-1) (gapped up - price moved away)
+  if (longRsi && longTrend && longSmaRising && longCandles && longClv && longRange) {
     if (hasOpen) {
-      badGap = o0 > c1;  // Gap up is bad for LONG entry
-      if (badGap && mid1) {
-        entryPrice = mid1;
-        entryType = 'MID';
-      } else {
-        entryPrice = o0;
-        entryType = 'OPEN';
+      // Gap > 2% в нужную сторону → отмена
+      gapCancel = o0 >= c1 * 1.02;
+      if (gapCancel) {
+        return { signal: 'GAP_CANCEL_LONG', clv, mid1, gapPct, reason: `Gap +${gapPct.toFixed(1)}% ≥ 2%` };
       }
+      entryPrice = o0;
+      entryType = 'OPEN';
     }
-    return { signal: 'LONG_SIGNAL', clv, mid1, gapPct, gapATR, badGap, entryPrice, entryType };
+    return { signal: 'LONG_SIGNAL', clv, mid1, gapPct, gapATR, badGap: false, entryPrice, entryType, rangePct };
   }
   
   // SHORT SIGNAL
-  if (shortRsi && shortTrend && shortCandles && shortClv) {
-    // Check gap for SHORT: bad if Open(T0) < Close(T-1) (gapped down - price moved in our favor already)
+  if (shortRsi && shortTrend && shortSmaFalling && shortCandles && shortClv && shortRange) {
     if (hasOpen) {
-      badGap = o0 < c1;  // Gap down is bad for SHORT entry (missed the move)
-      if (badGap && mid1) {
-        entryPrice = mid1;
-        entryType = 'MID';
-      } else {
-        entryPrice = o0;
-        entryType = 'OPEN';
+      // Gap > 2% в нужную сторону → отмена
+      gapCancel = o0 <= c1 * 0.98;
+      if (gapCancel) {
+        return { signal: 'GAP_CANCEL_SHORT', clv, mid1, gapPct, reason: `Gap ${gapPct.toFixed(1)}% ≤ -2%` };
       }
+      entryPrice = o0;
+      entryType = 'OPEN';
     }
-    return { signal: 'SHORT_SIGNAL', clv, mid1, gapPct, gapATR, badGap, entryPrice, entryType };
+    return { signal: 'SHORT_SIGNAL', clv, mid1, gapPct, gapATR, badGap: false, entryPrice, entryType, rangePct };
   }
   
-  // CLV fail - show why signal didn't trigger
-  if (longRsi && longTrend && longCandles && hasClv && clv > 0.3) {
-    return { signal: 'CLV_FAIL_LONG', clv, mid1, gapPct, reason: `CLV ${clv.toFixed(2)} > 0.3` };
+  // Fail reasons - show why signal didn't trigger
+  if (longRsi && longTrend && longCandles) {
+    if (hasClv && clv >= 0.20) {
+      return { signal: 'CLV_FAIL_LONG', clv, mid1, gapPct, reason: `IBS ${clv.toFixed(2)} ≥ 0.20` };
+    }
+    if (!longSmaRising && hasSma20) {
+      return { signal: 'SMA_FAIL_LONG', clv, mid1, gapPct, reason: `SMA200 не растёт` };
+    }
+    if (!longRange && hasRange) {
+      return { signal: 'RANGE_FAIL_LONG', clv, mid1, gapPct, reason: `Range ${rangePct?.toFixed(1)}% ≥ ${(atrPct * 2).toFixed(1)}%` };
+    }
   }
-  if (shortRsi && shortTrend && shortCandles && hasClv && clv < 0.7) {
-    return { signal: 'CLV_FAIL_SHORT', clv, mid1, gapPct, reason: `CLV ${clv.toFixed(2)} < 0.7` };
+  if (shortRsi && shortTrend && shortCandles) {
+    if (hasClv && clv <= 0.80) {
+      return { signal: 'CLV_FAIL_SHORT', clv, mid1, gapPct, reason: `IBS ${clv.toFixed(2)} ≤ 0.80` };
+    }
+    if (!shortSmaFalling && hasSma20) {
+      return { signal: 'SMA_FAIL_SHORT', clv, mid1, gapPct, reason: `SMA200 не падает` };
+    }
+    if (!shortRange && hasRange) {
+      return { signal: 'RANGE_FAIL_SHORT', clv, mid1, gapPct, reason: `Range ${rangePct?.toFixed(1)}% ≥ ${(atrPct * 2).toFixed(1)}%` };
+    }
   }
   
   // WATCH LONG: RSI(2) < 15 + uptrend
@@ -3654,7 +3936,7 @@ function renderRsiScan() {
   const wl = cache.watchlist;
   if (!wl.length) {
     document.getElementById('rsiScanTbody').innerHTML =
-      '<tr><td colspan="13" style="text-align:center;color:var(--t2);padding:30px">Add stocks to watchlist</td></tr>';
+      '<tr><td colspan="14" style="text-align:center;color:var(--t2);padding:30px">Add stocks to watchlist</td></tr>';
     return;
   }
 
@@ -3684,7 +3966,7 @@ function renderRsiScan() {
 
   if (filterActive && !filteredWl.length) {
     document.getElementById('rsiScanTbody').innerHTML =
-      '<tr><td colspan="13" style="text-align:center;color:var(--t2);padding:30px">Нет активных — снимите фильтр или заполните данные</td></tr>';
+      '<tr><td colspan="14" style="text-align:center;color:var(--t2);padding:30px">Нет активных — снимите фильтр или заполните данные</td></tr>';
     return;
   }
 
@@ -3697,6 +3979,7 @@ function renderRsiScan() {
     // Get scan values
     const rsi2 = t0Scan[w.ticker + '_rsi2'] ?? '';
     const sma200 = t0Scan[w.ticker + '_sma200'] ?? '';
+    const sma200_20 = t0Scan[w.ticker + '_sma200_20'] ?? '';  // SMA200 от 20 дней назад
     const close1 = t0Scan[w.ticker + '_close1'] ?? '';
     const low1 = t0Scan[w.ticker + '_low1'] ?? '';
     const high1 = t0Scan[w.ticker + '_high1'] ?? '';
@@ -3705,15 +3988,15 @@ function renderRsiScan() {
     const close3 = t0Scan[w.ticker + '_close3'] ?? '';
     const atrPct = w.atr || '';
 
-    // Compute signal with CLV and Gap
+    // Compute signal with IBS and new rules
     const sigResult = inactive ? { signal: 'blocked' } : hasPosition ? { signal: 'position' } : computeSignal(w, { 
-      rsi2, sma200, close1, low1, high1, open0, close2, close3
+      rsi2, sma200, sma200_20, close1, low1, high1, open0, close2, close3
     });
     const sig = sigResult.signal;
-    const clv = sigResult.clv;
+    const clv = sigResult.clv;  // IBS
     const mid1 = sigResult.mid1;
     const gapPct = sigResult.gapPct;
-    const badGap = sigResult.badGap;
+    const rangePct = sigResult.rangePct;
     const entryPrice = sigResult.entryPrice;
     const entryType = sigResult.entryType;
 
@@ -3722,8 +4005,14 @@ function renderRsiScan() {
     switch(sig) {
       case 'LONG_SIGNAL':  sigHtml = '<span class="sig-long">🟢 LONG</span>'; break;
       case 'SHORT_SIGNAL': sigHtml = '<span class="sig-short">🔴 SHORT</span>'; break;
-      case 'CLV_FAIL_LONG':  sigHtml = `<span class="sig-watch" title="${sigResult.reason||''}">⚠️ CLV</span>`; break;
-      case 'CLV_FAIL_SHORT': sigHtml = `<span class="sig-watch" title="${sigResult.reason||''}">⚠️ CLV</span>`; break;
+      case 'GAP_CANCEL_LONG':  sigHtml = `<span class="sig-watch" title="${sigResult.reason||''}">❌ Gap</span>`; break;
+      case 'GAP_CANCEL_SHORT': sigHtml = `<span class="sig-watch" title="${sigResult.reason||''}">❌ Gap</span>`; break;
+      case 'CLV_FAIL_LONG':  sigHtml = `<span class="sig-watch" title="${sigResult.reason||''}">⚠️ IBS</span>`; break;
+      case 'CLV_FAIL_SHORT': sigHtml = `<span class="sig-watch" title="${sigResult.reason||''}">⚠️ IBS</span>`; break;
+      case 'SMA_FAIL_LONG':  sigHtml = `<span class="sig-watch" title="${sigResult.reason||''}">⚠️ SMA</span>`; break;
+      case 'SMA_FAIL_SHORT': sigHtml = `<span class="sig-watch" title="${sigResult.reason||''}">⚠️ SMA</span>`; break;
+      case 'RANGE_FAIL_LONG':  sigHtml = `<span class="sig-watch" title="${sigResult.reason||''}">⚠️ Range</span>`; break;
+      case 'RANGE_FAIL_SHORT': sigHtml = `<span class="sig-watch" title="${sigResult.reason||''}">⚠️ Range</span>`; break;
       case 'WATCH_LONG':   sigHtml = '<span class="sig-watch">👀 L</span>'; break;
       case 'WATCH_SHORT':  sigHtml = '<span class="sig-watch">👀 S</span>'; break;
       case 'blocked':      sigHtml = `<span class="sig-none">${boBool ? '🚫' : '⏳'}</span>`; break;
@@ -3738,51 +4027,51 @@ function renderRsiScan() {
     // Gap display
     let gapHtml = '—';
     if (gapPct !== null && gapPct !== undefined) {
-      const gapColor = badGap ? 'var(--acc2)' : 'var(--acc)';
-      const gapIcon = badGap ? '⚠️' : '✓';
-      gapHtml = `<span style="color:${gapColor};font-size:9px">${gapPct >= 0 ? '+' : ''}${gapPct.toFixed(1)}% ${gapIcon}</span>`;
+      const isCancel = sig === 'GAP_CANCEL_LONG' || sig === 'GAP_CANCEL_SHORT';
+      const gapColor = isCancel ? 'var(--acc2)' : Math.abs(gapPct) >= 2 ? 'var(--acc3)' : 'var(--acc)';
+      gapHtml = `<span style="color:${gapColor};font-size:9px">${gapPct >= 0 ? '+' : ''}${gapPct.toFixed(1)}%</span>`;
     }
 
-    // Entry price display - show Mid(T-1) even before Open(T0) is entered
-    let entryHtml = '—';
-    if (mid1 != null) {
-      // Always show Mid as forecast entry
-      if (sig === 'LONG_SIGNAL' || sig === 'SHORT_SIGNAL') {
-        if (entryType === 'MID') {
-          entryHtml = `<span style="color:var(--acc3);font-weight:700">$${mid1.toFixed(2)}</span><br><span style="font-size:8px;color:var(--acc2)">Mid only!</span>`;
-        } else if (entryPrice != null) {
-          entryHtml = `<span style="color:var(--acc);font-weight:700">$${entryPrice.toFixed(2)}</span><br><span style="font-size:8px">Open ✓</span>`;
-        } else {
-          entryHtml = `<span style="color:var(--t2)">$${mid1.toFixed(2)}</span><br><span style="font-size:8px">Mid est.</span>`;
-        }
-      } else {
-        // Not a signal yet, but show Mid as estimate
-        entryHtml = `<span style="color:var(--t3);font-size:10px">$${mid1.toFixed(2)}</span>`;
-      }
-    }
-
-    // RSI(2) color
-    const rsiVal = parseFloat(rsi2);
-    const rsiColor = isNaN(rsiVal) ? 'var(--t2)' : rsiVal < 10 ? 'var(--acc)' : rsiVal > 90 ? 'var(--acc2)' : rsiVal < 20 ? 'var(--acc3)' : rsiVal > 80 ? 'var(--acc3)' : 'var(--t2)';
-    
-    // CLV color and display
-    let clvHtml = '—';
+    // IBS (CLV) color and display
+    let ibsHtml = '—';
     if (clv !== null && clv !== undefined) {
-      const clvColor = clv <= 0.3 ? 'var(--acc)' : clv >= 0.7 ? 'var(--acc2)' : 'var(--t2)';
-      const clvIcon = clv <= 0.3 ? '✓L' : clv >= 0.7 ? '✓S' : '';
-      clvHtml = `<span style="color:${clvColor};font-weight:${clvIcon ? '700' : '400'}">${clv.toFixed(2)}</span>`;
+      const ibsColor = clv < 0.20 ? 'var(--acc)' : clv > 0.80 ? 'var(--acc2)' : 'var(--t2)';
+      const ibsIcon = clv < 0.20 ? '✓L' : clv > 0.80 ? '✓S' : '';
+      ibsHtml = `<span style="color:${ibsColor};font-weight:${ibsIcon ? '700' : '400'}">${clv.toFixed(2)}</span>`;
     }
     
-    // Trend color (Close T-1 vs SMA200)
+    // Range display
     const c1 = parseFloat(close1);
+    const l1 = parseFloat(low1);
+    const h1 = parseFloat(high1);
+    const atr = parseFloat(atrPct) || 0;
+    let rangeHtml = '—';
+    if (!isNaN(c1) && !isNaN(l1) && !isNaN(h1) && c1 > 0) {
+      const rangePctCalc = ((h1 - l1) / c1) * 100;
+      const rangeOk = atr > 0 && rangePctCalc < (atr * 2);
+      rangeHtml = `<span style="color:${rangeOk ? 'var(--acc)' : atr > 0 ? 'var(--acc2)' : 'var(--t2)'};font-size:9px">${rangePctCalc.toFixed(1)}%</span>`;
+    }
+    
+    // Trend and SMA trend direction
     const sma = parseFloat(sma200);
+    const sma20 = parseFloat(sma200_20);
     const trendIcon = (isNaN(c1) || isNaN(sma)) ? '' : c1 > sma ? '<span class="g">▲</span>' : '<span class="r">▼</span>';
+    let smaTrendHtml = '—';
+    if (!isNaN(sma) && !isNaN(sma20)) {
+      const smaUp = sma > sma20;
+      smaTrendHtml = `<span style="color:${smaUp ? 'var(--acc)' : 'var(--acc2)'}">${smaUp ? '↑' : '↓'}</span>`;
+    }
 
     const rowBg = hasPosition ? 'background:rgba(91,156,246,.06)' :
                   sig === 'LONG_SIGNAL'  ? 'background:rgba(126,232,162,.08)' :
                   sig === 'SHORT_SIGNAL' ? 'background:rgba(255,107,138,.08)' :
-                  (sig && sig.includes('CLV_FAIL')) ? 'background:rgba(255,200,90,.06)' :
+                  (sig && sig.includes('FAIL')) ? 'background:rgba(255,200,90,.06)' :
+                  (sig && sig.includes('GAP_CANCEL')) ? 'background:rgba(255,107,138,.06)' :
                   sig === 'WATCH_LONG' || sig === 'WATCH_SHORT' ? 'background:rgba(255,200,90,.04)' : '';
+
+    // RSI(2) color
+    const rsiVal = parseFloat(rsi2);
+    const rsiColor = isNaN(rsiVal) ? 'var(--t2)' : rsiVal < 10 ? 'var(--acc)' : rsiVal > 90 ? 'var(--acc2)' : rsiVal < 20 ? 'var(--acc3)' : rsiVal > 80 ? 'var(--acc3)' : 'var(--t2)';
 
     return `<tr style="${rowBg}">
       <td style="font-weight:700;font-size:11px">${w.ticker}${hasPosition ? ' <span style="color:var(--acc4);font-size:8px">●</span>' : ''}</td>
@@ -3814,7 +4103,8 @@ function renderRsiScan() {
           onchange="updateRsiScan('${w.ticker}','high1',this.value)"
           ${inactive ? 'disabled style="opacity:.4"' : ''}>
       </td>
-      <td style="font-family:var(--mono);font-size:10px">${clvHtml}</td>
+      <td style="font-family:var(--mono);font-size:10px">${ibsHtml}</td>
+      <td style="font-family:var(--mono);font-size:9px">${rangeHtml}</td>
       <td>
         <input class="rsi-inp" type="number" step="0.01"
           value="${open0}" placeholder="—"
@@ -3831,6 +4121,14 @@ function renderRsiScan() {
           ${inactive ? 'disabled style="opacity:.4"' : ''}>
         ${trendIcon}
       </td>
+      <td style="font-family:var(--mono);font-size:11px">
+        ${smaTrendHtml}
+        <input class="rsi-inp" type="number" step="0.01" style="width:55px;font-size:9px"
+          value="${sma200_20}" placeholder="SMA-20"
+          onclick="this.select()" onfocus="this.select()"
+          onchange="updateRsiScan('${w.ticker}','sma200_20',this.value)"
+          ${inactive ? 'disabled style="opacity:.4"' : ''}>
+      </td>
       <td>
         <input class="rsi-inp" type="number" step="0.01" style="width:60px"
           value="${close2}" placeholder="—"
@@ -3846,7 +4144,6 @@ function renderRsiScan() {
           ${inactive ? 'disabled style="opacity:.4"' : ''}>
       </td>
       <td>${sigHtml}</td>
-      <td style="font-family:var(--mono);font-size:9px">${entryHtml}</td>
     </tr>`;
   }).join('');
 
@@ -4256,6 +4553,9 @@ async function init() {
 
   try { document.getElementById('hdrDate').textContent = today(); } catch {}
 
+  // Render strategy selector
+  renderStrategyTabs();
+  
   loadSetsUI(); loadGhUI(); loadFhKeyUI(); loadTnSession(); initChecklist(); renderHolidays();
   renderDash(); renderTrades(); renderWL(); renderQ(); renderRsiScan();
 
