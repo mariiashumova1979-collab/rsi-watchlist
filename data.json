@@ -7663,7 +7663,8 @@
           "NFLX_rsi2": 3.47,
           "NFLX_close1": 94.83,
           "NFLX_low1": 93.54,
-          "NFLX_high1": 97.6
+          "NFLX_high1": 97.6,
+          "NFLX_open0": 94
         }
       },
       "config": {}
@@ -11806,7 +11807,8 @@
       "NFLX_rsi2": 3.47,
       "NFLX_close1": 94.83,
       "NFLX_low1": 93.54,
-      "NFLX_high1": 97.6
+      "NFLX_high1": 97.6,
+      "NFLX_open0": 94
     }
   },
   "quarterly": {},
