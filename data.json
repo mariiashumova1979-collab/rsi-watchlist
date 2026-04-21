@@ -25,7 +25,7 @@
     },
     {
       "id": "1776255568118",
-      "createdAt": 1776255568118,
+      "createdAt": 1776799988398,
       "ticker": "MSFT",
       "type": "SHORT",
       "entryDate": "2026-04-15",
@@ -37,7 +37,7 @@
       "rsi2": "",
       "atrPct": "2.28",
       "trend": "",
-      "status": "OPEN",
+      "status": "CLOSED",
       "exitPrice": 0,
       "exitReason": "",
       "commission": 0,
