@@ -2,7 +2,7 @@
   "trades": [
     {
       "id": "1776255613535",
-      "createdAt": 1776255613535,
+      "createdAt": 1776799569953,
       "ticker": "META",
       "type": "SHORT",
       "entryDate": "2026-04-15",
@@ -14,11 +14,14 @@
       "rsi2": "",
       "atrPct": "3.58",
       "trend": "",
-      "status": "OPEN",
-      "exitPrice": 0,
-      "exitReason": "",
-      "commission": 0,
-      "notes": ""
+      "status": "CLOSED",
+      "exitPrice": 674.95,
+      "exitReason": "MANUAL",
+      "commission": 4,
+      "notes": "",
+      "pnlNet": -27.44,
+      "pnlPct": -2.07,
+      "result": "LOSS"
     },
     {
       "id": "1776255568118",
