@@ -7672,8 +7672,8 @@
           "NFLX_high1": 97.6,
           "NFLX_open0": 94,
           "NFLX_sma200_20": 107.25,
-          "NFLX_close2": 97.31,
-          "NFLX_close3": 107.71
+          "NFLX_close2": 105.52,
+          "NFLX_close3": 107.25
         }
       },
       "config": {}
@@ -11819,8 +11819,8 @@
       "NFLX_high1": 97.6,
       "NFLX_open0": 94,
       "NFLX_sma200_20": 107.25,
-      "NFLX_close2": 97.31,
-      "NFLX_close3": 107.71
+      "NFLX_close2": 105.52,
+      "NFLX_close3": 107.25
     }
   },
   "quarterly": {},
