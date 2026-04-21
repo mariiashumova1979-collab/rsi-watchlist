@@ -85,7 +85,7 @@
     },
     {
       "id": "1776087500406",
-      "createdAt": 1776087500406,
+      "createdAt": 1776800009636,
       "ticker": "URI",
       "type": "SHORT",
       "entryDate": "2026-04-13",
@@ -97,7 +97,7 @@
       "rsi2": "",
       "atrPct": "3.3",
       "trend": "",
-      "status": "OPEN",
+      "status": "CLOSED",
       "exitPrice": 0,
       "exitReason": "",
       "commission": 0,
