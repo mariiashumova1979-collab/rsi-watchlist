@@ -7662,7 +7662,8 @@
           "_migration_done": true,
           "NFLX_rsi2": 3.47,
           "NFLX_close1": 94.83,
-          "NFLX_low1": 93.54
+          "NFLX_low1": 93.54,
+          "NFLX_high1": 97.6
         }
       },
       "config": {}
@@ -11804,7 +11805,8 @@
       "_migration_done": true,
       "NFLX_rsi2": 3.47,
       "NFLX_close1": 94.83,
-      "NFLX_low1": 93.54
+      "NFLX_low1": 93.54,
+      "NFLX_high1": 97.6
     }
   },
   "quarterly": {},
