@@ -7972,7 +7972,8 @@
           "DKNG_close2": 35.97,
           "JD_close2": 31.1,
           "CRWD_close2": 463.13,
-          "PFE_rsi2": 7.42
+          "PFE_rsi2": 7.42,
+          "PFE_close1": 26.8
         }
       },
       "config": {}
@@ -12318,7 +12319,8 @@
       "DKNG_close2": 35.97,
       "JD_close2": 31.1,
       "CRWD_close2": 463.13,
-      "PFE_rsi2": 7.42
+      "PFE_rsi2": 7.42,
+      "PFE_close1": 26.8
     }
   },
   "quarterly": {},
