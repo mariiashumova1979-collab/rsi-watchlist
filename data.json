@@ -7973,7 +7973,8 @@
           "JD_close2": 31.1,
           "CRWD_close2": 463.13,
           "PFE_rsi2": 7.42,
-          "PFE_close1": 26.8
+          "PFE_close1": 26.8,
+          "PFE_low1": 26.74
         }
       },
       "config": {}
@@ -12320,7 +12321,8 @@
       "JD_close2": 31.1,
       "CRWD_close2": 463.13,
       "PFE_rsi2": 7.42,
-      "PFE_close1": 26.8
+      "PFE_close1": 26.8,
+      "PFE_low1": 26.74
     }
   },
   "quarterly": {},
