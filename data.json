@@ -1,6 +1,16 @@
 {
   "watchlist": [
     {
+      "ticker": "PFE",
+      "sector": "Healthcare",
+      "cap": "152.45",
+      "atr": "2.06",
+      "earningsDate": "2026-05-05",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1776924687656
+    },
+    {
       "ticker": "PCG",
       "sector": "Utilities",
       "cap": "37.32",
