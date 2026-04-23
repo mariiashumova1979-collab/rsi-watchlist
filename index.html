@@ -395,6 +395,10 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
 }
 .strat-btn.active .strat-count{background:rgba(126,232,162,.2);color:var(--acc)}
 .strat-btn.disabled{opacity:.4;cursor:not-allowed}
+
+/* RULES SECTIONS */
+.rules-section{animation:fadeIn .2s}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
 </style>
 </head>
 <body>
@@ -440,6 +444,7 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
   <div class="ntab" onclick="goTab('instruments')">📈 Инструменты</div>
   <div class="ntab" onclick="goTab('trades')">📋 Сделки</div>
   <div class="ntab" onclick="goTab('watchlist')">👁 Список</div>
+  <div class="ntab" onclick="goTab('rules')">📖 Правила</div>
   <div class="ntab" onclick="goTab('quarterly')">📅 Квартал</div>
   <div class="ntab" onclick="goTab('settings')">⚙️ Настройки</div>
 </nav>
@@ -604,18 +609,16 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
       <table>
         <thead><tr>
           <th>Ticker</th>
-          <th>RSI(2)<br><span style="font-weight:400;font-size:9px">T-1</span></th>
-          <th>Close<br><span style="font-weight:400;font-size:9px">T-1</span></th>
-          <th>Low<br><span style="font-weight:400;font-size:9px">T-1</span></th>
-          <th>High<br><span style="font-weight:400;font-size:9px">T-1</span></th>
+          <th>RSI(2)<br><span style="font-weight:400;font-size:9px">T0</span></th>
+          <th>Close<br><span style="font-weight:400;font-size:9px">T0</span></th>
+          <th>Low<br><span style="font-weight:400;font-size:9px">T0</span></th>
+          <th>High<br><span style="font-weight:400;font-size:9px">T0</span></th>
           <th>IBS</th>
           <th>Range%</th>
-          <th>Open<br><span style="font-weight:400;font-size:9px">T0</span></th>
+          <th>Open<br><span style="font-weight:400;font-size:9px">D+1</span></th>
           <th>Gap</th>
           <th>SMA200</th>
           <th>SMA↑↓</th>
-          <th>Close<br><span style="font-weight:400;font-size:9px">T-2</span></th>
-          <th>Close<br><span style="font-weight:400;font-size:9px">T-3</span></th>
           <th>Signal</th>
         </tr></thead>
         <tbody id="rsiScanTbody"></tbody>
@@ -649,6 +652,198 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
     </select>
   </div>
   <div class="wgrid" id="wlGrid"></div>
+</div>
+
+<!-- ═══════════════════════ RULES ═══════════════════════ -->
+<div class="tab" id="tab-rules">
+  <div style="font-size:22px;font-weight:800;margin-bottom:22px">📖 Правила торговли</div>
+  
+  <!-- Sub-tabs for rules -->
+  <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
+    <button class="btn btn-p btn-s" id="rulesTabGeneral" onclick="showRulesTab('general')">📋 Общие правила</button>
+    <button class="btn btn-g btn-s" id="rulesTabStrategy" onclick="showRulesTab('strategy')">📊 IBS Mean Reversion</button>
+    <button class="btn btn-g btn-s" id="rulesTabWatchlist" onclick="showRulesTab('watchlist')">👁 Правила списка</button>
+  </div>
+  
+  <!-- General Rules -->
+  <div id="rulesGeneral" class="rules-section">
+    <div class="card">
+      <div class="sh">Обозначения дней</div>
+      <div style="font-family:var(--mono);font-size:11px;line-height:1.8;color:var(--t2)">
+        <div><b style="color:var(--text)">T0</b> (сигнальный день) — день, когда выполнены все условия сетапа (на закрытии)</div>
+        <div><b style="color:var(--text)">D+1</b> — первый торговый день после T0, <span class="g">день входа</span></div>
+        <div><b style="color:var(--text)">D+k</b> — k-й торговый день после T0</div>
+        <div><b style="color:var(--acc2)">D+5</b> — финальный принудительный выход (time stop)</div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="sh">Базовые метрики</div>
+      <div style="font-family:var(--mono);font-size:10px;line-height:1.9;color:var(--t2);background:var(--bg3);padding:14px;border-radius:8px">
+        <div>ATR14 = Wilder ATR на 14 дневных барах</div>
+        <div>ATRp = ATR14 / Close × 100%</div>
+        <div>SMA_N(X) = простое скользящее среднее X за N дней</div>
+        <div>EMA_N(X) = экспоненциальное скользящее среднее X за N дней</div>
+        <div>RSI14(X) = RSI Уайлдера от X за 14 дней</div>
+        <div>RSI2(X) = RSI Уайлдера от X за 2 дня</div>
+        <div>ADV20 = среднее ($ оборот = Close × Volume) за 20 дней</div>
+        <div>IBS = (Close − Low) / (High − Low)</div>
+        <div>Range = High − Low</div>
+        <div>Return_N = Close_t / Close_{t-N} − 1</div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="sh">Базовый риск на сделку</div>
+      <div style="font-family:var(--mono);font-size:10px;line-height:1.9;color:var(--t2);background:var(--bg3);padding:14px;border-radius:8px">
+        <div><span class="g">RiskPerTrade_$</span> = 1% от капитала (фиксированная константа)</div>
+        <div>StopDistance_$ = |Entry − StopPrice|</div>
+        <div><span class="g">Shares</span> = floor( RiskPerTrade_$ / StopDistance_$ )</div>
+        <div>PositionSize_$ = Shares × Entry</div>
+        <div><span class="r">MaxPositionSize</span> = 25% капитала (ограничение для low-vol сетапов)</div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="sh">🚫 Общие запреты (для всех стратегий)</div>
+      <div style="font-family:var(--mono);font-size:10px;line-height:2.0;color:var(--t2)">
+        <div style="padding:6px 0;border-bottom:1px solid var(--line)">1. <span class="r">Нет сигнала</span>, если на T0 объявлены <b style="color:var(--acc3)">earnings</b> в течение D+1 или D+2 (кроме PEAD)</div>
+        <div style="padding:6px 0;border-bottom:1px solid var(--line)">2. <span class="r">Нет сигнала</span>, если <b style="color:var(--acc3)">VIX ≥ 35</b> на закрытии T0 (экстремальная волатильность)</div>
+        <div style="padding:6px 0;border-bottom:1px solid var(--line)">3. <span class="r">Нет сигнала</span>, если <b style="color:var(--acc3)">Range > 2 × ATR14</b> (news-driven bar)</div>
+        <div style="padding:6px 0;border-bottom:1px solid var(--line)">4. <span class="r">Нет сигнала</span>, если цена <b style="color:var(--acc3)">< $5</b> или <b style="color:var(--acc3)">ADV20 < $20M</b></div>
+        <div style="padding:6px 0;border-bottom:1px solid var(--line)">5. <span class="r">Максимум 5</span> одновременных позиций</div>
+        <div style="padding:6px 0">6. <span class="r">Не открывать</span> две одинаково-направленные позиции в одном секторе (GICS L1) в один день</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Strategy Rules (IBS Mean Reversion) -->
+  <div id="rulesStrategy" class="rules-section" style="display:none">
+    <div class="card">
+      <div class="sh">📊 IBS Mean Reversion</div>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--t2);margin-bottom:12px">
+        Классический mean-reversion на откате в трендовой акции. IBS используется как фильтр качества отката.
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="sh">Market Regime Filter</div>
+      <div style="font-family:var(--mono);font-size:10px;line-height:1.9;color:var(--t2);background:var(--bg3);padding:14px;border-radius:8px">
+        <div><span class="g">LongRegime</span> = SPY_Close_T0 > SMA200(SPY)_T0 → разрешены только long</div>
+        <div><span class="r">ShortRegime</span> = SPY_Close_T0 < SMA200(SPY)_T0 → разрешены только short</div>
+        <div style="color:var(--acc3)">Если SPY ровно на SMA200 (±0.1%) — сделки запрещены</div>
+      </div>
+    </div>
+    
+    <div class="g2">
+      <div class="card">
+        <div class="sh">🟢 Условия сигнала LONG (T0)</div>
+        <div style="font-family:var(--mono);font-size:10px;line-height:2.0;color:var(--t2)">
+          <div>1. Close_T0 > SMA200_T0</div>
+          <div>2. SMA200_T0 > SMA200_{T0−20} <span style="color:var(--t3)">(тренд растёт)</span></div>
+          <div>3. <span class="g">IBS_T0 < 0.20</span></div>
+          <div>4. <span class="g">RSI2_T0 < 10</span></div>
+          <div>5. Range_T0 < 2 × ATR14_T0</div>
+          <div>6. LongRegime = true</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="sh">🔴 Условия сигнала SHORT (T0)</div>
+        <div style="font-family:var(--mono);font-size:10px;line-height:2.0;color:var(--t2)">
+          <div>1. Close_T0 < SMA200_T0</div>
+          <div>2. SMA200_T0 < SMA200_{T0−20} <span style="color:var(--t3)">(тренд падает)</span></div>
+          <div>3. <span class="r">IBS_T0 > 0.80</span></div>
+          <div>4. <span class="r">RSI2_T0 > 90</span></div>
+          <div>5. Range_T0 < 2 × ATR14_T0</div>
+          <div>6. ShortRegime = true</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="sh">Правила входа (D+1)</div>
+      <div style="font-family:var(--mono);font-size:10px;line-height:1.9;color:var(--t2)">
+        <div><b style="color:var(--text)">Entry</b> = Open_{D+1} (market-at-open)</div>
+        <div style="margin-top:8px;color:var(--acc2)"><b>Отмена входа:</b></div>
+        <div>• LONG: если Open_{D+1} ≥ Close_T0 × 1.02 → гэп ≥2% вверх</div>
+        <div>• SHORT: если Open_{D+1} ≤ Close_T0 × 0.98 → гэп ≥2% вниз</div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="sh">Стоп и размер позиции</div>
+      <div style="font-family:var(--mono);font-size:10px;line-height:1.9;color:var(--t2);background:var(--bg3);padding:14px;border-radius:8px">
+        <div>StopDistance = <span class="g">min( 1.5 × ATR14_T0, 0.06 × Entry )</span></div>
+        <div style="margin-top:6px">LONG: StopPrice = Entry − StopDistance</div>
+        <div>SHORT: StopPrice = Entry + StopDistance</div>
+        <div style="margin-top:8px">Shares = floor( Capital × 0.01 / StopDistance )</div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="sh">Правила выхода</div>
+      <div style="font-family:var(--mono);font-size:10px;line-height:1.9;color:var(--t2)">
+        <div style="padding:8px 0;border-bottom:1px solid var(--line)">
+          <b style="color:var(--acc)">Target 1</b> = Entry ± 1.0 × ATR14 → закрыть 50%, стоп → безубыток
+        </div>
+        <div style="padding:8px 0;border-bottom:1px solid var(--line)">
+          <b style="color:var(--acc)">Target 2</b> = Entry ± 2.0 × ATR14 → закрыть остаток
+        </div>
+        <div style="padding:8px 0;border-bottom:1px solid var(--line)">
+          <b style="color:var(--acc3)">Trailing</b> (после Target 1) = Close − 1.0 × ATR14 (подтягивается только вверх для LONG)
+        </div>
+        <div style="padding:8px 0;border-bottom:1px solid var(--line)">
+          <b style="color:var(--acc2)">T0-day check</b>: если High_{D+1} − Entry < 0.5 × ATR → выход по Close_{D+1}
+        </div>
+        <div style="padding:8px 0">
+          <b style="color:var(--acc2)">Time stop</b>: на закрытии D+5 — принудительный выход остатка
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Watchlist Rules -->
+  <div id="rulesWatchlist" class="rules-section" style="display:none">
+    <div class="card">
+      <div class="sh">👁 Правила формирования списка</div>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--t2);margin-bottom:12px">
+        Universe требования для всех стратегий
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="sh">Базовые требования</div>
+      <div style="font-family:var(--mono);font-size:10px;line-height:2.0;color:var(--t2)">
+        <div style="padding:6px 0;border-bottom:1px solid var(--line)">1. Акции индексов <b style="color:var(--text)">S&P 500</b> и <b style="color:var(--text)">Nasdaq-100</b></div>
+        <div style="padding:6px 0;border-bottom:1px solid var(--line)">2. Close ≥ <b style="color:var(--acc)">$10</b></div>
+        <div style="padding:6px 0;border-bottom:1px solid var(--line)">3. ADV20 ≥ <b style="color:var(--acc)">$20M</b></div>
+        <div style="padding:6px 0;border-bottom:1px solid var(--line)">4. Историческая цена доступна за <b style="color:var(--acc)">250+</b> торговых дней</div>
+        <div style="padding:6px 0">5. Сектор указан (GICS Level 1)</div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="sh">Поля инструмента</div>
+      <div style="font-family:var(--mono);font-size:10px;line-height:1.9;color:var(--t2);background:var(--bg3);padding:14px;border-radius:8px">
+        <div><b style="color:var(--text)">ticker</b> — символ (обязательно)</div>
+        <div><b style="color:var(--text)">sector</b> — GICS сектор L1 (обязательно)</div>
+        <div><b style="color:var(--text)">atr</b> — ATR% (обязательно для расчёта стопа и целей)</div>
+        <div><b style="color:var(--t2)">cap</b> — капитализация (Large/Mid/Small)</div>
+        <div><b style="color:var(--t2)">earningsDate</b> — дата ближайших earnings</div>
+        <div><b style="color:var(--t2)">cooldownDate</b> — дата окончания кулдауна после earnings</div>
+        <div><b style="color:var(--t2)">notes</b> — заметки</div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="sh">Blackout правила</div>
+      <div style="font-family:var(--mono);font-size:10px;line-height:1.9;color:var(--t2)">
+        <div>• <b style="color:var(--acc2)">Earnings blackout</b>: −2 дня до earningsDate</div>
+        <div>• <b style="color:var(--acc3)">Cooldown</b>: до cooldownDate после earnings</div>
+        <div>• Инструмент с blackout/cooldown не участвует в сканировании</div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- ═══════════════════════ QUARTERLY ═══════════════════════ -->
@@ -1204,6 +1399,52 @@ const cache = {
   checklist: {}
 };
 
+// ═══════════════════════════════════════════════════════════
+// GLOBAL RULES (shared across all strategies)
+// ═══════════════════════════════════════════════════════════
+const GLOBAL_RULES = {
+  // Risk management
+  riskPerTradePct: 1,           // 1% of capital per trade
+  maxPositionPct: 25,           // Max 25% of capital per position
+  maxPositions: 5,              // Max 5 concurrent positions
+  
+  // Entry filters
+  minPrice: 5,                  // Min $5
+  minADV20: 20000000,           // Min $20M daily volume
+  minHistoryDays: 250,          // Min 250 trading days history
+  vixMax: 35,                   // No trades if VIX >= 35
+  maxRangeATR: 2,               // No signal if Range > 2*ATR
+  
+  // Sector rules
+  oneSectorOneDayOneDirection: true,  // No same-direction trades in same sector same day
+  
+  // Earnings rules
+  earningsBlackoutDays: 2,      // No signal if earnings within 2 days
+  
+  // Universe
+  indices: ['SPX', 'NDX'],      // S&P 500 and Nasdaq-100
+  
+  // Watchlist required fields
+  requiredFields: ['ticker', 'sector', 'atr']
+};
+
+// ═══════════════════════════════════════════════════════════
+// WATCHLIST RULES (shared)
+// ═══════════════════════════════════════════════════════════
+const WATCHLIST_RULES = {
+  requiredFields: {
+    ticker: { type: 'string', required: true, desc: 'Symbol' },
+    sector: { type: 'string', required: true, desc: 'GICS Sector L1' },
+    atr: { type: 'number', required: true, desc: 'ATR%' }
+  },
+  optionalFields: {
+    cap: { type: 'string', values: ['Large', 'Mid', 'Small'], desc: 'Market cap' },
+    earningsDate: { type: 'date', desc: 'Next earnings date' },
+    cooldownDate: { type: 'date', desc: 'Cooldown end date' },
+    notes: { type: 'string', desc: 'Notes' }
+  }
+};
+
 // Current strategy (for routing)
 let currentStrategy = 'ibs_swing';
 
@@ -1243,6 +1484,164 @@ const STRATEGIES = {
     icon: '📈',
     color: 'var(--acc2)',
     description: 'Long-term ETF portfolio'
+  }
+};
+
+// ═══════════════════════════════════════════════════════════
+// COMMON RULES (для всех стратегий)
+// ═══════════════════════════════════════════════════════════
+const COMMON_RULES = {
+  notation: {
+    title: 'Обозначения дней',
+    rules: [
+      'T0 (сигнальный день) — день, когда выполнены все условия сетапа (на закрытии)',
+      'D+1 — первый торговый день после T0, день входа',
+      'D+k — k-й торговый день после T0'
+    ]
+  },
+  metrics: {
+    title: 'Базовые метрики',
+    formulas: [
+      'ATR14 = Wilder ATR на 14 дневных барах',
+      'ATRp = ATR14 / Close × 100%',
+      'SMA_N(X) = простое скользящее среднее X за N дней',
+      'EMA_N(X) = экспоненциальное скользящее среднее X за N дней',
+      'RSI14(X) = RSI Уайлдера от X за 14 дней',
+      'RSI2(X) = RSI Уайлдера от X за 2 дня',
+      'ADV20 = среднее значение ($ оборот = Close × Volume) за 20 дней, в $',
+      'IBS = (Close − Low) / (High − Low)',
+      'Range = High − Low',
+      'Return_N = Close_t / Close_{t-N} − 1'
+    ]
+  },
+  risk: {
+    title: 'Базовый риск на сделку (общий для всех)',
+    formulas: [
+      'RiskPerTrade_$ = 1% от капитала (фиксированная константа)',
+      'StopDistance_$ = |Entry − StopPrice|',
+      'Shares = floor( RiskPerTrade_$ / StopDistance_$ )',
+      'PositionSize_$ = Shares × Entry',
+      'MaxPositionSize = 25% капитала (ограничение для low-vol сетапов)'
+    ]
+  },
+  prohibitions: {
+    title: 'Общие запреты (для всех стратегий)',
+    rules: [
+      'Нет сигнала, если на T0 объявлены earnings в течение следующих 2 торговых дней (D+1 или D+2), за исключением PEAD-стратегии',
+      'Нет сигнала, если VIX закрытие T0 ≥ 35 (экстремальная волатильность — пауза)',
+      'Нет сигнала, если Range на T0 > 2 × ATR14 (news-driven bar, низкое качество сетапа)',
+      'Нет сигнала, если цена < $5 или ADV20 < $20M',
+      'Максимум 5 одновременных позиций',
+      'Не открывать две одинаково-направленные позиции в одном секторе (GICS-sector level 1) в один день'
+    ]
+  },
+  universe: {
+    title: 'Правила формирования списка (watchlist)',
+    rules: [
+      'Акции индексов S&P 500 и Nasdaq-100',
+      'Close ≥ $10',
+      'ADV20 ≥ $20M',
+      'Историческая цена доступна за 250+ торговых дней',
+      'Наличие ATR14 и SMA200 на момент добавления'
+    ]
+  }
+};
+
+// Rules for specific strategies
+const STRATEGY_RULES = {
+  ibs_swing: {
+    name: 'IBS Mean Reversion',
+    description: 'Классический mean-reversion на откате в трендовой акции. IBS используется как фильтр качества отката.',
+    marketRegime: {
+      title: 'Market regime filter',
+      rules: [
+        'LongRegime = SPY_Close_T0 > SMA200(SPY)_T0',
+        'ShortRegime = SPY_Close_T0 < SMA200(SPY)_T0',
+        'LongRegime → разрешены только long-сделки',
+        'ShortRegime → разрешены только short-сделки',
+        'Если SPY ровно на SMA200 (±0.1%) — сделки запрещены'
+      ]
+    },
+    signalLong: {
+      title: 'Условия сигнального дня T0 (LONG)',
+      rules: [
+        'Close_T0 > SMA200_T0',
+        'SMA200_T0 > SMA200_{T0−20} (SMA200 растёт за последний месяц)',
+        'IBS_T0 < 0.20',
+        'RSI2_T0 < 10',
+        'Range_T0 < 2 × ATR14_T0',
+        'LongRegime = true'
+      ]
+    },
+    signalShort: {
+      title: 'Условия сигнального дня T0 (SHORT)',
+      rules: [
+        'Close_T0 < SMA200_T0',
+        'SMA200_T0 < SMA200_{T0−20}',
+        'IBS_T0 > 0.80',
+        'RSI2_T0 > 90',
+        'Range_T0 < 2 × ATR14_T0',
+        'ShortRegime = true'
+      ]
+    },
+    entry: {
+      title: 'Правила входа (D+1)',
+      rules: [
+        'EntryPrice = Open_{D+1}',
+        'Ордер: market-at-open на D+1',
+        'LONG отмена: если Open_{D+1} ≥ Close_T0 × 1.02 (гэп > 2%)',
+        'SHORT отмена: если Open_{D+1} ≤ Close_T0 × 0.98'
+      ]
+    },
+    stop: {
+      title: 'Правила стопа',
+      rules: [
+        'StopDistance = min( 1.5 × ATR14_T0, 0.06 × EntryPrice )',
+        'LONG: StopPrice = EntryPrice − StopDistance',
+        'SHORT: StopPrice = EntryPrice + StopDistance',
+        'Стоп фиксированный, не двигается до Target 1'
+      ]
+    },
+    holding: {
+      title: 'Правила удержания',
+      rules: [
+        'T0-day check (D+1): LONG — если High_{D+1} − Entry < 0.5×ATR на закрытии → выход по Close_{D+1}',
+        'T0-day check (D+1): SHORT — если Entry − Low_{D+1} < 0.5×ATR на закрытии → выход по Close_{D+1}',
+        'D+2..D+4: если касание Target 1 → частичный выход',
+        'D+2..D+4: если касание Stop → выход по Stop'
+      ]
+    },
+    exit: {
+      title: 'Правила выхода',
+      rules: [
+        'Target 1 (50%): LONG = Entry + 1×ATR, SHORT = Entry − 1×ATR',
+        'После Target 1: стоп оставшихся 50% переносится в безубыток (Entry)',
+        'Target 2 (финал): LONG = Entry + 2×ATR, SHORT = Entry − 2×ATR',
+        'Trailing после Target 1: LONG = Close − 1×ATR, SHORT = Close + 1×ATR',
+        'Trailing подтягивается только в сторону прибыли',
+        'Time stop: закрытие D+5 — принудительный выход по Close'
+      ]
+    }
+  },
+  momentum: {
+    name: 'Momentum',
+    description: 'Trend-following momentum (скоро)',
+    _placeholder: true
+  },
+  breakout: {
+    name: 'Breakout',
+    description: 'Range breakout strategy (скоро)',
+    _placeholder: true
+  },
+  options_flow: {
+    name: 'Options Flow',
+    description: 'Unusual options activity (скоро)',
+    _placeholder: true
+  },
+  passive_etf: {
+    name: 'Passive ETF',
+    description: 'Long-term ETF portfolio (скоро)',
+    _placeholder: true
   }
 };
 
@@ -1316,6 +1715,10 @@ function switchStrategy(strategyId) {
   // Update UI
   renderStrategyTabs();
   
+  // Update button label in Rules tab
+  const btn = document.getElementById('rulesTabStrategy');
+  if (btn) btn.textContent = `${strategy.icon} ${strategy.name}`;
+  
   // Update header
   const strategy = STRATEGIES[strategyId];
   const logoMark = document.querySelector('.logo-mark');
@@ -1329,6 +1732,84 @@ function switchStrategy(strategyId) {
   renderRsiScan();
   
   toast(`${strategy.icon} ${strategy.name}`);
+}
+
+// ═══════════════════════════════════════════════════════════
+// RULES TAB NAVIGATION
+// ═══════════════════════════════════════════════════════════
+function showRulesTab(tab) {
+  // Hide all sections
+  document.querySelectorAll('.rules-section').forEach(el => el.style.display = 'none');
+  
+  // Deactivate all buttons
+  ['rulesTabGeneral','rulesTabStrategy','rulesTabWatchlist'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.className = 'btn btn-g btn-s';
+  });
+  
+  // Show selected section and activate button
+  if (tab === 'general') {
+    document.getElementById('rulesGeneral').style.display = 'block';
+    document.getElementById('rulesTabGeneral').className = 'btn btn-p btn-s';
+  } else if (tab === 'strategy') {
+    renderRulesStrategy();
+    document.getElementById('rulesStrategy').style.display = 'block';
+    document.getElementById('rulesTabStrategy').className = 'btn btn-p btn-s';
+  } else if (tab === 'watchlist') {
+    document.getElementById('rulesWatchlist').style.display = 'block';
+    document.getElementById('rulesTabWatchlist').className = 'btn btn-p btn-s';
+  }
+}
+
+function renderRulesStrategy() {
+  const strategy = STRATEGIES[currentStrategy];
+  const rules = STRATEGY_RULES[currentStrategy];
+  const el = document.getElementById('rulesStrategy');
+  if (!el || !rules) return;
+
+  // Update button label
+  const btn = document.getElementById('rulesTabStrategy');
+  if (btn) btn.textContent = `${strategy.icon} ${strategy.name}`;
+
+  if (rules._placeholder) {
+    el.innerHTML = `
+      <div class="card">
+        <div class="sh">${strategy.icon} ${strategy.name}</div>
+        <div style="font-family:var(--mono);font-size:12px;color:var(--t2);padding:20px;text-align:center">
+          Правила для этой стратегии будут добавлены позже
+        </div>
+      </div>`;
+    return;
+  }
+
+  // Render ibs_swing (and future strategies from STRATEGY_RULES)
+  const sections = [
+    rules.marketRegime,
+    rules.signalLong,
+    rules.signalShort,
+    rules.entry,
+    rules.stop,
+    rules.holding,
+    rules.exit
+  ].filter(Boolean);
+
+  el.innerHTML = `
+    <div class="card">
+      <div class="sh">${strategy.icon} ${rules.name}</div>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--t2)">${rules.description}</div>
+    </div>
+    <div class="g2">
+      ${sections.map(s => `
+        <div class="card">
+          <div class="sh">${s.title}</div>
+          <div style="font-family:var(--mono);font-size:10px;line-height:2.0;color:var(--t2)">
+            ${(s.rules || s.formulas || []).map((r, i) => `
+              <div style="padding:4px 0;${i < (s.rules||s.formulas).length-1 ? 'border-bottom:1px solid var(--line)' : ''}">
+                ${i + 1}. ${r}
+              </div>`).join('')}
+          </div>
+        </div>`).join('')}
+    </div>`;
 }
 
 let saveTimer = null;
@@ -1697,6 +2178,8 @@ function goTab(name) {
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.querySelector(`[onclick="goTab('${name}')"]`).classList.add('active');
   document.getElementById('tab-'+name).classList.add('active');
+  // Init rules tab on first open
+  if (name === 'rules') showRulesTab('general');
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -2828,7 +3311,7 @@ function renderTrades() {
   const tk = (document.getElementById('fTicker')?.value||'').toUpperCase();
   const fl = tr.filter(t=>(!tf||t.type===tf)&&(!sf||t.status===sf)&&(!rf||t.result===rf)&&(!tk||t.ticker.includes(tk)));
   const tb = document.getElementById('tradesTb');
-  if(!fl.length){ tb.innerHTML='<tr><td colspan="14" style="text-align:center;color:var(--t2);padding:36px">No trades</td></tr>'; return; }
+  if(!fl.length){ tb.innerHTML='<tr><td colspan="12" style="text-align:center;color:var(--t2);padding:36px">No trades</td></tr>'; return; }
   tb.innerHTML = fl.map(t => {
     // Day count: T0=entry, hold T1-T3, exit T4
     const tDay = (t.status==='OPEN' || t.status==='PARTIAL') ? getTradingDayNumber(t.entryDate) : null;
@@ -2893,7 +3376,7 @@ function renderTrades() {
       </div></td>
     </tr>
     ${hasHistory ? `<tr class="hist-row" id="${historyId}" style="display:none">
-      <td colspan="14" style="padding:0">
+      <td colspan="12" style="padding:0">
         <div class="hist-panel">
           <div class="hist-title">📋 Position History: ${t.ticker} (${t.type})</div>
           <table class="hist-table">
@@ -3776,33 +4259,31 @@ function computeSignal(w, scan) {
   // SHORT: RSI(2) > 90 + Price < SMA200 + SMA200 падает + IBS > 0.80 + Range < 2×ATR
   // 
   // IBS = (Close(T-1) - Low(T-1)) / (High(T-1) - Low(T-1))
-  // Range = High(T-1) - Low(T-1)
+  // Range = High(T0) - Low(T0)
   // 
   // Gap Check (after signal confirmed):
   // Gap > 2% в нужную сторону → отмена входа
-  // LONG:  Open(T0) ≥ Close(T-1) × 1.02 → отмена
-  // SHORT: Open(T0) ≤ Close(T-1) × 0.98 → отмена
+  // LONG:  Open(D+1) ≥ Close(T0) × 1.02 → отмена
+  // SHORT: Open(D+1) ≤ Close(T0) × 0.98 → отмена
   // ═══════════════════════════════════════════════════════════
   
-  const { rsi2, sma200, sma200_20, close1, low1, high1, open0, close2, close3 } = scan;
+  const { rsi2, sma200, sma200_20, close1, low1, high1, open0 } = scan;
   const atrPct = parseFloat(w.atr) || 0;
   
-  // Need RSI(2) from T-1 to evaluate
+  // Need RSI(2) from T0 to evaluate
   if (rsi2 === '' || rsi2 === undefined) return { signal: 'none' };
   
   const rsi = parseFloat(rsi2);
   const sma = parseFloat(sma200);
   const sma20 = parseFloat(sma200_20);  // SMA200 от 20 дней назад
-  const c1 = parseFloat(close1);  // Close T-1
-  const l1 = parseFloat(low1);    // Low T-1
-  const h1 = parseFloat(high1);   // High T-1
-  const o0 = parseFloat(open0);   // Open T0 (today)
-  const c2 = parseFloat(close2);  // Close T-2
-  const c3 = parseFloat(close3);  // Close T-3
+  const c1 = parseFloat(close1);  // Close T0
+  const l1 = parseFloat(low1);    // Low T0
+  const h1 = parseFloat(high1);   // High T0
+  const o0 = parseFloat(open0);   // Open D+1 (next day)
   
   if (isNaN(rsi)) return { signal: 'none' };
   
-  // Calculate IBS (CLV) = (Close - Low) / (High - Low)
+  // Calculate IBS = (Close - Low) / (High - Low)
   let clv = null;
   if (!isNaN(c1) && !isNaN(l1) && !isNaN(h1) && h1 !== l1) {
     clv = (c1 - l1) / (h1 - l1);
@@ -3812,10 +4293,10 @@ function computeSignal(w, scan) {
   const range = (!isNaN(h1) && !isNaN(l1)) ? h1 - l1 : null;
   const rangePct = (range && c1) ? (range / c1) * 100 : null;
   
-  // Calculate Mid(T-1) for alternative entry
+  // Calculate Mid(T0) for reference
   const mid1 = (!isNaN(h1) && !isNaN(l1)) ? (h1 + l1) / 2 : null;
   
-  // Calculate Gap metrics
+  // Calculate Gap metrics (Open D+1 vs Close T0)
   let gapPct = null;
   let gapATR = null;
   let badGap = false;
@@ -3829,18 +4310,16 @@ function computeSignal(w, scan) {
   }
   
   // Check conditions
-  const hasCandles = !isNaN(c1) && !isNaN(c2) && !isNaN(c3);
   const hasSma = !isNaN(sma);
   const hasSma20 = !isNaN(sma20);
   const hasClv = clv !== null;
   const hasOpen = !isNaN(o0);
   const hasRange = rangePct !== null && atrPct > 0;
   
-  // LONG conditions
+  // LONG conditions (IBS Mean Reversion)
   const longRsi = rsi < 10;
   const longTrend = hasSma && c1 > sma;
   const longSmaRising = hasSma && hasSma20 && sma > sma20;  // SMA200 растёт
-  const longCandles = hasCandles && c1 < c2 && c2 < c3;  // 3 down days
   const longClv = hasClv && clv < 0.20;  // IBS < 0.20
   const longRange = hasRange && rangePct < (atrPct * 2);  // Range < 2×ATR
   
@@ -3848,7 +4327,6 @@ function computeSignal(w, scan) {
   const shortRsi = rsi > 90;
   const shortTrend = hasSma && c1 < sma;
   const shortSmaFalling = hasSma && hasSma20 && sma < sma20;  // SMA200 падает
-  const shortCandles = hasCandles && c1 > c2 && c2 > c3;  // 3 up days
   const shortClv = hasClv && clv > 0.80;  // IBS > 0.80
   const shortRange = hasRange && rangePct < (atrPct * 2);  // Range < 2×ATR
   
@@ -3857,7 +4335,7 @@ function computeSignal(w, scan) {
   let entryType = 'OPEN';  // Default: enter at Open(T0)
   
   // LONG SIGNAL
-  if (longRsi && longTrend && longSmaRising && longCandles && longClv && longRange) {
+  if (longRsi && longTrend && longSmaRising && longClv && longRange) {
     if (hasOpen) {
       // Gap > 2% в нужную сторону → отмена
       gapCancel = o0 >= c1 * 1.02;
@@ -3871,7 +4349,7 @@ function computeSignal(w, scan) {
   }
   
   // SHORT SIGNAL
-  if (shortRsi && shortTrend && shortSmaFalling && shortCandles && shortClv && shortRange) {
+  if (shortRsi && shortTrend && shortSmaFalling && shortClv && shortRange) {
     if (hasOpen) {
       // Gap > 2% в нужную сторону → отмена
       gapCancel = o0 <= c1 * 0.98;
@@ -3885,7 +4363,7 @@ function computeSignal(w, scan) {
   }
   
   // Fail reasons - show why signal didn't trigger
-  if (longRsi && longTrend && longCandles) {
+  if (longRsi && longTrend) {
     if (hasClv && clv >= 0.20) {
       return { signal: 'CLV_FAIL_LONG', clv, mid1, gapPct, reason: `IBS ${clv.toFixed(2)} ≥ 0.20` };
     }
@@ -3896,7 +4374,7 @@ function computeSignal(w, scan) {
       return { signal: 'RANGE_FAIL_LONG', clv, mid1, gapPct, reason: `Range ${rangePct?.toFixed(1)}% ≥ ${(atrPct * 2).toFixed(1)}%` };
     }
   }
-  if (shortRsi && shortTrend && shortCandles) {
+  if (shortRsi && shortTrend) {
     if (hasClv && clv <= 0.80) {
       return { signal: 'CLV_FAIL_SHORT', clv, mid1, gapPct, reason: `IBS ${clv.toFixed(2)} ≤ 0.80` };
     }
@@ -3936,7 +4414,7 @@ function renderRsiScan() {
   const wl = cache.watchlist;
   if (!wl.length) {
     document.getElementById('rsiScanTbody').innerHTML =
-      '<tr><td colspan="14" style="text-align:center;color:var(--t2);padding:30px">Add stocks to watchlist</td></tr>';
+      '<tr><td colspan="12" style="text-align:center;color:var(--t2);padding:30px">Add stocks to watchlist</td></tr>';
     return;
   }
 
@@ -3966,7 +4444,7 @@ function renderRsiScan() {
 
   if (filterActive && !filteredWl.length) {
     document.getElementById('rsiScanTbody').innerHTML =
-      '<tr><td colspan="14" style="text-align:center;color:var(--t2);padding:30px">Нет активных — снимите фильтр или заполните данные</td></tr>';
+      '<tr><td colspan="12" style="text-align:center;color:var(--t2);padding:30px">Нет активных — снимите фильтр или заполните данные</td></tr>';
     return;
   }
 
@@ -3984,13 +4462,11 @@ function renderRsiScan() {
     const low1 = t0Scan[w.ticker + '_low1'] ?? '';
     const high1 = t0Scan[w.ticker + '_high1'] ?? '';
     const open0 = t0Scan[w.ticker + '_open0'] ?? '';
-    const close2 = t0Scan[w.ticker + '_close2'] ?? '';
-    const close3 = t0Scan[w.ticker + '_close3'] ?? '';
     const atrPct = w.atr || '';
 
-    // Compute signal with IBS and new rules
+    // Compute signal with IBS Mean Reversion rules
     const sigResult = inactive ? { signal: 'blocked' } : hasPosition ? { signal: 'position' } : computeSignal(w, { 
-      rsi2, sma200, sma200_20, close1, low1, high1, open0, close2, close3
+      rsi2, sma200, sma200_20, close1, low1, high1, open0
     });
     const sig = sigResult.signal;
     const clv = sigResult.clv;  // IBS
@@ -4129,20 +4605,6 @@ function renderRsiScan() {
           onchange="updateRsiScan('${w.ticker}','sma200_20',this.value)"
           ${inactive ? 'disabled style="opacity:.4"' : ''}>
       </td>
-      <td>
-        <input class="rsi-inp" type="number" step="0.01" style="width:60px"
-          value="${close2}" placeholder="—"
-          onclick="this.select()" onfocus="this.select()"
-          onchange="updateRsiScan('${w.ticker}','close2',this.value)"
-          ${inactive ? 'disabled style="opacity:.4"' : ''}>
-      </td>
-      <td>
-        <input class="rsi-inp" type="number" step="0.01" style="width:60px"
-          value="${close3}" placeholder="—"
-          onclick="this.select()" onfocus="this.select()"
-          onchange="updateRsiScan('${w.ticker}','close3',this.value)"
-          ${inactive ? 'disabled style="opacity:.4"' : ''}>
-      </td>
       <td>${sigHtml}</td>
     </tr>`;
   }).join('');
@@ -4234,10 +4696,9 @@ function renderDashSignals() {
     const low1 = todayScan[w.ticker + '_low1'] ?? '';
     const high1 = todayScan[w.ticker + '_high1'] ?? '';
     const open0 = todayScan[w.ticker + '_open0'] ?? '';
-    const close2 = todayScan[w.ticker + '_close2'] ?? '';
-    const close3 = todayScan[w.ticker + '_close3'] ?? '';
+    const sma200_20 = todayScan[w.ticker + '_sma200_20'] ?? '';
     
-    const sigResult = computeSignal(w, { rsi2, sma200, close1, low1, high1, open0, close2, close3 });
+    const sigResult = computeSignal(w, { rsi2, sma200, sma200_20, close1, low1, high1, open0 });
     if (sigResult.signal !== 'none') {
       signals.push({ w, ...sigResult, rsi2, sma200, close1, low1, high1, open0 });
     }
