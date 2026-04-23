@@ -7976,7 +7976,8 @@
           "PFE_close1": 26.8,
           "PFE_low1": 26.74,
           "PFE_high1": 27.39,
-          "PFE_sma200": 25.64
+          "PFE_sma200": 25.64,
+          "PFE_close2": 27.31
         }
       },
       "config": {}
@@ -12326,7 +12327,8 @@
       "PFE_close1": 26.8,
       "PFE_low1": 26.74,
       "PFE_high1": 27.39,
-      "PFE_sma200": 25.64
+      "PFE_sma200": 25.64,
+      "PFE_close2": 27.31
     }
   },
   "quarterly": {},
