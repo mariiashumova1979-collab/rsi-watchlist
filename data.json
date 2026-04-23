@@ -3778,6 +3778,26 @@
     "ibs_swing": {
       "trades": [
         {
+          "id": "1776948555097",
+          "createdAt": 1776948555097,
+          "ticker": "PFE",
+          "type": "LONG",
+          "entryDate": "2026-04-23",
+          "entry": 26.85,
+          "shares": 120,
+          "stop": "26.02",
+          "target1": "27.92",
+          "target2": "29.00",
+          "rsi2": "",
+          "atrPct": "2.06",
+          "trend": "",
+          "status": "OPEN",
+          "exitPrice": 0,
+          "exitReason": "",
+          "commission": 0,
+          "notes": ""
+        },
+        {
           "id": "1776255613535",
           "createdAt": 1776799569953,
           "ticker": "META",
@@ -8113,7 +8133,19 @@
       "config": {}
     }
   },
-  "analytics": [],
+  "analytics": [
+    {
+      "timestamp": "2026-04-23T12:49:15.097Z",
+      "strategy": "ibs_swing",
+      "event": "trade_open",
+      "data": {
+        "id": "1776948555097",
+        "ticker": "PFE",
+        "type": "LONG",
+        "entry": 26.85
+      }
+    }
+  ],
   "settings": {
     "portfolio": 11900,
     "riskPct": 1.5,
@@ -8130,6 +8162,26 @@
     "savedAt": "2026-04-09T04:50:25.521Z"
   },
   "trades": [
+    {
+      "id": "1776948555097",
+      "createdAt": 1776948555097,
+      "ticker": "PFE",
+      "type": "LONG",
+      "entryDate": "2026-04-23",
+      "entry": 26.85,
+      "shares": 120,
+      "stop": "26.02",
+      "target1": "27.92",
+      "target2": "29.00",
+      "rsi2": "",
+      "atrPct": "2.06",
+      "trend": "",
+      "status": "OPEN",
+      "exitPrice": 0,
+      "exitReason": "",
+      "commission": 0,
+      "notes": ""
+    },
     {
       "id": "1776255613535",
       "createdAt": 1776799569953,
