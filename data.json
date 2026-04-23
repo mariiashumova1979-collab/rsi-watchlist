@@ -7974,7 +7974,8 @@
           "CRWD_close2": 463.13,
           "PFE_rsi2": 7.42,
           "PFE_close1": 26.8,
-          "PFE_low1": 26.74
+          "PFE_low1": 26.74,
+          "PFE_high1": 27.39
         }
       },
       "config": {}
@@ -12322,7 +12323,8 @@
       "CRWD_close2": 463.13,
       "PFE_rsi2": 7.42,
       "PFE_close1": 26.8,
-      "PFE_low1": 26.74
+      "PFE_low1": 26.74,
+      "PFE_high1": 27.39
     }
   },
   "quarterly": {},
