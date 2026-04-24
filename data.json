@@ -8203,7 +8203,7 @@
           "TEL_sma200": 213.82,
           "TMO_close3": 515.73,
           "TMO_sma200": 515.73,
-          "BAC_close3": 50.87,
+          "BAC_close3": 50.84,
           "BAC_sma200": 51.24,
           "JPM_close3": 301.57,
           "JPM_sma200": 301.57,
@@ -8299,7 +8299,7 @@
           "CI_close2": 287.29,
           "TEL_close2": 213.82,
           "TMO_close2": 515.73,
-          "BAC_close2": 50.87,
+          "BAC_close2": 51.24,
           "JPM_close2": 301.57,
           "SF_close2": 77.16,
           "FCNCA_close2": 1949.85,
@@ -8338,7 +8338,9 @@
           "BAC_low1": 52.25,
           "BAC_high1": 53.52,
           "BAC_open0": "",
-          "BAC_sma200_20": 50.84
+          "BAC_sma200_20": 50.84,
+          "WBD_close2": 22.29,
+          "WBD_close3": 21.14
         }
       },
       "config": {}
@@ -12825,7 +12827,7 @@
       "TEL_sma200": 213.82,
       "TMO_close3": 515.73,
       "TMO_sma200": 515.73,
-      "BAC_close3": 50.87,
+      "BAC_close3": 50.84,
       "BAC_sma200": 51.24,
       "JPM_close3": 301.57,
       "JPM_sma200": 301.57,
@@ -12921,7 +12923,7 @@
       "CI_close2": 287.29,
       "TEL_close2": 213.82,
       "TMO_close2": 515.73,
-      "BAC_close2": 50.87,
+      "BAC_close2": 51.24,
       "JPM_close2": 301.57,
       "SF_close2": 77.16,
       "FCNCA_close2": 1949.85,
@@ -12960,7 +12962,9 @@
       "BAC_low1": 52.25,
       "BAC_high1": 53.52,
       "BAC_open0": "",
-      "BAC_sma200_20": 50.84
+      "BAC_sma200_20": 50.84,
+      "WBD_close2": 22.29,
+      "WBD_close3": 21.14
     }
   },
   "quarterly": {},
