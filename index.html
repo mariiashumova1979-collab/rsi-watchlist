@@ -5498,47 +5498,80 @@ function updateSPYRegimeStatus(spyData) {
   
   const { close, sma20, sma50, sma200 } = spyData;
   
-  if (!close || !sma200) {
+  // Don't clear if we have cached data - only clear on explicit delete
+  if (!close && !sma200) {
     statusEl.innerHTML = '';
     return;
   }
   
-  // IBS regime (simple SMA200)
-  const ibsRegime = close > sma200 ? 'LONG' : 'SHORT';
-  const ibsColor = ibsRegime === 'LONG' ? 'var(--acc)' : 'var(--acc2)';
-  
-  // Event regime (needs SMA20 and SMA50 for full check)
-  let eventRegime = null;
-  let eventColor = 'var(--t2)';
-  if (sma20 && sma50) {
-    if (close > sma20 && sma20 > sma50) {
-      eventRegime = 'BULLISH';
-      eventColor = 'var(--acc)';
-    } else if (close < sma20 && sma20 < sma50) {
-      eventRegime = 'BEARISH';
-      eventColor = 'var(--acc2)';
-    } else {
-      eventRegime = 'MIXED';
-      eventColor = 'var(--acc3)';
+  // If we have data, show status
+  if (close && sma200) {
+    // IBS regime (simple SMA200)
+    const ibsRegime = close > sma200 ? 'LONG' : 'SHORT';
+    const ibsColor = ibsRegime === 'LONG' ? 'var(--acc)' : 'var(--acc2)';
+    
+    // Event regime (needs SMA20 and SMA50 for full check)
+    let eventRegime = null;
+    let eventColor = 'var(--t2)';
+    if (sma20 && sma50) {
+      if (close > sma20 && sma20 > sma50) {
+        eventRegime = 'BULLISH';
+        eventColor = 'var(--acc)';
+      } else if (close < sma20 && sma20 < sma50) {
+        eventRegime = 'BEARISH';
+        eventColor = 'var(--acc2)';
+      } else {
+        eventRegime = 'MIXED';
+        eventColor = 'var(--acc3)';
+      }
     }
+    
+    statusEl.style.background = 'var(--bg3)';
+    statusEl.style.border = '1px solid var(--line)';
+    statusEl.innerHTML = `
+      <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;justify-content:space-between">
+        <div style="display:flex;gap:16px;flex-wrap:wrap">
+          <div>
+            <span style="color:var(--t2)">IBS Regime:</span>
+            <span style="color:${ibsColor};font-weight:700;margin-left:6px">${ibsRegime}</span>
+            <span style="color:var(--t2);margin-left:4px">(${close.toFixed(2)} vs ${sma200.toFixed(2)})</span>
+          </div>
+          ${eventRegime ? `
+            <div>
+              <span style="color:var(--t2)">Event Regime:</span>
+              <span style="color:${eventColor};font-weight:700;margin-left:6px">${eventRegime}</span>
+              <span style="color:var(--t2);margin-left:4px">(${close.toFixed(2)} ${eventRegime === 'BULLISH' ? '>' : eventRegime === 'BEARISH' ? '<' : '~'} ${sma20.toFixed(2)} ${eventRegime === 'BULLISH' ? '>' : eventRegime === 'BEARISH' ? '<' : '~'} ${sma50.toFixed(2)})</span>
+            </div>
+          ` : '<div style="color:var(--t2)">Event Regime: <i>нужны SMA20 и SMA50</i></div>'}
+        </div>
+        <button class="btn btn-r btn-s" onclick="clearSPYData()" style="font-size:9px">× Очистить</button>
+      </div>
+    `;
+  }
+}
+
+function clearSPYData() {
+  if (!confirm('Очистить SPY данные за сегодня?')) return;
+  
+  const td = today();
+  if (cache.marketData[td]) {
+    delete cache.marketData[td].spy_close;
+    delete cache.marketData[td].spy_sma20;
+    delete cache.marketData[td].spy_sma50;
+    delete cache.marketData[td].spy_sma200;
   }
   
-  statusEl.innerHTML = `
-    <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center">
-      <div>
-        <span style="color:var(--t2)">IBS Regime:</span>
-        <span style="color:${ibsColor};font-weight:700;margin-left:6px">${ibsRegime}</span>
-        <span style="color:var(--t2);margin-left:4px">(${close.toFixed(2)} vs ${sma200.toFixed(2)})</span>
-      </div>
-      ${eventRegime ? `
-        <div>
-          <span style="color:var(--t2)">Event Regime:</span>
-          <span style="color:${eventColor};font-weight:700;margin-left:6px">${eventRegime}</span>
-          <span style="color:var(--t2);margin-left:4px">(${close.toFixed(2)} ${eventRegime === 'BULLISH' ? '>' : eventRegime === 'BEARISH' ? '<' : '~'} ${sma20.toFixed(2)} ${eventRegime === 'BULLISH' ? '>' : eventRegime === 'BEARISH' ? '<' : '~'} ${sma50.toFixed(2)})</span>
-        </div>
-      ` : '<div style="color:var(--t2)">Event Regime: <i>нужны SMA20 и SMA50</i></div>'}
-    </div>
-  `;
+  // Clear form
+  document.getElementById('spy_close').value = '';
+  document.getElementById('spy_sma20').value = '';
+  document.getElementById('spy_sma50').value = '';
+  document.getElementById('spy_sma200').value = '';
+  
+  // Clear status
+  document.getElementById('spyRegimeStatus').innerHTML = '';
+  
+  scheduleSave();
+  toast('SPY данные очищены');
 }
 
 function loadSPYData() {
