@@ -580,6 +580,13 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
     </div>
   </div>
 
+  <!-- Sub-tabs for different scanners -->
+  <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
+    <button class="btn btn-p btn-s" id="scannerTabIBS" onclick="showScanner('ibs')">📊 Daily RSI Scan</button>
+    <button class="btn btn-g btn-s" id="scannerTabEvent" onclick="showScanner('event')">⚡ Event Scanner</button>
+    <button class="btn btn-g btn-s" id="scannerTabManage" onclick="showScanner('manage')">📋 Manage List</button>
+  </div>
+
   <div class="g4" style="max-width:600px;margin-bottom:22px">
     <div class="stat" style="--sc:var(--acc)"><div class="stat-l">Всего</div><div class="stat-v" id="wlTot">0</div></div>
     <div class="stat" style="--sc:var(--acc4)"><div class="stat-l">Открыта поз.</div><div class="stat-v bl" id="wlOp">0</div></div>
@@ -588,6 +595,8 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
     <div class="stat" style="--sc:var(--acc)"><div class="stat-l">Активных</div><div class="stat-v g" id="wlAct">0</div></div>
   </div>
 
+  <!-- IBS Daily RSI Scanner -->
+  <div id="scanner-ibs" class="scanner-section">
   <!-- RSI SCAN TABLE -->
   <div style="margin-bottom:24px">
     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px">
@@ -625,7 +634,50 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
       </table>
     </div>
   </div>
+  </div><!-- end scanner-ibs -->
 
+  <!-- Event Scanner -->
+  <div id="scanner-event" class="scanner-section" style="display:none">
+    <div style="margin-bottom:24px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div class="sh">⚡ Event Scanner
+          <span style="font-family:var(--mono);font-size:9px;color:var(--t2);font-weight:400">Ручной ввод событий</span>
+        </div>
+        <button class="btn btn-p btn-s" onclick="openEventForm()">+ ДОБАВИТЬ СОБЫТИЕ</button>
+      </div>
+      
+      <div style="font-family:var(--mono);font-size:9px;color:var(--t2);margin:12px 0;padding:10px 14px;background:var(--bg3);border-radius:8px;border:1px solid var(--line);line-height:1.7">
+        <b>Event Day (E):</b> Gap 3–15% + RVOL ≥2.5 + Range ≥1.75×ATR<br>
+        <b>Setup:</b> Gap direction + Close strength + CLV check<br>
+        <b>Pullback:</b> E+1...E+3 window, ≤38% retracement<br>
+        <b>Entry:</b> D+1 после T0, breakout from pullback
+      </div>
+
+      <!-- Active Events Table -->
+      <div class="tw">
+        <table>
+          <thead><tr>
+            <th>Ticker</th>
+            <th>Event Date</th>
+            <th>Dir</th>
+            <th>Gap%</th>
+            <th>RVOL</th>
+            <th>Range/ATR</th>
+            <th>CLV</th>
+            <th>Status</th>
+            <th>Pullback Days</th>
+            <th>Actions</th>
+          </tr></thead>
+          <tbody id="eventsTbody">
+            <tr><td colspan="10" style="text-align:center;color:var(--t2);padding:30px">Нет активных событий — добавьте первое</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div><!-- end scanner-event -->
+
+  <!-- Manage Watchlist -->
+  <div id="scanner-manage" class="scanner-section" style="display:none">
   <!-- WATCHLIST CARDS -->
   <div class="fb">
     <input id="wlSrch" placeholder="Поиск..." oninput="renderWL()" style="max-width:180px">
@@ -652,6 +704,7 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
     </select>
   </div>
   <div class="wgrid" id="wlGrid"></div>
+  </div><!-- end scanner-manage -->
 </div>
 
 <!-- ═══════════════════════ RULES ═══════════════════════ -->
@@ -1457,6 +1510,13 @@ const STRATEGIES = {
     color: 'var(--acc)',
     description: 'Mean-reversion на откате в трендовой акции'
   },
+  event_continuation: {
+    id: 'event_continuation',
+    name: 'Event Continuation',
+    icon: '⚡',
+    color: 'var(--acc3)',
+    description: 'Breakout continuation после событийного гэпа'
+  },
   momentum: {
     id: 'momentum',
     name: 'Momentum',
@@ -1633,6 +1693,101 @@ const STRATEGY_RULES = {
     description: 'Range breakout strategy (скоро)',
     _placeholder: true
   },
+  event_continuation: {
+    name: 'Event Continuation',
+    description: 'Breakout continuation после событийного гэпа с откатом',
+    universe: {
+      title: 'Universe (дополнительные фильтры)',
+      rules: [
+        'Price: $10–$300',
+        'AvgVolume(30) ≥ 2,000,000 shares',
+        'MarketCap ≥ $1B',
+        'US common stocks только'
+      ]
+    },
+    marketRegime: {
+      title: 'Market Regime Filter',
+      rules: [
+        'LONG: C_SPY > EMA20_SPY > EMA50_SPY',
+        'SHORT: C_SPY < EMA20_SPY < EMA50_SPY',
+        'Если не выполнено → no trade'
+      ]
+    },
+    eventDay: {
+      title: 'Event Day (E) — поиск события',
+      rules: [
+        '|GapPct_E| ∈ [3%, 15%]',
+        'RVOL20_E ≥ 2.5 (объём > 2.5× среднего)',
+        '(H_E − L_E) / ATR14_{E-1} ≥ 1.75 (широкий range)'
+      ]
+    },
+    setupLong: {
+      title: 'Setup LONG (день E)',
+      rules: [
+        'O_E > H_{E-1} (гэп вверх)',
+        'C_E ≥ O_E (закрылись в плюс)',
+        'CLV_E ≥ 0.65 (закрытие в верхней части)',
+        '(C_E − C_{E-1}) / ATR14_{E-1} ≥ 1.0 (сильное движение)'
+      ]
+    },
+    setupShort: {
+      title: 'Setup SHORT (день E)',
+      rules: [
+        'O_E < L_{E-1} (гэп вниз)',
+        'C_E ≤ O_E (закрылись в минус)',
+        'CLV_E ≤ 0.35 (закрытие в нижней части)',
+        '(C_{E-1} − C_E) / ATR14_{E-1} ≥ 1.0 (сильное движение)'
+      ]
+    },
+    hardRejects: {
+      title: '🚫 Hard Rejects',
+      rules: [
+        'Ex-dividend gap → reject',
+        'ATR14 / C не в [0.02, 0.10] → reject (слишком тихий или волатильный)',
+        'Gap fill > 50% event range → reject',
+        'Market regime mismatch → reject'
+      ]
+    },
+    pullback: {
+      title: 'T0 — Pullback/Compression (E+1...E+3)',
+      rules: [
+        'LONG: (H_E − min(L_{E+1..T0})) / (H_E − L_E) ≤ 0.38',
+        'SHORT: (max(H_{E+1..T0}) − L_E) / (H_E − L_E) ≤ 0.38',
+        'max(H_i − L_i) ≤ 1.20 × ATR14_E для всех дней pullback',
+        'mean(V_{E+1..T0}) ≤ 0.70 × V_E (объём упал)',
+        'LONG: C_T0 > C_{T0-1}, SHORT: C_T0 < C_{T0-1}'
+      ]
+    },
+    entry: {
+      title: 'Entry (D+1 после T0)',
+      rules: [
+        'LONG: Entry = H_T0 + 0.05 × ATR14_T0',
+        'SHORT: Entry = L_T0 − 0.05 × ATR14_T0',
+        'Gap reject: если open хуже Entry > 1.0×ATR → reject'
+      ]
+    },
+    stop: {
+      title: 'Stop',
+      rules: [
+        'LONG: Stop = min(L_{E+1..T0}) − 0.10 × ATR14_T0',
+        'SHORT: Stop = max(H_{E+1..T0}) + 0.10 × ATR14_T0'
+      ]
+    },
+    size: {
+      title: 'Position Size',
+      rules: [
+        'Size = floor( 0.5% × Equity / |Entry − Stop| )'
+      ]
+    },
+    exit: {
+      title: 'Exit Rules',
+      rules: [
+        'Слабая реализация: если MFE < 0.50R к close D+2 → exit all',
+        'Частичный выход: 50% на +1.5R',
+        'Финальный выход: остаток на +2.2R или close D+5'
+      ]
+    }
+  },
   options_flow: {
     name: 'Options Flow',
     description: 'Unusual options activity (скоро)',
@@ -1682,12 +1837,14 @@ function renderStrategyTabs() {
   
   container.innerHTML = Object.values(STRATEGIES).map(s => {
     const isActive = currentStrategy === s.id;
-    const isImplemented = s.id === 'ibs_swing';  // Only IBS is implemented
+    const isImplemented = s.id === 'ibs_swing' || s.id === 'event_continuation';  // IBS and Event implemented
     
     // Count open trades for this strategy
     let openCount = 0;
     if (s.id === 'ibs_swing') {
       openCount = (cache.trades || []).filter(t => t.status === 'OPEN' || t.status === 'PARTIAL').length;
+    } else if (s.id === 'event_continuation') {
+      openCount = (cache.strategies?.event_continuation?.events || []).filter(e => e.status === 'READY_ENTRY').length;
     }
     
     return `
@@ -1758,6 +1915,30 @@ function showRulesTab(tab) {
   } else if (tab === 'watchlist') {
     document.getElementById('rulesWatchlist').style.display = 'block';
     document.getElementById('rulesTabWatchlist').className = 'btn btn-p btn-s';
+  }
+}
+
+function showScanner(type) {
+  // Hide all scanners
+  document.querySelectorAll('.scanner-section').forEach(el => el.style.display = 'none');
+  
+  // Deactivate all buttons
+  ['scannerTabIBS','scannerTabEvent','scannerTabManage'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.className = 'btn btn-g btn-s';
+  });
+  
+  // Show selected scanner and activate button
+  if (type === 'ibs') {
+    document.getElementById('scanner-ibs').style.display = 'block';
+    document.getElementById('scannerTabIBS').className = 'btn btn-p btn-s';
+  } else if (type === 'event') {
+    document.getElementById('scanner-event').style.display = 'block';
+    document.getElementById('scannerTabEvent').className = 'btn btn-p btn-s';
+    renderEvents();  // Render events when opening
+  } else if (type === 'manage') {
+    document.getElementById('scanner-manage').style.display = 'block';
+    document.getElementById('scannerTabManage').className = 'btn btn-p btn-s';
   }
 }
 
@@ -2180,6 +2361,8 @@ function goTab(name) {
   document.getElementById('tab-'+name).classList.add('active');
   // Init rules tab on first open
   if (name === 'rules') showRulesTab('general');
+  // Init watchlist scanner
+  if (name === 'watchlist') showScanner('ibs');
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -3234,12 +3417,14 @@ async function delTrade(id) {
 }
 
 // ═══════════════════════════════════════════════════════════
-// TRADING DAY LOGIC: T0 = entry day, T4 = exit day
+// POSITION TRACKING: Days since entry (NOT signal days!)
+// Signal day terminology: T0=signal → D+1=entry
+// Position tracking: T0=entry → T1,T2,T3,T4 = days in position
 // ═══════════════════════════════════════════════════════════
 function getTradingDayNumber(entryDate) {
-  // T0 = день открытия позиции
-  // T1, T2, T3 = следующие торговые дни
-  // T4 = день закрытия (максимум)
+  // T0 = entry day (D+1 in strategy rules)
+  // T1, T2, T3 = days after entry
+  // T4 = time stop (D+5 in strategy rules)
   if (!entryDate) return 0;
   
   const entryStr = typeof entryDate === 'string' ? entryDate : entryDate.toISOString().split('T')[0];
@@ -4258,8 +4443,8 @@ function computeSignal(w, scan) {
   // LONG:  RSI(2) < 10 + Price > SMA200 + SMA200 растёт + IBS < 0.20 + Range < 2×ATR
   // SHORT: RSI(2) > 90 + Price < SMA200 + SMA200 падает + IBS > 0.80 + Range < 2×ATR
   // 
-  // IBS = (Close(T-1) - Low(T-1)) / (High(T-1) - Low(T-1))
-  // Range = High(T0) - Low(T0)
+  // IBS = (Close_T0 - Low_T0) / (High_T0 - Low_T0)
+  // Range = High_T0 - Low_T0
   // 
   // Gap Check (after signal confirmed):
   // Gap > 2% в нужную сторону → отмена входа
@@ -4276,10 +4461,10 @@ function computeSignal(w, scan) {
   const rsi = parseFloat(rsi2);
   const sma = parseFloat(sma200);
   const sma20 = parseFloat(sma200_20);  // SMA200 от 20 дней назад
-  const c1 = parseFloat(close1);  // Close T0
+  const c1 = parseFloat(close1);  // Close T0 (signal day)
   const l1 = parseFloat(low1);    // Low T0
   const h1 = parseFloat(high1);   // High T0
-  const o0 = parseFloat(open0);   // Open D+1 (next day)
+  const o0 = parseFloat(open0);   // Open D+1 (entry day)
   
   if (isNaN(rsi)) return { signal: 'none' };
   
@@ -4364,24 +4549,43 @@ function computeSignal(w, scan) {
   
   // Fail reasons - show why signal didn't trigger
   if (longRsi && longTrend) {
-    if (hasClv && clv >= 0.20) {
+    // Check all conditions and show what's missing
+    if (!hasClv) {
+      return { signal: 'DATA_MISSING', clv, mid1, gapPct, reason: `Нет данных: Low/High T-1` };
+    }
+    if (clv >= 0.20) {
       return { signal: 'CLV_FAIL_LONG', clv, mid1, gapPct, reason: `IBS ${clv.toFixed(2)} ≥ 0.20` };
     }
-    if (!longSmaRising && hasSma20) {
-      return { signal: 'SMA_FAIL_LONG', clv, mid1, gapPct, reason: `SMA200 не растёт` };
+    if (!hasSma20) {
+      return { signal: 'DATA_MISSING', clv, mid1, gapPct, reason: `Нет данных: SMA200-20` };
     }
-    if (!longRange && hasRange) {
+    if (!longSmaRising) {
+      return { signal: 'SMA_FAIL_LONG', clv, mid1, gapPct, reason: `SMA200 не растёт (${sma.toFixed(2)} ≤ ${sma20.toFixed(2)})` };
+    }
+    if (!hasRange) {
+      return { signal: 'DATA_MISSING', clv, mid1, gapPct, reason: `Нет ATR% в watchlist` };
+    }
+    if (!longRange) {
       return { signal: 'RANGE_FAIL_LONG', clv, mid1, gapPct, reason: `Range ${rangePct?.toFixed(1)}% ≥ ${(atrPct * 2).toFixed(1)}%` };
     }
   }
   if (shortRsi && shortTrend) {
-    if (hasClv && clv <= 0.80) {
+    if (!hasClv) {
+      return { signal: 'DATA_MISSING', clv, mid1, gapPct, reason: `Нет данных: Low/High T-1` };
+    }
+    if (clv <= 0.80) {
       return { signal: 'CLV_FAIL_SHORT', clv, mid1, gapPct, reason: `IBS ${clv.toFixed(2)} ≤ 0.80` };
     }
-    if (!shortSmaFalling && hasSma20) {
-      return { signal: 'SMA_FAIL_SHORT', clv, mid1, gapPct, reason: `SMA200 не падает` };
+    if (!hasSma20) {
+      return { signal: 'DATA_MISSING', clv, mid1, gapPct, reason: `Нет данных: SMA200-20` };
     }
-    if (!shortRange && hasRange) {
+    if (!shortSmaFalling) {
+      return { signal: 'SMA_FAIL_SHORT', clv, mid1, gapPct, reason: `SMA200 не падает (${sma.toFixed(2)} ≥ ${sma20.toFixed(2)})` };
+    }
+    if (!hasRange) {
+      return { signal: 'DATA_MISSING', clv, mid1, gapPct, reason: `Нет ATR% в watchlist` };
+    }
+    if (!shortRange) {
       return { signal: 'RANGE_FAIL_SHORT', clv, mid1, gapPct, reason: `Range ${rangePct?.toFixed(1)}% ≥ ${(atrPct * 2).toFixed(1)}%` };
     }
   }
@@ -4483,6 +4687,7 @@ function renderRsiScan() {
       case 'SHORT_SIGNAL': sigHtml = '<span class="sig-short">🔴 SHORT</span>'; break;
       case 'GAP_CANCEL_LONG':  sigHtml = `<span class="sig-watch" title="${sigResult.reason||''}">❌ Gap</span>`; break;
       case 'GAP_CANCEL_SHORT': sigHtml = `<span class="sig-watch" title="${sigResult.reason||''}">❌ Gap</span>`; break;
+      case 'DATA_MISSING': sigHtml = `<span class="sig-none" title="${sigResult.reason||''}">📋 Data</span>`; break;
       case 'CLV_FAIL_LONG':  sigHtml = `<span class="sig-watch" title="${sigResult.reason||''}">⚠️ IBS</span>`; break;
       case 'CLV_FAIL_SHORT': sigHtml = `<span class="sig-watch" title="${sigResult.reason||''}">⚠️ IBS</span>`; break;
       case 'SMA_FAIL_LONG':  sigHtml = `<span class="sig-watch" title="${sigResult.reason||''}">⚠️ SMA</span>`; break;
@@ -5064,7 +5269,499 @@ async function init() {
   }
 }
 
+// ═══════════════════════════════════════════════════════════
+// EVENT CONTINUATION FUNCTIONS
+// ═══════════════════════════════════════════════════════════
+
+function openEventForm() {
+  document.getElementById('eventModal').style.display = 'flex';
+  // Clear form
+  ['evTicker','evDateE','evE1_O','evE1_H','evE1_L','evE1_C','evE1_V',
+   'evE_O','evE_H','evE_L','evE_C','evE_V'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+}
+
+function closeEventForm() {
+  document.getElementById('eventModal').style.display = 'none';
+}
+
+function saveEvent() {
+  const ticker = document.getElementById('evTicker').value.trim().toUpperCase();
+  const dateE = document.getElementById('evDateE').value;
+  
+  if (!ticker || !dateE) {
+    toast('Заполните ticker и дату события', true);
+    return;
+  }
+  
+  // Get E-1 data
+  const e1 = {
+    O: parseFloat(document.getElementById('evE1_O').value),
+    H: parseFloat(document.getElementById('evE1_H').value),
+    L: parseFloat(document.getElementById('evE1_L').value),
+    C: parseFloat(document.getElementById('evE1_C').value),
+    V: parseFloat(document.getElementById('evE1_V').value)
+  };
+  
+  // Get E data
+  const e = {
+    O: parseFloat(document.getElementById('evE_O').value),
+    H: parseFloat(document.getElementById('evE_H').value),
+    L: parseFloat(document.getElementById('evE_L').value),
+    C: parseFloat(document.getElementById('evE_C').value),
+    V: parseFloat(document.getElementById('evE_V').value)
+  };
+  
+  // Validate all fields filled
+  if (Object.values(e1).some(isNaN) || Object.values(e).some(isNaN)) {
+    toast('Заполните все OHLCV поля', true);
+    return;
+  }
+  
+  // Get ATR from watchlist
+  const wlItem = cache.watchlist.find(w => w.ticker.toUpperCase() === ticker);
+  const atrPct = wlItem ? parseFloat(wlItem.atr) : null;
+  
+  if (!atrPct) {
+    toast(`Добавьте ${ticker} в watchlist с ATR%`, true);
+    return;
+  }
+  
+  // Calculate metrics
+  const metrics = calculateEventMetrics(e1, e, atrPct);
+  
+  // Validate Event Day criteria
+  const validation = validateEventDay(e1, e, metrics, atrPct);
+  
+  if (!validation.valid) {
+    toast('Event Day criteria не выполнены:\n' + validation.errors.join('\n'), true);
+    return;
+  }
+  
+  // Create event object
+  const event = {
+    id: `${ticker}_${dateE}`,
+    ticker,
+    eventDate: dateE,
+    direction: metrics.direction,
+    e1,
+    e,
+    metrics,
+    pullbackDays: [],
+    t0Date: null,
+    entryDate: null,
+    status: 'WAITING_PULLBACK',
+    created: new Date().toISOString()
+  };
+  
+  // Save to cache
+  if (!cache.strategies) cache.strategies = {};
+  if (!cache.strategies.event_continuation) cache.strategies.event_continuation = { trades: [], scans: {}, events: [] };
+  if (!cache.strategies.event_continuation.events) cache.strategies.event_continuation.events = [];
+  
+  cache.strategies.event_continuation.events.push(event);
+  
+  closeEventForm();
+  renderEvents();
+  scheduleSave();
+  toast(`✓ Событие ${ticker} добавлено (${metrics.direction})`);
+}
+
+function calculateEventMetrics(e1, e, atrPct) {
+  // Gap%
+  const gapPct = ((e.O - e1.C) / e1.C) * 100;
+  
+  // CLV (Close Location Value)
+  const clv = (e.C - e.L) / (e.H - e.L);
+  
+  // Range / ATR
+  const rangeE = e.H - e.L;
+  const rangePct = (rangeE / e.C) * 100;
+  const rangeATR = rangePct / atrPct;
+  
+  // RVOL (placeholder - нужен 20-day avg volume)
+  const rvol = null;  // Will need historical data
+  
+  // Return change
+  const returnE = ((e.C - e1.C) / e1.C) * 100;
+  
+  // Determine direction
+  let direction = null;
+  if (e.O > e1.H && e.C >= e.O && clv >= 0.65) direction = 'LONG';
+  if (e.O < e1.L && e.C <= e.O && clv <= 0.35) direction = 'SHORT';
+  
+  return { gapPct, clv, rangeATR, rangePct, rvol, returnE, direction };
+}
+
+function validateEventDay(e1, e, metrics, atrPct) {
+  const errors = [];
+  
+  // Gap check: 3-15%
+  const absGap = Math.abs(metrics.gapPct);
+  if (absGap < 3) errors.push(`Gap ${metrics.gapPct.toFixed(1)}% < 3%`);
+  if (absGap > 15) errors.push(`Gap ${metrics.gapPct.toFixed(1)}% > 15%`);
+  
+  // Range check: >= 1.75 ATR
+  if (metrics.rangeATR < 1.75) errors.push(`Range ${metrics.rangeATR.toFixed(2)}×ATR < 1.75`);
+  
+  // Direction check
+  if (!metrics.direction) errors.push('Setup не определён (проверь gap direction, close, CLV)');
+  
+  // LONG setup
+  if (metrics.direction === 'LONG') {
+    if (e.O <= e1.H) errors.push('LONG: Open не выше High E-1');
+    if (e.C < e.O) errors.push('LONG: Close ниже Open');
+    if (metrics.clv < 0.65) errors.push(`LONG: CLV ${metrics.clv.toFixed(2)} < 0.65`);
+    const retATR = metrics.returnE / atrPct;
+    if (retATR < 1.0) errors.push(`LONG: Return ${retATR.toFixed(2)}×ATR < 1.0`);
+  }
+  
+  // SHORT setup
+  if (metrics.direction === 'SHORT') {
+    if (e.O >= e1.L) errors.push('SHORT: Open не ниже Low E-1');
+    if (e.C > e.O) errors.push('SHORT: Close выше Open');
+    if (metrics.clv > 0.35) errors.push(`SHORT: CLV ${metrics.clv.toFixed(2)} > 0.35`);
+    const retATR = Math.abs(metrics.returnE) / atrPct;
+    if (retATR < 1.0) errors.push(`SHORT: Return ${retATR.toFixed(2)}×ATR < 1.0`);
+  }
+  
+  // ATR check: 0.02-0.10
+  if (atrPct < 2 || atrPct > 10) errors.push(`ATR ${atrPct}% вне диапазона [2%, 10%]`);
+  
+  return { valid: errors.length === 0, errors };
+}
+
+function renderEvents() {
+  const events = cache.strategies?.event_continuation?.events || [];
+  const tbody = document.getElementById('eventsTbody');
+  
+  if (!events.length) {
+    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:var(--t2);padding:30px">Нет активных событий — добавьте первое</td></tr>';
+    return;
+  }
+  
+  tbody.innerHTML = events.map(ev => {
+    const m = ev.metrics;
+    const dirColor = ev.direction === 'LONG' ? 'var(--acc)' : 'var(--acc2)';
+    const statusText = {
+      'WAITING_PULLBACK': '⏳ Ждём pullback',
+      'READY_ENTRY': '🎯 Готов вход',
+      'ENTERED': '✓ Вошли',
+      'REJECTED': '❌ Rejected'
+    }[ev.status] || ev.status;
+    
+    // Entry/Stop info if T0 found
+    let entryInfo = '';
+    if (ev.status === 'READY_ENTRY' && ev.entryPrice) {
+      entryInfo = `
+        <tr style="background:var(--bg2)">
+          <td colspan="10" style="padding:12px">
+            <div style="font-family:var(--mono);font-size:11px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+              <div><span style="color:var(--t2)">Entry:</span> <b style="color:var(--acc)">$${ev.entryPrice.toFixed(2)}</b></div>
+              <div><span style="color:var(--t2)">Stop:</span> <b style="color:var(--acc2)">$${ev.stopPrice.toFixed(2)}</b></div>
+              <div><span style="color:var(--t2)">Risk:</span> <b>$${Math.abs(ev.entryPrice - ev.stopPrice).toFixed(2)}</b></div>
+              <div><span style="color:var(--t2)">Shares:</span> <b>${ev.shares}</b></div>
+            </div>
+            <div style="font-size:10px;color:var(--t2);margin-top:8px">
+              T0: ${ev.t0Date} → Entry на D+1 (следующий день)
+            </div>
+          </td>
+        </tr>`;
+    }
+    
+    return `<tr>
+      <td><b>${ev.ticker}</b></td>
+      <td style="font-family:var(--mono);font-size:10px">${ev.eventDate}</td>
+      <td><span style="color:${dirColor};font-weight:700">${ev.direction}</span></td>
+      <td style="font-family:var(--mono);font-size:10px">${m.gapPct.toFixed(1)}%</td>
+      <td style="font-family:var(--mono);font-size:10px">${m.rvol ? m.rvol.toFixed(1) : '—'}</td>
+      <td style="font-family:var(--mono);font-size:10px">${m.rangeATR.toFixed(2)}×</td>
+      <td style="font-family:var(--mono);font-size:10px">${m.clv.toFixed(2)}</td>
+      <td style="font-size:10px">${statusText}</td>
+      <td style="font-family:var(--mono);font-size:10px">${ev.pullbackDays.length}/3</td>
+      <td>
+        ${ev.status === 'WAITING_PULLBACK' && ev.pullbackDays.length < 3 ? 
+          `<button class="btn btn-g btn-s" onclick="addPullbackDay('${ev.id}')" style="font-size:9px">+ Day</button>` : ''}
+        <button class="btn btn-r btn-s" onclick="deleteEvent('${ev.id}')" style="font-size:9px">×</button>
+      </td>
+    </tr>${entryInfo}`;
+  }).join('');
+}
+
+function addPullbackDay(eventId) {
+  currentEventId = eventId;
+  const event = cache.strategies.event_continuation.events.find(e => e.id === eventId);
+  if (!event) return;
+  
+  const nextDay = event.pullbackDays.length + 1;
+  if (nextDay > 3) {
+    toast('Максимум 3 pullback дня (E+1, E+2, E+3)', true);
+    return;
+  }
+  
+  // Show modal
+  document.getElementById('pullbackModal').style.display = 'flex';
+  document.getElementById('pbEventInfo').textContent = `${event.ticker} — Event ${event.eventDate} (${event.direction})`;
+  document.getElementById('pbDayLabel').textContent = `Добавляем: E+${nextDay}`;
+  
+  // Clear form
+  ['pbDate','pb_O','pb_H','pb_L','pb_C','pb_V'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+}
+
+function closePullbackForm() {
+  document.getElementById('pullbackModal').style.display = 'none';
+  currentEventId = null;
+}
+
+function savePullbackDay() {
+  const event = cache.strategies.event_continuation.events.find(e => e.id === currentEventId);
+  if (!event) return;
+  
+  const date = document.getElementById('pbDate').value;
+  const pb = {
+    date,
+    O: parseFloat(document.getElementById('pb_O').value),
+    H: parseFloat(document.getElementById('pb_H').value),
+    L: parseFloat(document.getElementById('pb_L').value),
+    C: parseFloat(document.getElementById('pb_C').value),
+    V: parseFloat(document.getElementById('pb_V').value)
+  };
+  
+  if (!date || Object.values(pb).slice(1).some(isNaN)) {
+    toast('Заполните все поля', true);
+    return;
+  }
+  
+  // Add to pullback days
+  event.pullbackDays.push(pb);
+  
+  // Get ATR from watchlist
+  const wlItem = cache.watchlist.find(w => w.ticker.toUpperCase() === event.ticker);
+  const atrPct = wlItem ? parseFloat(wlItem.atr) : null;
+  
+  // Check if pullback is valid and if T0 is found
+  const pullbackCheck = checkPullback(event, atrPct);
+  
+  if (!pullbackCheck.valid) {
+    toast(`⚠️ Pullback warnings:\n${pullbackCheck.warnings.join('\n')}`, true);
+  }
+  
+  // Check if T0 conditions met
+  if (pullbackCheck.isT0) {
+    event.t0Date = date;
+    event.status = 'READY_ENTRY';
+    
+    // Calculate entry and stop
+    const entryParams = calculateEntry(event, atrPct);
+    event.entryPrice = entryParams.entry;
+    event.stopPrice = entryParams.stop;
+    event.shares = entryParams.shares;
+    
+    toast(`🎯 T0 найден! Entry: $${entryParams.entry.toFixed(2)}, Stop: $${entryParams.stop.toFixed(2)}`);
+  } else {
+    toast(`✓ День E+${event.pullbackDays.length} добавлен`);
+  }
+  
+  closePullbackForm();
+  renderEvents();
+  scheduleSave();
+}
+
+function checkPullback(event, atrPct) {
+  const warnings = [];
+  const { direction, e, pullbackDays } = event;
+  const rangeE = e.H - e.L;
+  
+  if (pullbackDays.length === 0) return { valid: true, isT0: false, warnings: [] };
+  
+  // Get all lows/highs in pullback window
+  const lows = pullbackDays.map(d => d.L);
+  const highs = pullbackDays.map(d => d.H);
+  const volumes = pullbackDays.map(d => d.V);
+  
+  // Check retracement
+  if (direction === 'LONG') {
+    const minLow = Math.min(...lows);
+    const retracement = (e.H - minLow) / rangeE;
+    if (retracement > 0.38) warnings.push(`Pullback ${(retracement * 100).toFixed(1)}% > 38%`);
+  } else if (direction === 'SHORT') {
+    const maxHigh = Math.max(...highs);
+    const retracement = (maxHigh - e.L) / rangeE;
+    if (retracement > 0.38) warnings.push(`Pullback ${(retracement * 100).toFixed(1)}% > 38%`);
+  }
+  
+  // Check range compression (all pullback days < 1.20×ATR)
+  const rangeE_pct = (rangeE / e.C) * 100;
+  const maxAllowedRange = 1.20 * rangeE_pct;
+  
+  for (let i = 0; i < pullbackDays.length; i++) {
+    const pb = pullbackDays[i];
+    const pbRange = ((pb.H - pb.L) / pb.C) * 100;
+    if (pbRange > maxAllowedRange) {
+      warnings.push(`E+${i + 1} range ${pbRange.toFixed(1)}% > ${maxAllowedRange.toFixed(1)}%`);
+    }
+  }
+  
+  // Check volume contraction
+  const avgPbVol = volumes.reduce((a, b) => a + b, 0) / volumes.length;
+  const volRatio = avgPbVol / e.V;
+  if (volRatio > 0.70) warnings.push(`Avg volume ${(volRatio * 100).toFixed(0)}% > 70% of E`);
+  
+  // Check if T0 (last day closes higher/lower than previous)
+  let isT0 = false;
+  if (pullbackDays.length >= 1) {
+    const lastDay = pullbackDays[pullbackDays.length - 1];
+    const prevDay = pullbackDays.length > 1 ? pullbackDays[pullbackDays.length - 2] : e;
+    
+    if (direction === 'LONG' && lastDay.C > prevDay.C) isT0 = true;
+    if (direction === 'SHORT' && lastDay.C < prevDay.C) isT0 = true;
+  }
+  
+  return { valid: warnings.length === 0, isT0, warnings };
+}
+
+function calculateEntry(event, atrPct) {
+  const { direction, pullbackDays } = event;
+  const t0 = pullbackDays[pullbackDays.length - 1];
+  
+  // Entry
+  let entry;
+  if (direction === 'LONG') {
+    entry = t0.H + 0.05 * (atrPct / 100) * t0.C;
+  } else {
+    entry = t0.L - 0.05 * (atrPct / 100) * t0.C;
+  }
+  
+  // Stop
+  const lows = pullbackDays.map(d => d.L);
+  const highs = pullbackDays.map(d => d.H);
+  let stop;
+  if (direction === 'LONG') {
+    const minLow = Math.min(...lows);
+    stop = minLow - 0.10 * (atrPct / 100) * t0.C;
+  } else {
+    const maxHigh = Math.max(...highs);
+    stop = maxHigh + 0.10 * (atrPct / 100) * t0.C;
+  }
+  
+  // Position size: 0.5% risk
+  const equity = parseFloat(document.getElementById('capital')?.value) || 100000;
+  const riskDollars = equity * 0.005;
+  const stopDistance = Math.abs(entry - stop);
+  const shares = Math.floor(riskDollars / stopDistance);
+  
+  return { entry, stop, shares };
+}
+
+let currentEventId = null;
+
+function deleteEvent(eventId) {
+  if (!confirm('Удалить это событие?')) return;
+  const events = cache.strategies.event_continuation.events;
+  cache.strategies.event_continuation.events = events.filter(e => e.id !== eventId);
+  renderEvents();
+  scheduleSave();
+  toast('Событие удалено');
+}
+
 init();
 </script>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- EVENT FORM MODAL -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="eventModal" class="modal">
+  <div class="modal-c" style="max-width:700px">
+    <div class="modal-h">
+      <div style="font-size:18px;font-weight:700">⚡ Добавить событие</div>
+      <div class="cls" onclick="closeEventForm()">×</div>
+    </div>
+    <div class="modal-b">
+      <div class="fgrid" style="grid-template-columns:1fr 1fr;margin-bottom:16px">
+        <div class="fg">
+          <label>Ticker *</label>
+          <input id="evTicker" placeholder="AAPL" style="text-transform:uppercase">
+        </div>
+        <div class="fg">
+          <label>Event Date (E) *</label>
+          <input id="evDateE" type="date">
+        </div>
+      </div>
+
+      <div style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--text);margin:20px 0 12px">Day E-1 (предыдущий день)</div>
+      <div class="fgrid" style="grid-template-columns:repeat(5,1fr)">
+        <div class="fg"><label>Open</label><input id="evE1_O" type="number" step="0.01"></div>
+        <div class="fg"><label>High</label><input id="evE1_H" type="number" step="0.01"></div>
+        <div class="fg"><label>Low</label><input id="evE1_L" type="number" step="0.01"></div>
+        <div class="fg"><label>Close</label><input id="evE1_C" type="number" step="0.01"></div>
+        <div class="fg"><label>Volume</label><input id="evE1_V" type="number" step="1"></div>
+      </div>
+
+      <div style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--text);margin:20px 0 12px">Day E (событие)</div>
+      <div class="fgrid" style="grid-template-columns:repeat(5,1fr)">
+        <div class="fg"><label>Open</label><input id="evE_O" type="number" step="0.01"></div>
+        <div class="fg"><label>High</label><input id="evE_H" type="number" step="0.01"></div>
+        <div class="fg"><label>Low</label><input id="evE_L" type="number" step="0.01"></div>
+        <div class="fg"><label>Close</label><input id="evE_C" type="number" step="0.01"></div>
+        <div class="fg"><label>Volume</label><input id="evE_V" type="number" step="1"></div>
+      </div>
+
+      <div style="font-family:var(--mono);font-size:10px;color:var(--t2);margin-top:16px;padding:10px;background:var(--bg3);border-radius:6px">
+        <b>Auto-calculated:</b> Gap%, RVOL20, Range/ATR, CLV, Direction
+      </div>
+    </div>
+    <div class="modal-f">
+      <button class="btn btn-g" onclick="closeEventForm()">Отмена</button>
+      <button class="btn btn-p" onclick="saveEvent()">💾 Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- PULLBACK DAY MODAL -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="pullbackModal" class="modal">
+  <div class="modal-c" style="max-width:600px">
+    <div class="modal-h">
+      <div style="font-size:18px;font-weight:700">📊 Добавить Pullback Day</div>
+      <div class="cls" onclick="closePullbackForm()">×</div>
+    </div>
+    <div class="modal-b">
+      <div style="font-family:var(--mono);font-size:11px;color:var(--t2);margin-bottom:16px;padding:12px;background:var(--bg3);border-radius:6px">
+        <div><b style="color:var(--text)" id="pbEventInfo"></b></div>
+        <div style="margin-top:6px" id="pbDayLabel"></div>
+      </div>
+
+      <div class="fgrid" style="grid-template-columns:1fr;margin-bottom:16px">
+        <div class="fg">
+          <label>Date *</label>
+          <input id="pbDate" type="date">
+        </div>
+      </div>
+
+      <div class="fgrid" style="grid-template-columns:repeat(5,1fr)">
+        <div class="fg"><label>Open</label><input id="pb_O" type="number" step="0.01"></div>
+        <div class="fg"><label>High</label><input id="pb_H" type="number" step="0.01"></div>
+        <div class="fg"><label>Low</label><input id="pb_L" type="number" step="0.01"></div>
+        <div class="fg"><label>Close</label><input id="pb_C" type="number" step="0.01"></div>
+        <div class="fg"><label>Volume</label><input id="pb_V" type="number" step="1"></div>
+      </div>
+
+      <div style="font-family:var(--mono);font-size:10px;color:var(--t2);margin-top:16px;padding:10px;background:var(--bg3);border-radius:6px">
+        <b>Auto-check:</b> Pullback ≤38%, Range ≤1.20×ATR, Volume ≤70%
+      </div>
+    </div>
+    <div class="modal-f">
+      <button class="btn btn-g" onclick="closePullbackForm()">Отмена</button>
+      <button class="btn btn-p" onclick="savePullbackDay()">💾 Добавить</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
