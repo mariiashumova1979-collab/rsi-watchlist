@@ -8326,7 +8326,8 @@
           "PANW_close2": 187.41,
           "DKNG_close2": 35.97,
           "JD_close2": 31.1,
-          "CRWD_close2": 463.13
+          "CRWD_close2": 463.13,
+          "WBD_rsi2": 4.31
         }
       },
       "config": {}
@@ -12936,7 +12937,8 @@
       "PANW_close2": 187.41,
       "DKNG_close2": 35.97,
       "JD_close2": 31.1,
-      "CRWD_close2": 463.13
+      "CRWD_close2": 463.13,
+      "WBD_rsi2": 4.31
     }
   },
   "quarterly": {},
