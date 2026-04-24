@@ -8250,7 +8250,8 @@
           "CRWD_close3": 463.13,
           "CRWD_sma200": 463.13,
           "_migration_done": true,
-          "PCG_rsi2": 5.41
+          "PCG_rsi2": 5.41,
+          "PFE_rsi2": 5.37
         }
       },
       "config": {}
@@ -12794,7 +12795,8 @@
       "CRWD_close3": 463.13,
       "CRWD_sma200": 463.13,
       "_migration_done": true,
-      "PCG_rsi2": 5.41
+      "PCG_rsi2": 5.41,
+      "PFE_rsi2": 5.37
     }
   },
   "quarterly": {},
