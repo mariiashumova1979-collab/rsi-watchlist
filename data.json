@@ -8252,7 +8252,8 @@
           "_migration_done": true,
           "PCG_rsi2": 5.41,
           "PFE_rsi2": 5.37,
-          "PCG_close1": 16.83
+          "PCG_close1": 16.83,
+          "PCG_low1": 16.68
         }
       },
       "config": {}
@@ -12798,7 +12799,8 @@
       "_migration_done": true,
       "PCG_rsi2": 5.41,
       "PFE_rsi2": 5.37,
-      "PCG_close1": 16.83
+      "PCG_close1": 16.83,
+      "PCG_low1": 16.68
     }
   },
   "quarterly": {},
