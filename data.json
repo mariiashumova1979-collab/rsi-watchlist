@@ -8336,7 +8336,8 @@
           "BAC_rsi2": 4.9,
           "BAC_close1": 52.47,
           "BAC_low1": 52.25,
-          "BAC_high1": 53.52
+          "BAC_high1": 53.52,
+          "BAC_open0": 51.24
         }
       },
       "config": {}
@@ -12956,7 +12957,8 @@
       "BAC_rsi2": 4.9,
       "BAC_close1": 52.47,
       "BAC_low1": 52.25,
-      "BAC_high1": 53.52
+      "BAC_high1": 53.52,
+      "BAC_open0": 51.24
     }
   },
   "quarterly": {},
