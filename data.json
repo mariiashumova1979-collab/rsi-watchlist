@@ -8255,7 +8255,8 @@
           "PCG_close1": 16.83,
           "PCG_low1": 16.68,
           "PCG_high1": 17.28,
-          "PCG_sma200": 16.03
+          "PCG_sma200": 16.03,
+          "PCG_sma200_20": 15.77
         }
       },
       "config": {}
@@ -12804,7 +12805,8 @@
       "PCG_close1": 16.83,
       "PCG_low1": 16.68,
       "PCG_high1": 17.28,
-      "PCG_sma200": 16.03
+      "PCG_sma200": 16.03,
+      "PCG_sma200_20": 15.77
     }
   },
   "quarterly": {},
