@@ -5607,18 +5607,33 @@ function openPEADForm() {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
+  // Clear errors
+  const errorsEl = document.getElementById('peadErrors');
+  if (errorsEl) {
+    errorsEl.style.display = 'none';
+    errorsEl.innerHTML = '';
+  }
 }
 
 function closePEADForm() {
   document.getElementById('peadModal').style.display = 'none';
+  // Clear errors on close
+  const errorsEl = document.getElementById('peadErrors');
+  if (errorsEl) {
+    errorsEl.style.display = 'none';
+    errorsEl.innerHTML = '';
+  }
 }
 
 function savePEAD() {
+  const errorsEl = document.getElementById('peadErrors');
+  
   const ticker = document.getElementById('peadTicker').value.trim().toUpperCase();
   const date = document.getElementById('peadDate').value;
   
   if (!ticker || !date) {
-    toast('Заполните ticker и дату earnings', true);
+    errorsEl.style.display = 'block';
+    errorsEl.innerHTML = '<b>❌ Ошибка:</b><br>Заполните ticker и дату earnings';
     return;
   }
   
@@ -5644,7 +5659,8 @@ function savePEAD() {
   
   // Validate
   if (Object.values(t1).some(isNaN) || Object.values(t0).some(isNaN) || isNaN(epsConsensus) || isNaN(epsActual)) {
-    toast('Заполните все поля', true);
+    errorsEl.style.display = 'block';
+    errorsEl.innerHTML = '<b>❌ Ошибка:</b><br>Заполните все поля OHLCV и EPS данными';
     return;
   }
   
@@ -5655,7 +5671,8 @@ function savePEAD() {
   const validation = validatePEADSetup(t1, t0, metrics);
   
   if (!validation.valid) {
-    toast('PEAD criteria не выполнены:\n' + validation.errors.join('\n'), true);
+    errorsEl.style.display = 'block';
+    errorsEl.innerHTML = `<b>❌ PEAD критерии не выполнены:</b><br>${validation.errors.map(e => `• ${e}`).join('<br>')}`;
     return;
   }
   
@@ -5840,18 +5857,33 @@ function openEventForm() {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
+  // Clear errors
+  const errorsEl = document.getElementById('eventErrors');
+  if (errorsEl) {
+    errorsEl.style.display = 'none';
+    errorsEl.innerHTML = '';
+  }
 }
 
 function closeEventForm() {
   document.getElementById('eventModal').style.display = 'none';
+  // Clear errors
+  const errorsEl = document.getElementById('eventErrors');
+  if (errorsEl) {
+    errorsEl.style.display = 'none';
+    errorsEl.innerHTML = '';
+  }
 }
 
 function saveEvent() {
+  const errorsEl = document.getElementById('eventErrors');
+  
   const ticker = document.getElementById('evTicker').value.trim().toUpperCase();
   const dateE = document.getElementById('evDateE').value;
   
   if (!ticker || !dateE) {
-    toast('Заполните ticker и дату события', true);
+    errorsEl.style.display = 'block';
+    errorsEl.innerHTML = '<b>❌ Ошибка:</b><br>Заполните ticker и дату события';
     return;
   }
   
@@ -5875,7 +5907,8 @@ function saveEvent() {
   
   // Validate all fields filled
   if (Object.values(e1).some(isNaN) || Object.values(e).some(isNaN)) {
-    toast('Заполните все OHLCV поля', true);
+    errorsEl.style.display = 'block';
+    errorsEl.innerHTML = '<b>❌ Ошибка:</b><br>Заполните все OHLCV поля для дней E-1 и E';
     return;
   }
   
@@ -5884,7 +5917,8 @@ function saveEvent() {
   const atrPct = wlItem ? parseFloat(wlItem.atr) : null;
   
   if (!atrPct) {
-    toast(`Добавьте ${ticker} в watchlist с ATR%`, true);
+    errorsEl.style.display = 'block';
+    errorsEl.innerHTML = `<b>❌ Ошибка:</b><br>Добавьте ${ticker} в watchlist с ATR%`;
     return;
   }
   
@@ -5895,7 +5929,8 @@ function saveEvent() {
   const validation = validateEventDay(e1, e, metrics, atrPct);
   
   if (!validation.valid) {
-    toast('Event Day criteria не выполнены:\n' + validation.errors.join('\n'), true);
+    errorsEl.style.display = 'block';
+    errorsEl.innerHTML = `<b>❌ Event Day критерии не выполнены:</b><br>${validation.errors.map(err => `• ${err}`).join('<br>')}`;
     return;
   }
   
@@ -6070,14 +6105,29 @@ function addPullbackDay(eventId) {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
+  
+  // Clear warnings
+  const warningsEl = document.getElementById('pullbackWarnings');
+  if (warningsEl) {
+    warningsEl.style.display = 'none';
+    warningsEl.innerHTML = '';
+  }
 }
 
 function closePullbackForm() {
   document.getElementById('pullbackModal').style.display = 'none';
   currentEventId = null;
+  // Clear warnings
+  const warningsEl = document.getElementById('pullbackWarnings');
+  if (warningsEl) {
+    warningsEl.style.display = 'none';
+    warningsEl.innerHTML = '';
+  }
 }
 
 function savePullbackDay() {
+  const warningsEl = document.getElementById('pullbackWarnings');
+  
   const event = cache.strategies.event_continuation.events.find(e => e.id === currentEventId);
   if (!event) return;
   
@@ -6092,7 +6142,8 @@ function savePullbackDay() {
   };
   
   if (!date || Object.values(pb).slice(1).some(isNaN)) {
-    toast('Заполните все поля', true);
+    warningsEl.style.display = 'block';
+    warningsEl.innerHTML = '<b>⚠️ Ошибка:</b><br>Заполните все поля';
     return;
   }
   
@@ -6107,7 +6158,15 @@ function savePullbackDay() {
   const pullbackCheck = checkPullback(event, atrPct);
   
   if (!pullbackCheck.valid) {
-    toast(`⚠️ Pullback warnings:\n${pullbackCheck.warnings.join('\n')}`, true);
+    warningsEl.style.display = 'block';
+    warningsEl.innerHTML = `<b>⚠️ Pullback warnings:</b><br>${pullbackCheck.warnings.map(w => `• ${w}`).join('<br>')}<br><br><i>День добавлен, но критерии не выполнены</i>`;
+    // Don't return - still add the day
+    setTimeout(() => {
+      closePullbackForm();
+      renderEvents();
+      scheduleSave();
+    }, 3000);  // Close after 3 sec so user can read warnings
+    return;
   }
   
   // Check if T0 conditions met
@@ -6273,6 +6332,9 @@ init();
       <div style="font-family:var(--mono);font-size:10px;color:var(--t2);margin-top:16px;padding:10px;background:var(--bg3);border-radius:6px">
         <b>Auto-calculated:</b> Gap%, RVOL20, Range/ATR, CLV, Direction
       </div>
+      
+      <!-- Error display -->
+      <div id="eventErrors" style="display:none;margin-top:16px;padding:12px;background:#ff000010;border:1px solid #ff000040;border-radius:6px;font-family:var(--mono);font-size:10px;line-height:1.8;color:#ff4444"></div>
     </div>
     <div class="modal-f">
       <button class="btn btn-g" onclick="closeEventForm()">Отмена</button>
@@ -6314,6 +6376,9 @@ init();
       <div style="font-family:var(--mono);font-size:10px;color:var(--t2);margin-top:16px;padding:10px;background:var(--bg3);border-radius:6px">
         <b>Auto-check:</b> Pullback ≤38%, Range ≤1.20×ATR, Volume ≤70%
       </div>
+      
+      <!-- Warning display -->
+      <div id="pullbackWarnings" style="display:none;margin-top:16px;padding:12px;background:#ff990010;border:1px solid #ff990040;border-radius:6px;font-family:var(--mono);font-size:10px;line-height:1.8;color:#ff9900"></div>
     </div>
     <div class="modal-f">
       <button class="btn btn-g" onclick="closePullbackForm()">Отмена</button>
@@ -6374,6 +6439,9 @@ init();
       <div style="font-family:var(--mono);font-size:10px;color:var(--t2);margin-top:16px;padding:10px;background:var(--bg3);border-radius:6px">
         <b>Auto-calculated:</b> SUE, EAR%, VolSpike, Direction, Entry/Stop/Targets
       </div>
+      
+      <!-- Error display -->
+      <div id="peadErrors" style="display:none;margin-top:16px;padding:12px;background:#ff000010;border:1px solid #ff000040;border-radius:6px;font-family:var(--mono);font-size:10px;line-height:1.8;color:#ff4444"></div>
     </div>
     <div class="modal-f">
       <button class="btn btn-g" onclick="closePEADForm()">Отмена</button>
