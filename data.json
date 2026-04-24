@@ -8328,7 +8328,8 @@
           "JD_close2": 31.1,
           "CRWD_close2": 463.13,
           "WBD_rsi2": 4.31,
-          "WBD_close1": 26.9
+          "WBD_close1": 26.9,
+          "WBD_low1": 26.9
         }
       },
       "config": {}
@@ -12940,7 +12941,8 @@
       "JD_close2": 31.1,
       "CRWD_close2": 463.13,
       "WBD_rsi2": 4.31,
-      "WBD_close1": 26.9
+      "WBD_close1": 26.9,
+      "WBD_low1": 26.9
     }
   },
   "quarterly": {},
