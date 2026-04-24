@@ -8254,7 +8254,8 @@
           "PFE_rsi2": 5.37,
           "PCG_close1": 16.83,
           "PCG_low1": 16.68,
-          "PCG_high1": 17.28
+          "PCG_high1": 17.28,
+          "PCG_sma200": 16.03
         }
       },
       "config": {}
@@ -12802,7 +12803,8 @@
       "PFE_rsi2": 5.37,
       "PCG_close1": 16.83,
       "PCG_low1": 16.68,
-      "PCG_high1": 17.28
+      "PCG_high1": 17.28,
+      "PCG_sma200": 16.03
     }
   },
   "quarterly": {},
