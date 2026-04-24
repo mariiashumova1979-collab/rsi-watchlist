@@ -5690,24 +5690,36 @@ function calculatePEADMetrics(t1, t0, epsConsensus, epsActual) {
 function validatePEADSetup(t1, t0, metrics) {
   const errors = [];
   
-  if (!metrics.direction) {
-    errors.push('Setup не определён');
+  // Check which direction we're evaluating
+  const isLongCandidate = metrics.sue >= 0.05 || metrics.ear >= 3;
+  const isShortCandidate = metrics.sue <= -0.05 || metrics.ear <= -3;
+  
+  if (!isLongCandidate && !isShortCandidate) {
+    errors.push('SUE и EAR недостаточны для LONG или SHORT');
+    return { valid: false, errors };
   }
   
-  if (metrics.direction === 'LONG') {
-    if (metrics.sue < 0.05) errors.push(`SUE ${(metrics.sue * 100).toFixed(1)}% < 5%`);
-    if (metrics.ear < 3) errors.push(`EAR ${metrics.ear.toFixed(1)}% < 3%`);
-    if (metrics.volSpike < 2.0) errors.push(`VolSpike ${metrics.volSpike.toFixed(1)} < 2.0`);
-    if (t0.C <= t1.SMA50) errors.push(`Close ${t0.C.toFixed(2)} ≤ SMA50 ${t1.SMA50.toFixed(2)}`);
-    if (!metrics.rangeCheck) errors.push(`Range ${metrics.rangePct.toFixed(1)}% > 2.5×ATR (${(metrics.atrPct * 2.5).toFixed(1)}%)`);
+  // LONG validation
+  if (isLongCandidate) {
+    if (metrics.sue < 0.05) errors.push(`LONG: SUE ${(metrics.sue * 100).toFixed(1)}% < 5%`);
+    if (metrics.ear < 3) errors.push(`LONG: EAR ${metrics.ear.toFixed(1)}% < 3%`);
+    if (metrics.volSpike < 2.0) errors.push(`LONG: VolSpike ${metrics.volSpike.toFixed(1)} < 2.0`);
+    if (t0.C <= t1.SMA50) errors.push(`LONG: Close ${t0.C.toFixed(2)} ≤ SMA50 ${t1.SMA50.toFixed(2)}`);
+    if (!metrics.rangeCheck) errors.push(`LONG: Range ${metrics.rangePct.toFixed(1)}% > 2.5×ATR (${(metrics.atrPct * 2.5).toFixed(1)}%)`);
   }
   
-  if (metrics.direction === 'SHORT') {
-    if (metrics.sue > -0.05) errors.push(`SUE ${(metrics.sue * 100).toFixed(1)}% > -5%`);
-    if (metrics.ear > -3) errors.push(`EAR ${metrics.ear.toFixed(1)}% > -3%`);
-    if (metrics.volSpike < 2.0) errors.push(`VolSpike ${metrics.volSpike.toFixed(1)} < 2.0`);
-    if (t0.C >= t1.SMA50) errors.push(`Close ${t0.C.toFixed(2)} ≥ SMA50 ${t1.SMA50.toFixed(2)}`);
-    if (!metrics.rangeCheck) errors.push(`Range ${metrics.rangePct.toFixed(1)}% > 2.5×ATR`);
+  // SHORT validation
+  if (isShortCandidate) {
+    if (metrics.sue > -0.05) errors.push(`SHORT: SUE ${(metrics.sue * 100).toFixed(1)}% > -5%`);
+    if (metrics.ear > -3) errors.push(`SHORT: EAR ${metrics.ear.toFixed(1)}% > -3%`);
+    if (metrics.volSpike < 2.0) errors.push(`SHORT: VolSpike ${metrics.volSpike.toFixed(1)} < 2.0`);
+    if (t0.C >= t1.SMA50) errors.push(`SHORT: Close ${t0.C.toFixed(2)} ≥ SMA50 ${t1.SMA50.toFixed(2)}`);
+    if (!metrics.rangeCheck) errors.push(`SHORT: Range ${metrics.rangePct.toFixed(1)}% > 2.5×ATR`);
+  }
+  
+  // If no direction was set and we have errors, that's the issue
+  if (!metrics.direction && errors.length === 0) {
+    errors.push('Все условия выполнены, но direction не определён (проверь логику)');
   }
   
   return { valid: errors.length === 0, errors };
