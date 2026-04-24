@@ -8334,7 +8334,8 @@
           "WBD_sma200": 22.29,
           "WBD_sma200_20": 21.14,
           "BAC_rsi2": 4.9,
-          "BAC_close1": 52.47
+          "BAC_close1": 52.47,
+          "BAC_low1": 52.25
         }
       },
       "config": {}
@@ -12952,7 +12953,8 @@
       "WBD_sma200": 22.29,
       "WBD_sma200_20": 21.14,
       "BAC_rsi2": 4.9,
-      "BAC_close1": 52.47
+      "BAC_close1": 52.47,
+      "BAC_low1": 52.25
     }
   },
   "quarterly": {},
