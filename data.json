@@ -8249,7 +8249,8 @@
           "JD_sma200": 31.1,
           "CRWD_close3": 463.13,
           "CRWD_sma200": 463.13,
-          "_migration_done": true
+          "_migration_done": true,
+          "PCG_rsi2": 5.41
         }
       },
       "config": {}
@@ -8265,6 +8266,42 @@
         "ticker": "PFE",
         "type": "LONG",
         "entry": 26.85
+      }
+    },
+    {
+      "timestamp": "2026-04-24T06:04:47.662Z",
+      "strategy": "event_continuation",
+      "event": "strategy_switch",
+      "data": {
+        "from": "event_continuation",
+        "to": "event_continuation"
+      }
+    },
+    {
+      "timestamp": "2026-04-24T06:09:44.400Z",
+      "strategy": "ibs_swing",
+      "event": "strategy_switch",
+      "data": {
+        "from": "ibs_swing",
+        "to": "ibs_swing"
+      }
+    },
+    {
+      "timestamp": "2026-04-24T06:09:47.059Z",
+      "strategy": "event_continuation",
+      "event": "strategy_switch",
+      "data": {
+        "from": "event_continuation",
+        "to": "event_continuation"
+      }
+    },
+    {
+      "timestamp": "2026-04-24T06:09:47.858Z",
+      "strategy": "ibs_swing",
+      "event": "strategy_switch",
+      "data": {
+        "from": "ibs_swing",
+        "to": "ibs_swing"
       }
     }
   ],
@@ -12756,7 +12793,8 @@
       "JD_sma200": 31.1,
       "CRWD_close3": 463.13,
       "CRWD_sma200": 463.13,
-      "_migration_done": true
+      "_migration_done": true,
+      "PCG_rsi2": 5.41
     }
   },
   "quarterly": {},
