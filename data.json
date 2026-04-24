@@ -8331,7 +8331,8 @@
           "WBD_close1": 26.9,
           "WBD_low1": 26.9,
           "WBD_high1": 27.45,
-          "WBD_sma200": 22.29
+          "WBD_sma200": 22.29,
+          "WBD_sma200_20": 21.14
         }
       },
       "config": {}
@@ -12946,7 +12947,8 @@
       "WBD_close1": 26.9,
       "WBD_low1": 26.9,
       "WBD_high1": 27.45,
-      "WBD_sma200": 22.29
+      "WBD_sma200": 22.29,
+      "WBD_sma200_20": 21.14
     }
   },
   "quarterly": {},
