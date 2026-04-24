@@ -8337,7 +8337,8 @@
           "BAC_close1": 52.47,
           "BAC_low1": 52.25,
           "BAC_high1": 53.52,
-          "BAC_open0": ""
+          "BAC_open0": "",
+          "BAC_sma200_20": 50.84
         }
       },
       "config": {}
@@ -12958,7 +12959,8 @@
       "BAC_close1": 52.47,
       "BAC_low1": 52.25,
       "BAC_high1": 53.52,
-      "BAC_open0": ""
+      "BAC_open0": "",
+      "BAC_sma200_20": 50.84
     }
   },
   "quarterly": {},
