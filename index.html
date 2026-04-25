@@ -2039,21 +2039,21 @@ const STRATEGY_RULES = {
       ]
     },
     d1Patterns: {
-      title: 'D+1 Patterns — один из трёх',
+      title: 'D+1 Patterns — один из трёх (для LONG)',
       rules: [
         '<b>Паттерн 1: Inside Day</b>',
         '• High_D+1 ≤ High_D0',
         '• Low_D+1 ≥ Low_D0',
         '',
         '<b>Паттерн 2: Weak Pullback</b>',
-        '• Low_D+1 > Mid_D0 (где Mid = (High + Low) / 2)',
-        '• (High_D0 − Low_D+1) / Range_D0 < 0.5',
-        '• Close_D+1 > Mid_D0',
+        '• LONG: Low_D+1 > Mid_D0, pullback < 50%, Close_D+1 > Mid_D0',
+        '• SHORT: High_D+1 < Mid_D0, pullback < 50%, Close_D+1 < Mid_D0',
         '',
         '<b>Паттерн 3: Compression</b>',
         '• Range_D+1 / Range_D0 < 0.5',
         '• |Close_D+1 − Close_D0| < 0.3 × Range_D0',
-        '• Close_D+1 > Mid_D0',
+        '• LONG: Close_D+1 > Mid_D0',
+        '• SHORT: Close_D+1 < Mid_D0',
         '',
         'Если ни один не выполнен → сделки нет'
       ]
@@ -2061,15 +2061,17 @@ const STRATEGY_RULES = {
     entry: {
       title: 'Entry (D+2)',
       rules: [
-        'Entry = High_D0 + 0.1 × ATR(14)',
-        'Ордер: buy-stop limit на D+2'
+        'LONG: Entry = High_D0 + 0.1 × ATR(14)',
+        'SHORT: Entry = Low_D0 − 0.1 × ATR(14)',
+        'Ордер: buy-stop limit (LONG) или sell-stop limit (SHORT) на D+2'
       ]
     },
     stop: {
       title: 'Stop',
       rules: [
-        'Stop = Low_D+1 − 0.2 × ATR(14)',
-        'RiskPerShare = Entry − Stop',
+        'LONG: Stop = Low_D+1 − 0.2 × ATR(14)',
+        'SHORT: Stop = High_D+1 + 0.2 × ATR(14)',
+        'RiskPerShare = |Entry − Stop|',
         'Ограничение: RiskPerShare / ATR ≤ 1.5',
         'Если стоп слишком широкий → сделка отменяется'
       ]
@@ -6240,8 +6242,8 @@ function saveImpulseD1() {
     return;
   }
   
-  // Check patterns
-  const patternCheck = checkImpulseD1Patterns(candidate.d0, d1, candidate.metrics);
+  // Check patterns (pass direction)
+  const patternCheck = checkImpulseD1Patterns(candidate.d0, d1, candidate.metrics, candidate.direction);
   
   if (!patternCheck.valid) {
     warningsEl.style.display = 'block';
@@ -6249,11 +6251,11 @@ function saveImpulseD1() {
     return;
   }
   
-  // Calculate Entry/Stop
-  const entryParams = calculateImpulseEntry(candidate.d0, d1, candidate.atr);
+  // Calculate Entry/Stop (pass direction)
+  const entryParams = calculateImpulseEntry(candidate.d0, d1, candidate.atr, candidate.direction);
   
   // Validate risk
-  const riskCheck = validateImpulseRisk(entryParams.entry, entryParams.stop, candidate.atr);
+  const riskCheck = validateImpulseRisk(entryParams.entry, entryParams.stop, candidate.atr, candidate.direction);
   
   if (!riskCheck.valid) {
     warningsEl.style.display = 'block';
@@ -6283,26 +6285,43 @@ function saveImpulseD1() {
   toast(`🎯 ${candidate.ticker} готов к входу! Паттерн: ${patternCheck.pattern}`);
 }
 
-function checkImpulseD1Patterns(d0, d1, metrics) {
+function checkImpulseD1Patterns(d0, d1, metrics, direction) {
   const errors = [];
   const mid0 = metrics.mid;
   const range0 = metrics.range;
   
-  // Pattern 1: Inside Day
+  // Pattern 1: Inside Day (одинаковый для LONG и SHORT)
   const isInsideDay = d1.H <= d0.H && d1.L >= d0.L;
   
   // Pattern 2: Weak Pullback
-  const isWeakPullback = 
-    d1.L > mid0 &&
-    ((d0.H - d1.L) / range0) < 0.5 &&
-    d1.C > mid0;
+  let isWeakPullback = false;
+  if (direction === 'LONG') {
+    isWeakPullback = 
+      d1.L > mid0 &&
+      ((d0.H - d1.L) / range0) < 0.5 &&
+      d1.C > mid0;
+  } else if (direction === 'SHORT') {
+    // SHORT: High1 < Mid0, pullback не больше 50%, Close < Mid0
+    isWeakPullback = 
+      d1.H < mid0 &&
+      ((d1.H - d0.L) / range0) < 0.5 &&
+      d1.C < mid0;
+  }
   
   // Pattern 3: Compression
   const range1 = d1.H - d1.L;
-  const isCompression = 
-    (range1 / range0) < 0.5 &&
-    Math.abs(d1.C - d0.C) < 0.3 * range0 &&
-    d1.C > mid0;
+  let isCompression = false;
+  if (direction === 'LONG') {
+    isCompression = 
+      (range1 / range0) < 0.5 &&
+      Math.abs(d1.C - d0.C) < 0.3 * range0 &&
+      d1.C > mid0;
+  } else if (direction === 'SHORT') {
+    isCompression = 
+      (range1 / range0) < 0.5 &&
+      Math.abs(d1.C - d0.C) < 0.3 * range0 &&
+      d1.C < mid0;
+  }
   
   let pattern = null;
   if (isInsideDay) pattern = 'Inside Day';
@@ -6311,26 +6330,38 @@ function checkImpulseD1Patterns(d0, d1, metrics) {
   
   if (!pattern) {
     errors.push(`Inside Day: High1=${d1.H.toFixed(2)} ${d1.H > d0.H ? '>' : '≤'} High0=${d0.H.toFixed(2)}, Low1=${d1.L.toFixed(2)} ${d1.L < d0.L ? '<' : '≥'} Low0=${d0.L.toFixed(2)}`);
-    errors.push(`Weak Pullback: Low1=${d1.L.toFixed(2)} ${d1.L <= mid0 ? '≤' : '>'} Mid0=${mid0.toFixed(2)}`);
-    errors.push(`Compression: Range1/Range0=${(range1/range0).toFixed(2)} ${(range1/range0) >= 0.5 ? '≥' : '<'} 0.5`);
+    if (direction === 'LONG') {
+      errors.push(`Weak Pullback (LONG): Low1=${d1.L.toFixed(2)} ${d1.L <= mid0 ? '≤' : '>'} Mid0=${mid0.toFixed(2)}, Close1=${d1.C.toFixed(2)} ${d1.C <= mid0 ? '≤' : '>'} Mid0`);
+      errors.push(`Compression (LONG): Range1/Range0=${(range1/range0).toFixed(2)}, Close1=${d1.C.toFixed(2)} ${d1.C <= mid0 ? '≤' : '>'} Mid0`);
+    } else {
+      errors.push(`Weak Pullback (SHORT): High1=${d1.H.toFixed(2)} ${d1.H >= mid0 ? '≥' : '<'} Mid0=${mid0.toFixed(2)}, Close1=${d1.C.toFixed(2)} ${d1.C >= mid0 ? '≥' : '<'} Mid0`);
+      errors.push(`Compression (SHORT): Range1/Range0=${(range1/range0).toFixed(2)}, Close1=${d1.C.toFixed(2)} ${d1.C >= mid0 ? '≥' : '<'} Mid0`);
+    }
   }
   
   return { valid: pattern !== null, pattern, errors };
 }
 
-function calculateImpulseEntry(d0, d1, atr) {
-  // Entry = High0 + 0.1 * ATR
-  const entry = d0.H + 0.1 * atr;
+function calculateImpulseEntry(d0, d1, atr, direction) {
+  let entry, stop, riskPerShare;
   
-  // Stop = Low1 - 0.2 * ATR
-  const stop = d1.L - 0.2 * atr;
-  
-  // Risk per share
-  const riskPerShare = entry - stop;
+  if (direction === 'LONG') {
+    // LONG: Entry = High0 + 0.1 * ATR
+    entry = d0.H + 0.1 * atr;
+    // LONG: Stop = Low1 - 0.2 * ATR
+    stop = d1.L - 0.2 * atr;
+    riskPerShare = entry - stop;
+  } else if (direction === 'SHORT') {
+    // SHORT: Entry = Low0 - 0.1 * ATR (short sell below Low0)
+    entry = d0.L - 0.1 * atr;
+    // SHORT: Stop = High1 + 0.2 * ATR
+    stop = d1.H + 0.2 * atr;
+    riskPerShare = stop - entry;
+  }
   
   // Targets
-  const target1 = entry + riskPerShare;  // +1R
-  const target2 = entry + 2 * riskPerShare;  // +2R
+  const target1 = direction === 'LONG' ? entry + riskPerShare : entry - riskPerShare;  // +1R for LONG, -1R for SHORT
+  const target2 = direction === 'LONG' ? entry + 2 * riskPerShare : entry - 2 * riskPerShare;  // +2R for LONG, -2R for SHORT
   
   // Position size (1% risk)
   const equity = parseFloat(document.getElementById('capital')?.value) || 100000;
@@ -6340,8 +6371,8 @@ function calculateImpulseEntry(d0, d1, atr) {
   return { entry, stop, riskPerShare, target1, target2, shares };
 }
 
-function validateImpulseRisk(entry, stop, atr) {
-  const riskPerShare = entry - stop;
+function validateImpulseRisk(entry, stop, atr, direction) {
+  const riskPerShare = direction === 'LONG' ? (entry - stop) : (stop - entry);
   const ratio = riskPerShare / atr;
   
   return { valid: ratio <= 1.5, ratio };
