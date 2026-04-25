@@ -3985,6 +3985,134 @@
       "BAC_sma200_20": 50.84,
       "WBD_close2": 22.29,
       "WBD_close3": 21.14
+    },
+    "2026-04-25": {
+      "WBD_close2": 26.9,
+      "WBD_close3": 22.29,
+      "WBD_sma200": 22.29,
+      "PFE_close3": 25.64,
+      "PFE_sma200": 25.64,
+      "PCG_close2": 16.83,
+      "PCG_close3": 16.03,
+      "PCG_sma200": 16.03,
+      "MSFT_close3": 473.11,
+      "MSFT_sma200": 473.11,
+      "OXY_close3": 46.28,
+      "OXY_sma200": 46.28,
+      "MPLX_close3": 53.24,
+      "MPLX_sma200": 53.24,
+      "COP_close3": 99.55,
+      "COP_sma200": 99.55,
+      "WMB_close3": 63.09,
+      "WMB_sma200": 63.09,
+      "VZ_close3": 43.52,
+      "VZ_sma200": 43.52,
+      "NEE_close3": 81.8,
+      "NEE_sma200": 81.8,
+      "URI_close3": 860.17,
+      "URI_sma200": 860.17,
+      "CDNS_close3": 321.56,
+      "CDNS_sma200": 321.56,
+      "MDT_close3": 94.46,
+      "MDT_sma200": 94.46,
+      "SYK_close3": 369.74,
+      "SYK_sma200": 369.74,
+      "DIS_close3": 111.21,
+      "DIS_sma200": 111.21,
+      "AXP_close3": 335.63,
+      "AXP_sma200": 335.63,
+      "META_close3": 682.03,
+      "META_sma200": 682.03,
+      "WAT_close3": 336.93,
+      "WAT_sma200": 336.93,
+      "ELV_close3": 326.9,
+      "ELV_sma200": 326.9,
+      "NVDA_close3": 180.15,
+      "NVDA_sma200": 180.15,
+      "UNH_close3": 312.48,
+      "UNH_sma200": 312.48,
+      "ROK_close3": 369.93,
+      "ROK_sma200": 369.93,
+      "PSA_close3": 284.83,
+      "PSA_sma200": 284.83,
+      "SHW_close3": 343.14,
+      "SHW_sma200": 343.14,
+      "MELI_close3": 2165.05,
+      "MELI_sma200": 2165.05,
+      "NFLX_close3": 105.52,
+      "NFLX_sma200": 105.52,
+      "CHTR_close3": 253.08,
+      "CHTR_sma200": 253.08,
+      "KHC_close3": 25.27,
+      "KHC_sma200": 25.27,
+      "HUM_close3": 244.68,
+      "HUM_sma200": 244.68,
+      "LPLA_close3": 353.12,
+      "LPLA_sma200": 353.12,
+      "CI_close3": 287.29,
+      "CI_sma200": 287.29,
+      "TEL_close3": 213.82,
+      "TEL_sma200": 213.82,
+      "TMO_close3": 515.73,
+      "TMO_sma200": 515.73,
+      "BAC_close2": 52.47,
+      "BAC_close3": 51.24,
+      "BAC_sma200": 51.24,
+      "JPM_close3": 301.57,
+      "JPM_sma200": 301.57,
+      "SF_close3": 77.16,
+      "SF_sma200": 77.16,
+      "FCNCA_close3": 1949.85,
+      "FCNCA_sma200": 1949.85,
+      "ZM_close3": 81.74,
+      "ZM_sma200": 81.74,
+      "AGJ_close3": 272.4,
+      "AGJ_sma200": 272.4,
+      "SCHW_close3": 95.38,
+      "SCHW_sma200": 95.38,
+      "APO_close3": 133.86,
+      "APO_sma200": 133.86,
+      "WFC_close3": 84.26,
+      "WFC_sma200": 84.26,
+      "TLN_close3": 361.27,
+      "TLN_sma200": 361.27,
+      "SYF_close3": 73.11,
+      "SYF_sma200": 73.11,
+      "CARR_close3": 61.99,
+      "CARR_sma200": 61.99,
+      "ARM_close3": 138.09,
+      "ARM_sma200": 138.09,
+      "BX_close3": 150.94,
+      "BX_sma200": 150.94,
+      "LMT_close3": 505.54,
+      "LMT_sma200": 505.54,
+      "HON_close3": 210.2,
+      "HON_sma200": 210.2,
+      "AMGN_close3": 315.66,
+      "AMGN_sma200": 315.66,
+      "LLY_close3": 890.03,
+      "LLY_sma200": 890.03,
+      "IBM_close3": 279.21,
+      "IBM_sma200": 279.21,
+      "MRK_close3": 93.88,
+      "MRK_sma200": 93.88,
+      "NTAP_close3": 109.02,
+      "NTAP_sma200": 109.02,
+      "CPNG_close3": 26.85,
+      "CPNG_sma200": 26.85,
+      "ABBV_close3": 214.78,
+      "ABBV_sma200": 214.78,
+      "AAPL_close3": 245.85,
+      "AAPL_sma200": 245.85,
+      "PANW_close3": 187.41,
+      "PANW_sma200": 187.41,
+      "DKNG_close3": 35.97,
+      "DKNG_sma200": 35.97,
+      "JD_close3": 31.1,
+      "JD_sma200": 31.1,
+      "CRWD_close3": 463.13,
+      "CRWD_sma200": 463.13,
+      "_migration_done": true
     }
   },
   "strategies": {
@@ -8675,6 +8803,43 @@
         }
       },
       "config": {}
+    },
+    "impulse": {
+      "trades": [],
+      "candidates": [
+        {
+          "id": "TSCO_2026-04-20",
+          "ticker": "TSCO",
+          "d0Date": "2026-04-20",
+          "direction": "SHORT",
+          "d_1": {
+            "C": 44.81
+          },
+          "d0": {
+            "O": 42.6,
+            "H": 42.9,
+            "L": 38.92,
+            "C": 39.57,
+            "V": 13.84
+          },
+          "atr": 2.33,
+          "relVol": 3.89,
+          "metrics": {
+            "impulse": -0.1169381834411962,
+            "clv": 0.16331658291457263,
+            "body": 0.7613065326633175,
+            "mid": 40.91,
+            "range": 3.979999999999997,
+            "direction": "SHORT"
+          },
+          "d1": null,
+          "pattern": null,
+          "entry": null,
+          "stop": null,
+          "status": "WAITING_D1",
+          "created": "2026-04-25T07:22:52.339Z"
+        }
+      ]
     }
   },
   "analytics": [
@@ -8723,6 +8888,51 @@
       "data": {
         "from": "ibs_swing",
         "to": "ibs_swing"
+      }
+    },
+    {
+      "timestamp": "2026-04-25T07:11:34.392Z",
+      "strategy": "impulse",
+      "event": "strategy_switch",
+      "data": {
+        "from": "impulse",
+        "to": "impulse"
+      }
+    },
+    {
+      "timestamp": "2026-04-25T07:11:53.701Z",
+      "strategy": "event_continuation",
+      "event": "strategy_switch",
+      "data": {
+        "from": "event_continuation",
+        "to": "event_continuation"
+      }
+    },
+    {
+      "timestamp": "2026-04-25T07:11:57.945Z",
+      "strategy": "impulse",
+      "event": "strategy_switch",
+      "data": {
+        "from": "impulse",
+        "to": "impulse"
+      }
+    },
+    {
+      "timestamp": "2026-04-25T07:11:58.478Z",
+      "strategy": "pead",
+      "event": "strategy_switch",
+      "data": {
+        "from": "pead",
+        "to": "pead"
+      }
+    },
+    {
+      "timestamp": "2026-04-25T07:12:01.600Z",
+      "strategy": "impulse",
+      "event": "strategy_switch",
+      "data": {
+        "from": "impulse",
+        "to": "impulse"
       }
     }
   ],
