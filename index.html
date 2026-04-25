@@ -585,6 +585,7 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
     <button class="btn btn-p btn-s" id="scannerTabIBS" onclick="showScanner('ibs')">📊 Daily RSI Scan</button>
     <button class="btn btn-g btn-s" id="scannerTabEvent" onclick="showScanner('event')">⚡ Event Scanner</button>
     <button class="btn btn-g btn-s" id="scannerTabPEAD" onclick="showScanner('pead')">📈 Earnings Scanner</button>
+    <button class="btn btn-g btn-s" id="scannerTabImpulse" onclick="showScanner('impulse')">🚀 Impulse Scanner</button>
     <button class="btn btn-g btn-s" id="scannerTabManage" onclick="showScanner('manage')">📋 Manage List</button>
   </div>
 
@@ -743,6 +744,46 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
       </div>
     </div>
   </div><!-- end scanner-pead -->
+
+  <!-- Impulse Scanner -->
+  <div id="scanner-impulse" class="scanner-section" style="display:none">
+    <div style="margin-bottom:24px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div class="sh">🚀 Impulse Scanner
+          <span style="font-family:var(--mono);font-size:9px;color:var(--t2);font-weight:400">Импульсное движение с подтверждением</span>
+        </div>
+        <button class="btn btn-p btn-s" onclick="openImpulseForm()">+ ДОБАВИТЬ ИМПУЛЬС</button>
+      </div>
+      
+      <div style="font-family:var(--mono);font-size:9px;color:var(--t2);margin:12px 0;padding:10px 14px;background:var(--bg3);border-radius:8px;border:1px solid var(--line);line-height:1.7">
+        <b>D0:</b> Move +5% to +12%, CLV > 0.70, Body > 0.50, RelVol ≥ 1.5<br>
+        <b>D+1:</b> Inside Day OR Weak Pullback OR Compression<br>
+        <b>Entry D+2:</b> High_D0 + 0.1×ATR, Stop = Low_D+1 − 0.2×ATR
+      </div>
+
+      <!-- Impulse Candidates Table -->
+      <div class="tw">
+        <table>
+          <thead><tr>
+            <th>Ticker</th>
+            <th>D0 Date</th>
+            <th>Dir</th>
+            <th>Impulse%</th>
+            <th>CLV</th>
+            <th>Body</th>
+            <th>RelVol</th>
+            <th>D+1 Pattern</th>
+            <th>Entry</th>
+            <th>Stop</th>
+            <th>Actions</th>
+          </tr></thead>
+          <tbody id="impulseTbody">
+            <tr><td colspan="11" style="text-align:center;color:var(--t2);padding:30px">Нет импульсных кандидатов — добавьте первый</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div><!-- end scanner-impulse -->
 
   <!-- Manage Watchlist -->
   <div id="scanner-manage" class="scanner-section" style="display:none">
@@ -1592,6 +1633,13 @@ const STRATEGIES = {
     color: '#9b59b6',
     description: 'Post-Earnings Announcement Drift на earnings surprise'
   },
+  impulse: {
+    id: 'impulse',
+    name: 'Impulse',
+    icon: '🚀',
+    color: '#e74c3c',
+    description: 'Импульсное движение D0 с подтверждением на D+1'
+  },
   momentum: {
     id: 'momentum',
     name: 'Momentum',
@@ -1961,6 +2009,88 @@ const STRATEGY_RULES = {
       ]
     }
   },
+  impulse: {
+    name: 'Impulse Continuation',
+    description: 'Импульсное движение D0 с подтверждением паттерном на D+1',
+    universe: {
+      title: 'Universe (Screener Settings)',
+      rules: [
+        'Market: US',
+        'Price ≥ $20',
+        'Avg Volume ≥ 2,000,000',
+        'Market Cap ≥ $2B',
+        'LONG: Day Change +5% to +12%',
+        'SHORT: Day Change −5% to −12%',
+        'Relative Volume ≥ 1.5 (приоритет ≥ 2.0)'
+      ]
+    },
+    d0Criteria: {
+      title: 'D0 (Impulse Day) — обязательные условия',
+      rules: [
+        'Impulse = (Close_D0 − Close_{D-1}) / Close_{D-1}',
+        'LONG: Impulse ≥ 5% AND ≤ 12%',
+        'SHORT: Impulse ≤ −5% AND ≥ −12%',
+        'CLV = (Close − Low) / (High − Low)',
+        'LONG: CLV > 0.70 (закрытие в верхней части)',
+        'Body = |Close − Open| / Range',
+        'Body > 0.50 (не дожи)',
+        'RelVol ≥ 1.5',
+        'Если хотя бы одно не выполнено → тикер исключается'
+      ]
+    },
+    d1Patterns: {
+      title: 'D+1 Patterns — один из трёх',
+      rules: [
+        '<b>Паттерн 1: Inside Day</b>',
+        '• High_D+1 ≤ High_D0',
+        '• Low_D+1 ≥ Low_D0',
+        '',
+        '<b>Паттерн 2: Weak Pullback</b>',
+        '• Low_D+1 > Mid_D0 (где Mid = (High + Low) / 2)',
+        '• (High_D0 − Low_D+1) / Range_D0 < 0.5',
+        '• Close_D+1 > Mid_D0',
+        '',
+        '<b>Паттерн 3: Compression</b>',
+        '• Range_D+1 / Range_D0 < 0.5',
+        '• |Close_D+1 − Close_D0| < 0.3 × Range_D0',
+        '• Close_D+1 > Mid_D0',
+        '',
+        'Если ни один не выполнен → сделки нет'
+      ]
+    },
+    entry: {
+      title: 'Entry (D+2)',
+      rules: [
+        'Entry = High_D0 + 0.1 × ATR(14)',
+        'Ордер: buy-stop limit на D+2'
+      ]
+    },
+    stop: {
+      title: 'Stop',
+      rules: [
+        'Stop = Low_D+1 − 0.2 × ATR(14)',
+        'RiskPerShare = Entry − Stop',
+        'Ограничение: RiskPerShare / ATR ≤ 1.5',
+        'Если стоп слишком широкий → сделка отменяется'
+      ]
+    },
+    size: {
+      title: 'Position Size',
+      rules: [
+        'PositionSize = RiskAmount / (Entry − Stop)',
+        'Пример: капитал $10,000, риск 1% = $100',
+        'Если Entry = 52.5, Stop = 50.0 → Size = 100 / 2.5 = 40 акций'
+      ]
+    },
+    exit: {
+      title: 'Targets',
+      rules: [
+        'TP1 (50%): Entry + 1R (где R = Entry − Stop)',
+        'TP2 (50%): Entry + 2R',
+        'После TP1: trailing stop или безубыток'
+      ]
+    }
+  },
   options_flow: {
     name: 'Options Flow',
     description: 'Unusual options activity (скоро)',
@@ -2010,7 +2140,7 @@ function renderStrategyTabs() {
   
   container.innerHTML = Object.values(STRATEGIES).map(s => {
     const isActive = currentStrategy === s.id;
-    const isImplemented = s.id === 'ibs_swing' || s.id === 'event_continuation' || s.id === 'pead';  // IBS, Event, PEAD implemented
+    const isImplemented = s.id === 'ibs_swing' || s.id === 'event_continuation' || s.id === 'pead' || s.id === 'impulse';  // 4 strategies
     
     // Count open trades for this strategy
     let openCount = 0;
@@ -2020,6 +2150,8 @@ function renderStrategyTabs() {
       openCount = (cache.strategies?.event_continuation?.events || []).filter(e => e.status === 'READY_ENTRY').length;
     } else if (s.id === 'pead') {
       openCount = (cache.strategies?.pead?.earnings || []).filter(e => e.status === 'READY_ENTRY').length;
+    } else if (s.id === 'impulse') {
+      openCount = (cache.strategies?.impulse?.candidates || []).filter(c => c.status === 'READY_ENTRY').length;
     }
     
     return `
@@ -2098,7 +2230,7 @@ function showScanner(type) {
   document.querySelectorAll('.scanner-section').forEach(el => el.style.display = 'none');
   
   // Deactivate all buttons
-  ['scannerTabIBS','scannerTabEvent','scannerTabPEAD','scannerTabManage'].forEach(id => {
+  ['scannerTabIBS','scannerTabEvent','scannerTabPEAD','scannerTabImpulse','scannerTabManage'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.className = 'btn btn-g btn-s';
   });
@@ -2116,6 +2248,10 @@ function showScanner(type) {
     document.getElementById('scanner-pead').style.display = 'block';
     document.getElementById('scannerTabPEAD').className = 'btn btn-p btn-s';
     renderPEAD();  // Render PEAD when opening
+  } else if (type === 'impulse') {
+    document.getElementById('scanner-impulse').style.display = 'block';
+    document.getElementById('scannerTabImpulse').className = 'btn btn-p btn-s';
+    renderImpulse();  // Render Impulse when opening
   } else if (type === 'manage') {
     document.getElementById('scanner-manage').style.display = 'block';
     document.getElementById('scannerTabManage').className = 'btn btn-p btn-s';
@@ -5846,6 +5982,383 @@ function deletePEAD(id) {
 }
 
 // ═══════════════════════════════════════════════════════════
+// IMPULSE CONTINUATION FUNCTIONS
+// ═══════════════════════════════════════════════════════════
+
+function openImpulseForm() {
+  document.getElementById('impulseModal').style.display = 'flex';
+  // Clear form
+  ['impTicker','impD0Date','impD_1_C','impD0_O','impD0_H','impD0_L','impD0_C','impD0_V','impATR','impRelVol'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  // Clear errors
+  const errorsEl = document.getElementById('impulseErrors');
+  if (errorsEl) {
+    errorsEl.style.display = 'none';
+    errorsEl.innerHTML = '';
+  }
+}
+
+function closeImpulseForm() {
+  document.getElementById('impulseModal').style.display = 'none';
+  const errorsEl = document.getElementById('impulseErrors');
+  if (errorsEl) {
+    errorsEl.style.display = 'none';
+    errorsEl.innerHTML = '';
+  }
+}
+
+function saveImpulse() {
+  const errorsEl = document.getElementById('impulseErrors');
+  
+  const ticker = document.getElementById('impTicker').value.trim().toUpperCase();
+  const d0Date = document.getElementById('impD0Date').value;
+  
+  if (!ticker || !d0Date) {
+    errorsEl.style.display = 'block';
+    errorsEl.innerHTML = '<b>❌ Ошибка:</b><br>Заполните ticker и дату D0';
+    return;
+  }
+  
+  // Get D-1 data
+  const d_1 = {
+    C: parseFloat(document.getElementById('impD_1_C').value)
+  };
+  
+  // Get D0 data
+  const d0 = {
+    O: parseFloat(document.getElementById('impD0_O').value),
+    H: parseFloat(document.getElementById('impD0_H').value),
+    L: parseFloat(document.getElementById('impD0_L').value),
+    C: parseFloat(document.getElementById('impD0_C').value),
+    V: parseFloat(document.getElementById('impD0_V').value)
+  };
+  
+  const atr = parseFloat(document.getElementById('impATR').value);
+  const relVol = parseFloat(document.getElementById('impRelVol').value);
+  
+  // Validate
+  if (isNaN(d_1.C) || Object.values(d0).some(isNaN) || isNaN(atr) || isNaN(relVol)) {
+    errorsEl.style.display = 'block';
+    errorsEl.innerHTML = '<b>❌ Ошибка:</b><br>Заполните все поля';
+    return;
+  }
+  
+  // Calculate D0 metrics
+  const metrics = calculateImpulseD0Metrics(d_1, d0, atr, relVol);
+  
+  // Validate D0
+  const validation = validateImpulseD0(d_1, d0, metrics);
+  
+  if (!validation.valid) {
+    errorsEl.style.display = 'block';
+    errorsEl.innerHTML = `<b>❌ D0 критерии не выполнены:</b><br>${validation.errors.map(e => `• ${e}`).join('<br>')}`;
+    return;
+  }
+  
+  // Create impulse candidate
+  const impulse = {
+    id: `${ticker}_${d0Date}`,
+    ticker,
+    d0Date,
+    direction: metrics.direction,
+    d_1,
+    d0,
+    atr,
+    relVol,
+    metrics,
+    d1: null,  // Will be filled later
+    pattern: null,
+    entry: null,
+    stop: null,
+    status: 'WAITING_D1',
+    created: new Date().toISOString()
+  };
+  
+  // Save to cache
+  if (!cache.strategies) cache.strategies = {};
+  if (!cache.strategies.impulse) cache.strategies.impulse = { trades: [], candidates: [] };
+  if (!cache.strategies.impulse.candidates) cache.strategies.impulse.candidates = [];
+  
+  cache.strategies.impulse.candidates.push(impulse);
+  
+  closeImpulseForm();
+  renderImpulse();
+  scheduleSave();
+  toast(`✓ Impulse ${ticker} добавлен (${metrics.direction}, ${(metrics.impulse * 100).toFixed(1)}%)`);
+}
+
+function calculateImpulseD0Metrics(d_1, d0, atr, relVol) {
+  // Impulse
+  const impulse = (d0.C - d_1.C) / d_1.C;
+  
+  // Range
+  const range = d0.H - d0.L;
+  
+  // CLV (Close Location Value)
+  const clv = range > 0 ? (d0.C - d0.L) / range : 0;
+  
+  // Body
+  const body = range > 0 ? Math.abs(d0.C - d0.O) / range : 0;
+  
+  // Mid
+  const mid = (d0.H + d0.L) / 2;
+  
+  // Direction
+  let direction = null;
+  // LONG: Impulse +5% to +12%, CLV > 0.70, Body > 0.50, RelVol >= 1.5
+  if (impulse >= 0.05 && impulse <= 0.12 && clv > 0.70 && body > 0.50 && relVol >= 1.5) {
+    direction = 'LONG';
+  } 
+  // SHORT: Impulse -5% to -12%, CLV < 0.30 (closes near low), Body > 0.50, RelVol >= 1.5
+  else if (impulse <= -0.05 && impulse >= -0.12 && clv < 0.30 && body > 0.50 && relVol >= 1.5) {
+    direction = 'SHORT';
+  }
+  
+  return { impulse, clv, body, mid, range, direction };
+}
+
+function validateImpulseD0(d_1, d0, metrics) {
+  const errors = [];
+  
+  const isLongCandidate = metrics.impulse >= 0.05;
+  const isShortCandidate = metrics.impulse <= -0.05;
+  
+  if (!isLongCandidate && !isShortCandidate) {
+    errors.push('Impulse недостаточен для LONG (+5%) или SHORT (−5%)');
+    return { valid: false, errors };
+  }
+  
+  // LONG validation
+  if (isLongCandidate) {
+    if (metrics.impulse < 0.05) errors.push(`LONG: Impulse ${(metrics.impulse * 100).toFixed(1)}% < 5%`);
+    if (metrics.impulse > 0.12) errors.push(`LONG: Impulse ${(metrics.impulse * 100).toFixed(1)}% > 12%`);
+    if (metrics.clv <= 0.70) errors.push(`LONG: CLV ${metrics.clv.toFixed(2)} ≤ 0.70`);
+    if (metrics.body <= 0.50) errors.push(`LONG: Body ${metrics.body.toFixed(2)} ≤ 0.50`);
+  }
+  
+  // SHORT validation
+  if (isShortCandidate) {
+    if (metrics.impulse > -0.05) errors.push(`SHORT: Impulse ${(metrics.impulse * 100).toFixed(1)}% > −5%`);
+    if (metrics.impulse < -0.12) errors.push(`SHORT: Impulse ${(metrics.impulse * 100).toFixed(1)}% < −12%`);
+    if (metrics.clv >= 0.30) errors.push(`SHORT: CLV ${metrics.clv.toFixed(2)} ≥ 0.30`);
+    if (metrics.body <= 0.50) errors.push(`SHORT: Body ${metrics.body.toFixed(2)} ≤ 0.50`);
+  }
+  
+  return { valid: errors.length === 0, errors };
+}
+
+function renderImpulse() {
+  const candidates = cache.strategies?.impulse?.candidates || [];
+  const tbody = document.getElementById('impulseTbody');
+  
+  if (!candidates.length) {
+    tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;color:var(--t2);padding:30px">Нет импульсных кандидатов — добавьте первый</td></tr>';
+    return;
+  }
+  
+  tbody.innerHTML = candidates.map(c => {
+    const m = c.metrics;
+    const dirColor = c.direction === 'LONG' ? 'var(--acc)' : 'var(--acc2)';
+    const statusText = {
+      'WAITING_D1': '⏳ Ждём D+1',
+      'READY_ENTRY': '🎯 Готов вход',
+      'REJECTED': '❌ Rejected'
+    }[c.status] || c.status;
+    
+    return `<tr>
+      <td><b>${c.ticker}</b></td>
+      <td style="font-family:var(--mono);font-size:10px">${c.d0Date}</td>
+      <td><span style="color:${dirColor};font-weight:700">${c.direction}</span></td>
+      <td style="font-family:var(--mono);font-size:10px;color:${m.impulse >= 0 ? 'var(--acc)' : 'var(--acc2)'}">${m.impulse >= 0 ? '+' : ''}${(m.impulse * 100).toFixed(1)}%</td>
+      <td style="font-family:var(--mono);font-size:10px">${m.clv.toFixed(2)}</td>
+      <td style="font-family:var(--mono);font-size:10px">${m.body.toFixed(2)}</td>
+      <td style="font-family:var(--mono);font-size:10px">${c.relVol.toFixed(1)}×</td>
+      <td style="font-size:10px">${c.pattern || '—'}</td>
+      <td style="font-family:var(--mono);font-size:10px">${c.entry ? '$' + c.entry.toFixed(2) : '—'}</td>
+      <td style="font-family:var(--mono);font-size:10px">${c.stop ? '$' + c.stop.toFixed(2) : '—'}</td>
+      <td>
+        ${c.status === 'WAITING_D1' ? `<button class="btn btn-g btn-s" onclick="addD1Data('${c.id}')" style="font-size:9px">+ D+1</button>` : ''}
+        <button class="btn btn-r btn-s" onclick="deleteImpulse('${c.id}')" style="font-size:9px">×</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function addD1Data(candidateId) {
+  currentImpulseId = candidateId;
+  const candidate = cache.strategies.impulse.candidates.find(c => c.id === candidateId);
+  if (!candidate) return;
+  
+  // Show modal
+  document.getElementById('impulseD1Modal').style.display = 'flex';
+  document.getElementById('impD1Info').textContent = `${candidate.ticker} — D0: ${candidate.d0Date} (${candidate.direction})`;
+  
+  // Clear form
+  ['impD1Date','impD1_O','impD1_H','impD1_L','impD1_C'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  
+  // Clear warnings
+  const warningsEl = document.getElementById('impD1Warnings');
+  if (warningsEl) {
+    warningsEl.style.display = 'none';
+    warningsEl.innerHTML = '';
+  }
+}
+
+function closeImpulseD1Form() {
+  document.getElementById('impulseD1Modal').style.display = 'none';
+  currentImpulseId = null;
+  const warningsEl = document.getElementById('impD1Warnings');
+  if (warningsEl) {
+    warningsEl.style.display = 'none';
+    warningsEl.innerHTML = '';
+  }
+}
+
+function saveImpulseD1() {
+  const warningsEl = document.getElementById('impD1Warnings');
+  
+  const candidate = cache.strategies.impulse.candidates.find(c => c.id === currentImpulseId);
+  if (!candidate) return;
+  
+  const date = document.getElementById('impD1Date').value;
+  const d1 = {
+    date,
+    O: parseFloat(document.getElementById('impD1_O').value),
+    H: parseFloat(document.getElementById('impD1_H').value),
+    L: parseFloat(document.getElementById('impD1_L').value),
+    C: parseFloat(document.getElementById('impD1_C').value)
+  };
+  
+  if (!date || Object.values(d1).slice(1).some(isNaN)) {
+    warningsEl.style.display = 'block';
+    warningsEl.innerHTML = '<b>⚠️ Ошибка:</b><br>Заполните все поля OHLC';
+    return;
+  }
+  
+  // Check patterns
+  const patternCheck = checkImpulseD1Patterns(candidate.d0, d1, candidate.metrics);
+  
+  if (!patternCheck.valid) {
+    warningsEl.style.display = 'block';
+    warningsEl.innerHTML = `<b>❌ D+1 паттерны не выполнены:</b><br>${patternCheck.errors.map(e => `• ${e}`).join('<br>')}<br><br><i>Ни один из трёх паттернов не подошёл</i>`;
+    return;
+  }
+  
+  // Calculate Entry/Stop
+  const entryParams = calculateImpulseEntry(candidate.d0, d1, candidate.atr);
+  
+  // Validate risk
+  const riskCheck = validateImpulseRisk(entryParams.entry, entryParams.stop, candidate.atr);
+  
+  if (!riskCheck.valid) {
+    warningsEl.style.display = 'block';
+    warningsEl.innerHTML = `<b>❌ Стоп слишком широкий:</b><br>• RiskPerShare / ATR = ${riskCheck.ratio.toFixed(2)} > 1.5<br><br><i>Сделка отменяется</i>`;
+    setTimeout(() => {
+      candidate.status = 'REJECTED';
+      closeImpulseD1Form();
+      renderImpulse();
+      scheduleSave();
+    }, 3000);
+    return;
+  }
+  
+  // Update candidate
+  candidate.d1 = d1;
+  candidate.pattern = patternCheck.pattern;
+  candidate.entry = entryParams.entry;
+  candidate.stop = entryParams.stop;
+  candidate.target1 = entryParams.target1;
+  candidate.target2 = entryParams.target2;
+  candidate.shares = entryParams.shares;
+  candidate.status = 'READY_ENTRY';
+  
+  closeImpulseD1Form();
+  renderImpulse();
+  scheduleSave();
+  toast(`🎯 ${candidate.ticker} готов к входу! Паттерн: ${patternCheck.pattern}`);
+}
+
+function checkImpulseD1Patterns(d0, d1, metrics) {
+  const errors = [];
+  const mid0 = metrics.mid;
+  const range0 = metrics.range;
+  
+  // Pattern 1: Inside Day
+  const isInsideDay = d1.H <= d0.H && d1.L >= d0.L;
+  
+  // Pattern 2: Weak Pullback
+  const isWeakPullback = 
+    d1.L > mid0 &&
+    ((d0.H - d1.L) / range0) < 0.5 &&
+    d1.C > mid0;
+  
+  // Pattern 3: Compression
+  const range1 = d1.H - d1.L;
+  const isCompression = 
+    (range1 / range0) < 0.5 &&
+    Math.abs(d1.C - d0.C) < 0.3 * range0 &&
+    d1.C > mid0;
+  
+  let pattern = null;
+  if (isInsideDay) pattern = 'Inside Day';
+  else if (isWeakPullback) pattern = 'Weak Pullback';
+  else if (isCompression) pattern = 'Compression';
+  
+  if (!pattern) {
+    errors.push(`Inside Day: High1=${d1.H.toFixed(2)} ${d1.H > d0.H ? '>' : '≤'} High0=${d0.H.toFixed(2)}, Low1=${d1.L.toFixed(2)} ${d1.L < d0.L ? '<' : '≥'} Low0=${d0.L.toFixed(2)}`);
+    errors.push(`Weak Pullback: Low1=${d1.L.toFixed(2)} ${d1.L <= mid0 ? '≤' : '>'} Mid0=${mid0.toFixed(2)}`);
+    errors.push(`Compression: Range1/Range0=${(range1/range0).toFixed(2)} ${(range1/range0) >= 0.5 ? '≥' : '<'} 0.5`);
+  }
+  
+  return { valid: pattern !== null, pattern, errors };
+}
+
+function calculateImpulseEntry(d0, d1, atr) {
+  // Entry = High0 + 0.1 * ATR
+  const entry = d0.H + 0.1 * atr;
+  
+  // Stop = Low1 - 0.2 * ATR
+  const stop = d1.L - 0.2 * atr;
+  
+  // Risk per share
+  const riskPerShare = entry - stop;
+  
+  // Targets
+  const target1 = entry + riskPerShare;  // +1R
+  const target2 = entry + 2 * riskPerShare;  // +2R
+  
+  // Position size (1% risk)
+  const equity = parseFloat(document.getElementById('capital')?.value) || 100000;
+  const riskAmount = equity * 0.01;
+  const shares = Math.floor(riskAmount / riskPerShare);
+  
+  return { entry, stop, riskPerShare, target1, target2, shares };
+}
+
+function validateImpulseRisk(entry, stop, atr) {
+  const riskPerShare = entry - stop;
+  const ratio = riskPerShare / atr;
+  
+  return { valid: ratio <= 1.5, ratio };
+}
+
+let currentImpulseId = null;
+
+function deleteImpulse(id) {
+  if (!confirm('Удалить этот impulse кандидат?')) return;
+  const candidates = cache.strategies.impulse.candidates;
+  cache.strategies.impulse.candidates = candidates.filter(c => c.id !== id);
+  renderImpulse();
+  scheduleSave();
+  toast('Impulse удалён');
+}
+
+// ═══════════════════════════════════════════════════════════
 // EVENT CONTINUATION FUNCTIONS
 // ═══════════════════════════════════════════════════════════
 
@@ -6446,6 +6959,104 @@ init();
     <div class="modal-f">
       <button class="btn btn-g" onclick="closePEADForm()">Отмена</button>
       <button class="btn btn-p" onclick="savePEAD()">💾 Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- IMPULSE MODAL -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="impulseModal" class="modal">
+  <div class="modal-c" style="max-width:700px">
+    <div class="modal-h">
+      <div style="font-size:18px;font-weight:700">🚀 Добавить Impulse</div>
+      <div class="cls" onclick="closeImpulseForm()">×</div>
+    </div>
+    <div class="modal-b">
+      <div class="fgrid" style="grid-template-columns:1fr 1fr;margin-bottom:16px">
+        <div class="fg">
+          <label>Ticker *</label>
+          <input id="impTicker" placeholder="AAPL" style="text-transform:uppercase">
+        </div>
+        <div class="fg">
+          <label>D0 Date (Impulse Day) *</label>
+          <input id="impD0Date" type="date">
+        </div>
+      </div>
+
+      <div style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--text);margin:20px 0 12px">Day D-1 (предыдущий)</div>
+      <div class="fgrid" style="grid-template-columns:1fr">
+        <div class="fg"><label>Close</label><input id="impD_1_C" type="number" step="0.01"></div>
+      </div>
+
+      <div style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--text);margin:20px 0 12px">Day D0 (Impulse Day)</div>
+      <div class="fgrid" style="grid-template-columns:repeat(5,1fr)">
+        <div class="fg"><label>Open</label><input id="impD0_O" type="number" step="0.01"></div>
+        <div class="fg"><label>High</label><input id="impD0_H" type="number" step="0.01"></div>
+        <div class="fg"><label>Low</label><input id="impD0_L" type="number" step="0.01"></div>
+        <div class="fg"><label>Close</label><input id="impD0_C" type="number" step="0.01"></div>
+        <div class="fg"><label>Volume</label><input id="impD0_V" type="number" step="1"></div>
+      </div>
+
+      <div style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--text);margin:20px 0 12px">D0 Metrics</div>
+      <div class="fgrid" style="grid-template-columns:1fr 1fr">
+        <div class="fg"><label>ATR(14)</label><input id="impATR" type="number" step="0.01"></div>
+        <div class="fg"><label>Relative Volume</label><input id="impRelVol" type="number" step="0.1"></div>
+      </div>
+
+      <div style="font-family:var(--mono);font-size:10px;color:var(--t2);margin-top:16px;padding:10px;background:var(--bg3);border-radius:6px">
+        <b>Auto-calculated:</b> Impulse%, CLV, Body, Mid_D0, Direction
+      </div>
+      
+      <!-- Error display -->
+      <div id="impulseErrors" style="display:none;margin-top:16px;padding:12px;background:#ff000010;border:1px solid #ff000040;border-radius:6px;font-family:var(--mono);font-size:10px;line-height:1.8;color:#ff4444"></div>
+    </div>
+    <div class="modal-f">
+      <button class="btn btn-g" onclick="closeImpulseForm()">Отмена</button>
+      <button class="btn btn-p" onclick="saveImpulse()">💾 Сохранить D0</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- IMPULSE D+1 MODAL -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="impulseD1Modal" class="modal">
+  <div class="modal-c" style="max-width:600px">
+    <div class="modal-h">
+      <div style="font-size:18px;font-weight:700">📊 Добавить D+1 Data</div>
+      <div class="cls" onclick="closeImpulseD1Form()">×</div>
+    </div>
+    <div class="modal-b">
+      <div style="font-family:var(--mono);font-size:11px;color:var(--t2);margin-bottom:16px;padding:12px;background:var(--bg3);border-radius:6px">
+        <div><b style="color:var(--text)" id="impD1Info"></b></div>
+        <div style="margin-top:6px">Проверим паттерны: Inside Day, Weak Pullback, Compression</div>
+      </div>
+
+      <div class="fgrid" style="grid-template-columns:1fr;margin-bottom:16px">
+        <div class="fg">
+          <label>D+1 Date *</label>
+          <input id="impD1Date" type="date">
+        </div>
+      </div>
+
+      <div class="fgrid" style="grid-template-columns:repeat(4,1fr)">
+        <div class="fg"><label>Open</label><input id="impD1_O" type="number" step="0.01"></div>
+        <div class="fg"><label>High</label><input id="impD1_H" type="number" step="0.01"></div>
+        <div class="fg"><label>Low</label><input id="impD1_L" type="number" step="0.01"></div>
+        <div class="fg"><label>Close</label><input id="impD1_C" type="number" step="0.01"></div>
+      </div>
+
+      <div style="font-family:var(--mono);font-size:10px;color:var(--t2);margin-top:16px;padding:10px;background:var(--bg3);border-radius:6px">
+        <b>Auto-check:</b> Inside Day, Weak Pullback, Compression patterns
+      </div>
+      
+      <!-- Error/Warning display -->
+      <div id="impD1Warnings" style="display:none;margin-top:16px;padding:12px;background:#ff990010;border:1px solid #ff990040;border-radius:6px;font-family:var(--mono);font-size:10px;line-height:1.8;color:#ff9900"></div>
+    </div>
+    <div class="modal-f">
+      <button class="btn btn-g" onclick="closeImpulseD1Form()">Отмена</button>
+      <button class="btn btn-p" onclick="saveImpulseD1()">💾 Добавить</button>
     </div>
   </div>
 </div>
