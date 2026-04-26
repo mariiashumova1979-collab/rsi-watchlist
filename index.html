@@ -2172,6 +2172,9 @@ function switchStrategy(strategyId) {
   
   currentStrategy = strategyId;
   
+  // Get strategy object first
+  const strategy = STRATEGIES[strategyId];
+  
   // Log strategy switch
   logEvent(strategyId, 'strategy_switch', { from: currentStrategy, to: strategyId });
   
@@ -2183,7 +2186,6 @@ function switchStrategy(strategyId) {
   if (btn) btn.textContent = `${strategy.icon} ${strategy.name}`;
   
   // Update header
-  const strategy = STRATEGIES[strategyId];
   const logoMark = document.querySelector('.logo-mark');
   const logoVer = document.querySelector('.logo-ver');
   if (logoMark) logoMark.textContent = strategy.icon === '📊' ? 'IBS' : strategy.name.substring(0, 3).toUpperCase();
@@ -2546,7 +2548,7 @@ async function syncFromGithub() {
     if (data) { 
       applyData(data); 
       loadSetsUI(); loadGhUI(); loadFhKeyUI(); initChecklist(); 
-      renderDash(); renderTrades(); renderWL(); renderQ(); renderRsiScan(); renderScannerTabs(); 
+      renderDash(); renderTrades(); renderWL(); renderQ(); renderRsiScan();
       // Load regime
       const trend = cache.regime?.spyTrend;
       if (trend) { 
@@ -2555,6 +2557,18 @@ async function syncFromGithub() {
         updRegime(false);
       }
     }
+    
+    // Always render scanner tabs and show scanner for current strategy
+    renderScannerTabs();
+    const scannerMap = {
+      'ibs_swing': 'ibs',
+      'event_continuation': 'event',
+      'pead': 'pead',
+      'impulse': 'impulse'
+    };
+    const scannerType = scannerMap[currentStrategy] || 'ibs';
+    showScanner(scannerType);
+    
     setSyncState('synced', storageModeLabel());
     updateStorageInfo();
     toast('Синхронизировано ✓');
@@ -6478,10 +6492,19 @@ function closeEventForm() {
 }
 
 function saveEvent() {
+  console.log('[Event] saveEvent called');
   const errorsEl = document.getElementById('eventErrors');
+  
+  if (!errorsEl) {
+    console.error('[Event] Error element not found!');
+    alert('Ошибка: элемент formы не найден');
+    return;
+  }
   
   const ticker = document.getElementById('evTicker').value.trim().toUpperCase();
   const dateE = document.getElementById('evDateE').value;
+  
+  console.log('[Event] Ticker:', ticker, 'Date:', dateE);
   
   if (!ticker || !dateE) {
     errorsEl.style.display = 'block';
@@ -6489,80 +6512,99 @@ function saveEvent() {
     return;
   }
   
-  // Get E-1 data
-  const e1 = {
-    O: parseFloat(document.getElementById('evE1_O').value),
-    H: parseFloat(document.getElementById('evE1_H').value),
-    L: parseFloat(document.getElementById('evE1_L').value),
-    C: parseFloat(document.getElementById('evE1_C').value),
-    V: parseFloat(document.getElementById('evE1_V').value)
-  };
-  
-  // Get E data
-  const e = {
-    O: parseFloat(document.getElementById('evE_O').value),
-    H: parseFloat(document.getElementById('evE_H').value),
-    L: parseFloat(document.getElementById('evE_L').value),
-    C: parseFloat(document.getElementById('evE_C').value),
-    V: parseFloat(document.getElementById('evE_V').value)
-  };
-  
-  // Validate all fields filled
-  if (Object.values(e1).some(isNaN) || Object.values(e).some(isNaN)) {
+  try {
+    // Get E-1 data
+    const e1 = {
+      O: parseFloat(document.getElementById('evE1_O').value),
+      H: parseFloat(document.getElementById('evE1_H').value),
+      L: parseFloat(document.getElementById('evE1_L').value),
+      C: parseFloat(document.getElementById('evE1_C').value),
+      V: parseFloat(document.getElementById('evE1_V').value)
+    };
+    
+    // Get E data
+    const e = {
+      O: parseFloat(document.getElementById('evE_O').value),
+      H: parseFloat(document.getElementById('evE_H').value),
+      L: parseFloat(document.getElementById('evE_L').value),
+      C: parseFloat(document.getElementById('evE_C').value),
+      V: parseFloat(document.getElementById('evE_V').value)
+    };
+    
+    console.log('[Event] E-1:', e1, 'E:', e);
+    
+    // Validate all fields filled
+    if (Object.values(e1).some(isNaN) || Object.values(e).some(isNaN)) {
+      errorsEl.style.display = 'block';
+      errorsEl.innerHTML = '<b>❌ Ошибка:</b><br>Заполните все OHLCV поля для дней E-1 и E';
+      return;
+    }
+    
+    // Get ATR from watchlist
+    const wlItem = cache.watchlist.find(w => w.ticker.toUpperCase() === ticker);
+    const atrPct = wlItem ? parseFloat(wlItem.atr) : null;
+    
+    console.log('[Event] ATR:', atrPct);
+    
+    if (!atrPct) {
+      errorsEl.style.display = 'block';
+      errorsEl.innerHTML = `<b>❌ Ошибка:</b><br>Добавьте ${ticker} в watchlist с ATR%`;
+      return;
+    }
+    
+    // Calculate metrics
+    const metrics = calculateEventMetrics(e1, e, atrPct);
+    console.log('[Event] Metrics:', metrics);
+    
+    // Validate Event Day criteria
+    const validation = validateEventDay(e1, e, metrics, atrPct);
+    console.log('[Event] Validation:', validation);
+    
+    if (!validation.valid) {
+      const errorMsg = `Event Day критерии не выполнены:\n${validation.errors.join('\n')}`;
+      console.log('[Event] Validation failed:', errorMsg);
+      errorsEl.style.display = 'block';
+      errorsEl.innerHTML = `<b>❌ Event Day критерии не выполнены:</b><br>${validation.errors.map(err => `• ${err}`).join('<br>')}`;
+      alert(errorMsg); // Показываем alert чтобы точно увидеть ошибку
+      return;
+    }
+    
+    // Create event object
+    const event = {
+      id: `${ticker}_${dateE}`,
+      ticker,
+      eventDate: dateE,
+      direction: metrics.direction,
+      e1,
+      e,
+      metrics,
+      pullbackDays: [],
+      t0Date: null,
+      entryDate: null,
+      status: 'WAITING_PULLBACK',
+      created: new Date().toISOString()
+    };
+    
+    console.log('[Event] Event object:', event);
+    
+    // Save to cache
+    if (!cache.strategies) cache.strategies = {};
+    if (!cache.strategies.event_continuation) cache.strategies.event_continuation = { trades: [], scans: {}, events: [] };
+    if (!cache.strategies.event_continuation.events) cache.strategies.event_continuation.events = [];
+    
+    cache.strategies.event_continuation.events.push(event);
+    
+    console.log('[Event] Saved to cache, total events:', cache.strategies.event_continuation.events.length);
+    
+    closeEventForm();
+    renderEvents();
+    scheduleSave();
+    toast(`✓ Событие ${ticker} добавлено (${metrics.direction})`);
+  } catch (error) {
+    console.error('[Event] Error:', error);
     errorsEl.style.display = 'block';
-    errorsEl.innerHTML = '<b>❌ Ошибка:</b><br>Заполните все OHLCV поля для дней E-1 и E';
-    return;
+    errorsEl.innerHTML = `<b>❌ Критическая ошибка:</b><br>${error.message}`;
   }
-  
-  // Get ATR from watchlist
-  const wlItem = cache.watchlist.find(w => w.ticker.toUpperCase() === ticker);
-  const atrPct = wlItem ? parseFloat(wlItem.atr) : null;
-  
-  if (!atrPct) {
-    errorsEl.style.display = 'block';
-    errorsEl.innerHTML = `<b>❌ Ошибка:</b><br>Добавьте ${ticker} в watchlist с ATR%`;
-    return;
-  }
-  
-  // Calculate metrics
-  const metrics = calculateEventMetrics(e1, e, atrPct);
-  
-  // Validate Event Day criteria
-  const validation = validateEventDay(e1, e, metrics, atrPct);
-  
-  if (!validation.valid) {
-    errorsEl.style.display = 'block';
-    errorsEl.innerHTML = `<b>❌ Event Day критерии не выполнены:</b><br>${validation.errors.map(err => `• ${err}`).join('<br>')}`;
-    return;
-  }
-  
-  // Create event object
-  const event = {
-    id: `${ticker}_${dateE}`,
-    ticker,
-    eventDate: dateE,
-    direction: metrics.direction,
-    e1,
-    e,
-    metrics,
-    pullbackDays: [],
-    t0Date: null,
-    entryDate: null,
-    status: 'WAITING_PULLBACK',
-    created: new Date().toISOString()
-  };
-  
-  // Save to cache
-  if (!cache.strategies) cache.strategies = {};
-  if (!cache.strategies.event_continuation) cache.strategies.event_continuation = { trades: [], scans: {}, events: [] };
-  if (!cache.strategies.event_continuation.events) cache.strategies.event_continuation.events = [];
-  
-  cache.strategies.event_continuation.events.push(event);
-  
-  closeEventForm();
-  renderEvents();
-  scheduleSave();
-  toast(`✓ Событие ${ticker} добавлено (${metrics.direction})`);
 }
 
 function calculateEventMetrics(e1, e, atrPct) {
