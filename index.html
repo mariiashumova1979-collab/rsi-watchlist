@@ -1529,6 +1529,18 @@ const DEF_SETS = {
 };
 
 // ═══════════════════════════════════════════════════════════
+// HELPER FUNCTIONS
+// ═══════════════════════════════════════════════════════════
+
+// Parse number with comma or dot as decimal separator
+function parseNum(str) {
+  if (typeof str === 'number') return str;
+  if (!str) return NaN;
+  // Replace comma with dot, then parse
+  return parseFloat(String(str).replace(',', '.'));
+}
+
+// ═══════════════════════════════════════════════════════════
 // US MARKET HOLIDAYS 2025-2026 (NYSE/NASDAQ closed)
 // ═══════════════════════════════════════════════════════════
 const US_HOLIDAYS_DEFAULT = [
@@ -5888,23 +5900,23 @@ function savePEAD() {
   
   // Get T-1 data
   const t1 = {
-    C: parseFloat(document.getElementById('peadT1_C').value),
-    ATR: parseFloat(document.getElementById('peadT1_ATR').value),
-    SMA50: parseFloat(document.getElementById('peadT1_SMA50').value),
-    AvgVol: parseFloat(document.getElementById('peadT1_AvgVol').value)
+    C: parseNum(document.getElementById('peadT1_C').value),
+    ATR: parseNum(document.getElementById('peadT1_ATR').value),
+    SMA50: parseNum(document.getElementById('peadT1_SMA50').value),
+    AvgVol: parseNum(document.getElementById('peadT1_AvgVol').value)
   };
   
   // Get T0 data
   const t0 = {
-    C: parseFloat(document.getElementById('peadT0_C').value),
-    L: parseFloat(document.getElementById('peadT0_L').value),
-    H: parseFloat(document.getElementById('peadT0_H').value),
-    V: parseFloat(document.getElementById('peadT0_V').value)
+    C: parseNum(document.getElementById('peadT0_C').value),
+    L: parseNum(document.getElementById('peadT0_L').value),
+    H: parseNum(document.getElementById('peadT0_H').value),
+    V: parseNum(document.getElementById('peadT0_V').value)
   };
   
   // Get earnings data
-  const epsConsensus = parseFloat(document.getElementById('peadEPSConsensus').value);
-  const epsActual = parseFloat(document.getElementById('peadEPSActual').value);
+  const epsConsensus = parseNum(document.getElementById('peadEPSConsensus').value);
+  const epsActual = parseNum(document.getElementById('peadEPSActual').value);
   
   // Validate
   if (Object.values(t1).some(isNaN) || Object.values(t0).some(isNaN) || isNaN(epsConsensus) || isNaN(epsActual)) {
@@ -6149,20 +6161,20 @@ function saveImpulse() {
   
   // Get D-1 data
   const d_1 = {
-    C: parseFloat(document.getElementById('impD_1_C').value)
+    C: parseNum(document.getElementById('impD_1_C').value)
   };
   
   // Get D0 data
   const d0 = {
-    O: parseFloat(document.getElementById('impD0_O').value),
-    H: parseFloat(document.getElementById('impD0_H').value),
-    L: parseFloat(document.getElementById('impD0_L').value),
-    C: parseFloat(document.getElementById('impD0_C').value),
-    V: parseFloat(document.getElementById('impD0_V').value)
+    O: parseNum(document.getElementById('impD0_O').value),
+    H: parseNum(document.getElementById('impD0_H').value),
+    L: parseNum(document.getElementById('impD0_L').value),
+    C: parseNum(document.getElementById('impD0_C').value),
+    V: parseNum(document.getElementById('impD0_V').value)
   };
   
-  const atr = parseFloat(document.getElementById('impATR').value);
-  const relVol = parseFloat(document.getElementById('impRelVol').value);
+  const atr = parseNum(document.getElementById('impATR').value);
+  const relVol = parseNum(document.getElementById('impRelVol').value);
   
   // Validate
   if (isNaN(d_1.C) || Object.values(d0).some(isNaN) || isNaN(atr) || isNaN(relVol)) {
@@ -6292,7 +6304,8 @@ function renderImpulse() {
     const statusText = {
       'WAITING_D1': '⏳ Ждём D+1',
       'READY_ENTRY': '🎯 Готов вход',
-      'REJECTED': '❌ Rejected'
+      'REJECTED': '❌ Rejected',
+      'ENTERED': '✅ В сделке'
     }[c.status] || c.status;
     
     // Entry note for WAITING_D1
@@ -6324,6 +6337,7 @@ function renderImpulse() {
       <td style="font-family:var(--mono);font-size:10px">${c.stop ? '$' + c.stop.toFixed(2) : '—'}</td>
       <td>
         ${c.status === 'WAITING_D1' ? `<button class="btn btn-g btn-s" onclick="addD1Data('${c.id}')" style="font-size:9px">+ D+1</button>` : ''}
+        ${c.status === 'READY_ENTRY' ? `<button class="btn btn-p btn-s" onclick="openImpulseTradeForm('${c.id}')" style="font-size:9px">+ Сделка</button>` : ''}
         <button class="btn btn-r btn-s" onclick="deleteImpulse('${c.id}')" style="font-size:9px">×</button>
       </td>
     </tr>${entryNote}`;
@@ -6372,10 +6386,10 @@ function saveImpulseD1() {
   const date = document.getElementById('impD1Date').value;
   const d1 = {
     date,
-    O: parseFloat(document.getElementById('impD1_O').value),
-    H: parseFloat(document.getElementById('impD1_H').value),
-    L: parseFloat(document.getElementById('impD1_L').value),
-    C: parseFloat(document.getElementById('impD1_C').value)
+    O: parseNum(document.getElementById('impD1_O').value),
+    H: parseNum(document.getElementById('impD1_H').value),
+    L: parseNum(document.getElementById('impD1_L').value),
+    C: parseNum(document.getElementById('impD1_C').value)
   };
   
   if (!date || Object.values(d1).slice(1).some(isNaN)) {
@@ -6520,9 +6534,145 @@ function validateImpulseRisk(entry, stop, atr, direction) {
   return { valid: ratio <= 1.5, ratio };
 }
 
-let currentImpulseId = null;
+let currentImpulseTradeId = null;
 
-function deleteImpulse(id) {
+function openImpulseTradeForm(candidateId) {
+  const c = cache.strategies?.impulse?.candidates?.find(x => x.id === candidateId);
+  if (!c) return;
+  currentImpulseTradeId = candidateId;
+
+  // Fill info block
+  const dirColor = c.direction === 'LONG' ? 'var(--acc)' : 'var(--acc2)';
+  const riskPerShare = c.direction === 'LONG' ? (c.entry - c.stop) : (c.stop - c.entry);
+  document.getElementById('impTradeInfo').innerHTML = `
+    <div><b style="color:${dirColor}">${c.direction}</b> &nbsp;|&nbsp; <b>${c.ticker}</b> &nbsp;|&nbsp; Паттерн: ${c.pattern}</div>
+    <div>Entry: <b style="color:var(--acc)">$${c.entry.toFixed(2)}</b> &nbsp;|&nbsp; Stop: <b style="color:var(--acc2)">$${c.stop.toFixed(2)}</b></div>
+    <div>Risk/share: <b>$${riskPerShare.toFixed(2)}</b> &nbsp;|&nbsp; ATR: $${c.atr.toFixed(2)}</div>
+    <div>Target 1: <b>$${c.target1.toFixed(2)}</b> &nbsp;|&nbsp; Target 2: <b>$${c.target2.toFixed(2)}</b></div>
+  `;
+
+  // Defaults
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('impTradeDate').value = today;
+  document.getElementById('impTradeEntryActual').value = '';
+  document.getElementById('impTradeRisk').value = 100;
+  document.getElementById('impTradeComm').value = '';
+  document.getElementById('impTradeSummary').style.display = 'none';
+  document.getElementById('impTradeErrors').style.display = 'none';
+
+  document.getElementById('impulseTradeModal').style.display = 'flex';
+}
+
+function closeImpulseTradeForm() {
+  document.getElementById('impulseTradeModal').style.display = 'none';
+  currentImpulseTradeId = null;
+}
+
+function calcImpulseTrade() {
+  const c = cache.strategies?.impulse?.candidates?.find(x => x.id === currentImpulseTradeId);
+  if (!c) return;
+
+  const riskAmount = parseNum(document.getElementById('impTradeRisk').value) || 100;
+  const entryActual = parseNum(document.getElementById('impTradeEntryActual').value);
+  const entry = (!isNaN(entryActual) && entryActual > 0) ? entryActual : c.entry;
+
+  const riskPerShare = c.direction === 'LONG' ? (entry - c.stop) : (c.stop - entry);
+  if (riskPerShare <= 0) {
+    document.getElementById('impTradeErrors').style.display = 'block';
+    document.getElementById('impTradeErrors').innerHTML = '❌ RiskPerShare ≤ 0: проверь Entry и Stop';
+    return;
+  }
+
+  const shares = Math.floor(riskAmount / riskPerShare);
+  const positionValue = entry * shares;
+  const riskActual = riskPerShare * shares;
+
+  // Recalculate targets from actual entry
+  const t1 = c.direction === 'LONG' ? entry + riskPerShare : entry - riskPerShare;
+  const t2 = c.direction === 'LONG' ? entry + 2 * riskPerShare : entry - 2 * riskPerShare;
+
+  const dirColor = c.direction === 'LONG' ? 'var(--acc)' : 'var(--acc2)';
+  const summary = document.getElementById('impTradeSummary');
+  summary.style.display = 'block';
+  summary.innerHTML = `
+    <div style="font-weight:700;margin-bottom:6px;color:${dirColor}">Позиция</div>
+    <div>Акций: <b>${shares}</b> &nbsp;|&nbsp; Entry: <b>$${entry.toFixed(2)}</b></div>
+    <div>Размер позиции: <b>$${positionValue.toFixed(0)}</b></div>
+    <div>Риск ($): <b style="color:var(--acc2)">$${riskActual.toFixed(2)}</b></div>
+    <div>Stop: <b>$${c.stop.toFixed(2)}</b></div>
+    <div>Target 1 (50%): <b>$${t1.toFixed(2)}</b></div>
+    <div>Target 2 (50%): <b>$${t2.toFixed(2)}</b></div>
+  `;
+  document.getElementById('impTradeErrors').style.display = 'none';
+}
+
+function saveImpulseTrade() {
+  const errEl = document.getElementById('impTradeErrors');
+  const c = cache.strategies?.impulse?.candidates?.find(x => x.id === currentImpulseTradeId);
+  if (!c) return;
+
+  const date = document.getElementById('impTradeDate').value;
+  if (!date) {
+    errEl.style.display = 'block';
+    errEl.innerHTML = '❌ Укажи дату входа';
+    return;
+  }
+
+  const riskAmount = parseNum(document.getElementById('impTradeRisk').value) || 100;
+  const entryActual = parseNum(document.getElementById('impTradeEntryActual').value);
+  const entry = (!isNaN(entryActual) && entryActual > 0) ? entryActual : c.entry;
+  const commission = parseNum(document.getElementById('impTradeComm').value) || 0;
+
+  const riskPerShare = c.direction === 'LONG' ? (entry - c.stop) : (c.stop - entry);
+  if (riskPerShare <= 0) {
+    errEl.style.display = 'block';
+    errEl.innerHTML = '❌ RiskPerShare ≤ 0: проверь Entry и Stop';
+    return;
+  }
+
+  const shares = Math.floor(riskAmount / riskPerShare);
+  if (shares < 1) {
+    errEl.style.display = 'block';
+    errEl.innerHTML = `❌ Слишком мало акций (${shares}): увеличь риск или проверь Entry/Stop`;
+    return;
+  }
+
+  const t1 = c.direction === 'LONG' ? entry + riskPerShare : entry - riskPerShare;
+  const t2 = c.direction === 'LONG' ? entry + 2 * riskPerShare : entry - 2 * riskPerShare;
+
+  // Build trade object (same structure as regular trades)
+  const trade = {
+    id: Date.now().toString(),
+    createdAt: Date.now(),
+    ticker: c.ticker,
+    type: c.direction,
+    entryDate: date,
+    entry: entry,
+    shares: shares,
+    stop: c.stop.toFixed(2),
+    target1: t1.toFixed(2),
+    target2: t2.toFixed(2),
+    status: 'OPEN',
+    strategy: 'impulse',
+    commission: commission,
+    notes: `D0: ${c.d0Date} | Паттерн D+1: ${c.pattern} | ATR: ${c.atr.toFixed(2)} | Impulse: ${(c.metrics.impulse * 100).toFixed(1)}%`,
+    atrPct: ((c.atr / entry) * 100).toFixed(2)
+  };
+
+  if (!cache.trades) cache.trades = [];
+  cache.trades.push(trade);
+
+  // Mark candidate as entered
+  c.status = 'ENTERED';
+  c.tradeId = trade.id;
+
+  closeImpulseTradeForm();
+  renderImpulse();
+  renderTrades();
+  renderDash();
+  scheduleSave();
+  toast(`✅ Сделка ${c.ticker} ${c.direction} добавлена · ${shares} акций · Entry $${entry.toFixed(2)}`);
+}
   if (!confirm('Удалить этот impulse кандидат?')) return;
   const candidates = cache.strategies.impulse.candidates;
   cache.strategies.impulse.candidates = candidates.filter(c => c.id !== id);
@@ -6585,20 +6735,20 @@ function saveEvent() {
   try {
     // Get E-1 data
     const e1 = {
-      O: parseFloat(document.getElementById('evE1_O').value),
-      H: parseFloat(document.getElementById('evE1_H').value),
-      L: parseFloat(document.getElementById('evE1_L').value),
-      C: parseFloat(document.getElementById('evE1_C').value),
-      V: parseFloat(document.getElementById('evE1_V').value)
+      O: parseNum(document.getElementById('evE1_O').value),
+      H: parseNum(document.getElementById('evE1_H').value),
+      L: parseNum(document.getElementById('evE1_L').value),
+      C: parseNum(document.getElementById('evE1_C').value),
+      V: parseNum(document.getElementById('evE1_V').value)
     };
     
     // Get E data
     const e = {
-      O: parseFloat(document.getElementById('evE_O').value),
-      H: parseFloat(document.getElementById('evE_H').value),
-      L: parseFloat(document.getElementById('evE_L').value),
-      C: parseFloat(document.getElementById('evE_C').value),
-      V: parseFloat(document.getElementById('evE_V').value)
+      O: parseNum(document.getElementById('evE_O').value),
+      H: parseNum(document.getElementById('evE_H').value),
+      L: parseNum(document.getElementById('evE_L').value),
+      C: parseNum(document.getElementById('evE_C').value),
+      V: parseNum(document.getElementById('evE_V').value)
     };
     
     console.log('[Event] E-1:', e1, 'E:', e);
@@ -6848,11 +6998,11 @@ function savePullbackDay() {
   const date = document.getElementById('pbDate').value;
   const pb = {
     date,
-    O: parseFloat(document.getElementById('pb_O').value),
-    H: parseFloat(document.getElementById('pb_H').value),
-    L: parseFloat(document.getElementById('pb_L').value),
-    C: parseFloat(document.getElementById('pb_C').value),
-    V: parseFloat(document.getElementById('pb_V').value)
+    O: parseNum(document.getElementById('pb_O').value),
+    H: parseNum(document.getElementById('pb_H').value),
+    L: parseNum(document.getElementById('pb_L').value),
+    C: parseNum(document.getElementById('pb_C').value),
+    V: parseNum(document.getElementById('pb_V').value)
   };
   
   if (!date || Object.values(pb).slice(1).some(isNaN)) {
@@ -7259,6 +7409,57 @@ init();
     <div class="modal-f">
       <button class="btn btn-g" onclick="closeImpulseD1Form()">Отмена</button>
       <button class="btn btn-p" onclick="saveImpulseD1()">💾 Добавить</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- IMPULSE TRADE MODAL -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="impulseTradeModal" class="modal">
+  <div class="modal-c" style="max-width:520px">
+    <div class="modal-h">
+      <div style="font-size:18px;font-weight:700">🚀 Открыть сделку</div>
+      <div class="cls" onclick="closeImpulseTradeForm()">×</div>
+    </div>
+    <div class="modal-b">
+
+      <!-- Summary -->
+      <div id="impTradeInfo" style="padding:14px;background:var(--bg3);border-radius:8px;border:1px solid var(--line);margin-bottom:20px;font-family:var(--mono);font-size:11px;line-height:2"></div>
+
+      <!-- Entry date -->
+      <div class="fgrid" style="grid-template-columns:1fr 1fr;margin-bottom:16px">
+        <div class="fg">
+          <label>Дата входа *</label>
+          <input id="impTradeDate" type="date">
+        </div>
+        <div class="fg">
+          <label>Фактический вход</label>
+          <input id="impTradeEntryActual" type="number" step="0.01" placeholder="Если отличается от расчётного">
+        </div>
+      </div>
+
+      <!-- Risk amount -->
+      <div class="fgrid" style="grid-template-columns:1fr 1fr">
+        <div class="fg">
+          <label>Риск на сделку ($)</label>
+          <input id="impTradeRisk" type="number" step="1" placeholder="100">
+        </div>
+        <div class="fg">
+          <label>Комиссия ($)</label>
+          <input id="impTradeComm" type="number" step="0.01" placeholder="0">
+        </div>
+      </div>
+
+      <!-- Calculated position summary -->
+      <div id="impTradeSummary" style="display:none;margin-top:16px;padding:14px;background:var(--bg3);border-radius:8px;border:1px solid var(--line);font-family:var(--mono);font-size:11px;line-height:2"></div>
+
+      <div id="impTradeErrors" style="display:none;margin-top:12px;padding:12px;background:#ff000010;border:1px solid #ff000040;border-radius:6px;font-family:var(--mono);font-size:10px;line-height:1.8;color:#ff4444"></div>
+    </div>
+    <div class="modal-f">
+      <button class="btn btn-g" onclick="closeImpulseTradeForm()">Отмена</button>
+      <button class="btn btn-g" onclick="calcImpulseTrade()" style="border-color:var(--acc3);color:var(--acc3)">🧮 Рассчитать</button>
+      <button class="btn btn-p" onclick="saveImpulseTrade()">✅ Добавить сделку</button>
     </div>
   </div>
 </div>
