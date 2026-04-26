@@ -8976,11 +8976,12 @@
           "pattern": "Weak Pullback",
           "entry": 38.687000000000005,
           "stop": 40.606,
-          "status": "READY_ENTRY",
+          "status": "ENTERED",
           "created": "2026-04-25T07:22:52.339Z",
           "target1": 36.76800000000001,
           "target2": 34.84900000000001,
-          "shares": 521
+          "shares": 521,
+          "tradeId": "1777187887672"
         },
         {
           "id": "EW_2026-04-24",
@@ -9123,6 +9124,15 @@
     },
     {
       "timestamp": "2026-04-26T05:59:59.961Z",
+      "strategy": "impulse",
+      "event": "strategy_switch",
+      "data": {
+        "from": "impulse",
+        "to": "impulse"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T07:16:30.256Z",
       "strategy": "impulse",
       "event": "strategy_switch",
       "data": {
@@ -10719,6 +10729,23 @@
       "pnlNet": -44.04,
       "result": "LOSS",
       "strategy": "ibs_swing"
+    },
+    {
+      "id": "1777187887672",
+      "createdAt": 1777187887672,
+      "ticker": "TSCO",
+      "type": "SHORT",
+      "entryDate": "2026-04-22",
+      "entry": 39.34,
+      "shares": 78,
+      "stop": "40.61",
+      "target1": "38.07",
+      "target2": "36.81",
+      "status": "OPEN",
+      "strategy": "impulse",
+      "commission": 0,
+      "notes": "D0: 2026-04-20 | Паттерн D+1: Weak Pullback | ATR: 2.33 | Impulse: -11.7%",
+      "atrPct": "5.92"
     }
   ],
   "rsiScans": {
