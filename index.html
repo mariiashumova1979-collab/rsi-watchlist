@@ -6674,6 +6674,7 @@ function saveImpulseTrade() {
   scheduleSave();
   toast(`✅ Сделка ${c.ticker} ${c.direction} добавлена · ${shares} акций · Entry $${entry.toFixed(2)}`);
 }
+function deleteImpulse(id) {
   if (!confirm('Удалить этот impulse кандидат?')) return;
   const candidates = cache.strategies.impulse.candidates;
   cache.strategies.impulse.candidates = candidates.filter(c => c.id !== id);
