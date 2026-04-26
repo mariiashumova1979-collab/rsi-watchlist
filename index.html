@@ -581,12 +581,8 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
   </div>
 
   <!-- Sub-tabs for different scanners -->
-  <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
-    <button class="btn btn-p btn-s" id="scannerTabIBS" onclick="showScanner('ibs')">📊 Daily RSI Scan</button>
-    <button class="btn btn-g btn-s" id="scannerTabEvent" onclick="showScanner('event')">⚡ Event Scanner</button>
-    <button class="btn btn-g btn-s" id="scannerTabPEAD" onclick="showScanner('pead')">📈 Earnings Scanner</button>
-    <button class="btn btn-g btn-s" id="scannerTabImpulse" onclick="showScanner('impulse')">🚀 Impulse Scanner</button>
-    <button class="btn btn-g btn-s" id="scannerTabManage" onclick="showScanner('manage')">📋 Manage List</button>
+  <div id="scannerTabs" style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
+    <!-- Tabs rendered dynamically based on current strategy -->
   </div>
 
   <div class="g4" style="max-width:600px;margin-bottom:22px">
@@ -772,13 +768,14 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
             <th>CLV</th>
             <th>Body</th>
             <th>RelVol</th>
+            <th>Status</th>
             <th>D+1 Pattern</th>
             <th>Entry</th>
             <th>Stop</th>
             <th>Actions</th>
           </tr></thead>
           <tbody id="impulseTbody">
-            <tr><td colspan="11" style="text-align:center;color:var(--t2);padding:30px">Нет импульсных кандидатов — добавьте первый</td></tr>
+            <tr><td colspan="12" style="text-align:center;color:var(--t2);padding:30px">Нет импульсных кандидатов — добавьте первый</td></tr>
           </tbody>
         </table>
       </div>
@@ -2198,6 +2195,20 @@ function switchStrategy(strategyId) {
   renderRsiScan();
   
   toast(`${strategy.icon} ${strategy.name}`);
+  
+  // Auto-switch to strategy's scanner and render tabs
+  const scannerMap = {
+    'ibs_swing': 'ibs',
+    'event_continuation': 'event',
+    'pead': 'pead',
+    'impulse': 'impulse'
+  };
+  
+  const scannerType = scannerMap[strategyId];
+  if (scannerType) {
+    renderScannerTabs();  // Render tabs first
+    showScanner(scannerType);  // Then show scanner
+  }
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -2227,36 +2238,65 @@ function showRulesTab(tab) {
   }
 }
 
+// ═══════════════════════════════════════════════════════════
+// SCANNER MANAGEMENT
+// ═══════════════════════════════════════════════════════════
+
+function renderScannerTabs() {
+  const container = document.getElementById('scannerTabs');
+  if (!container) return;
+  
+  // Map strategies to their scanners
+  const scannerConfig = {
+    'ibs_swing': { type: 'ibs', icon: '📊', label: 'Daily RSI Scan' },
+    'event_continuation': { type: 'event', icon: '⚡', label: 'Event Scanner' },
+    'pead': { type: 'pead', icon: '📈', label: 'Earnings Scanner' },
+    'impulse': { type: 'impulse', icon: '🚀', label: 'Impulse Scanner' }
+  };
+  
+  const config = scannerConfig[currentStrategy];
+  if (!config) {
+    container.innerHTML = '';
+    return;
+  }
+  
+  // Get current active scanner type
+  const activeScanner = document.querySelector('.scanner-section[style*="display: block"]')?.id?.replace('scanner-', '') || config.type;
+  
+  container.innerHTML = `
+    <button class="btn ${activeScanner === config.type ? 'btn-p' : 'btn-g'} btn-s" 
+            onclick="showScanner('${config.type}')">
+      ${config.icon} ${config.label}
+    </button>
+    <button class="btn ${activeScanner === 'manage' ? 'btn-p' : 'btn-g'} btn-s" 
+            onclick="showScanner('manage')">
+      📋 Manage List
+    </button>
+  `;
+}
+
 function showScanner(type) {
   // Hide all scanners
   document.querySelectorAll('.scanner-section').forEach(el => el.style.display = 'none');
   
-  // Deactivate all buttons
-  ['scannerTabIBS','scannerTabEvent','scannerTabPEAD','scannerTabImpulse','scannerTabManage'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.className = 'btn btn-g btn-s';
-  });
+  // Show selected scanner
+  const scannerEl = document.getElementById(`scanner-${type}`);
+  if (scannerEl) {
+    scannerEl.style.display = 'block';
+  }
   
-  // Show selected scanner and activate button
+  // Re-render tabs to update active state
+  renderScannerTabs();
+  
+  // Render data for opened scanner
   if (type === 'ibs') {
-    document.getElementById('scanner-ibs').style.display = 'block';
-    document.getElementById('scannerTabIBS').className = 'btn btn-p btn-s';
-    loadSPYData();  // Load SPY data when opening IBS scanner
+    loadSPYData();
   } else if (type === 'event') {
-    document.getElementById('scanner-event').style.display = 'block';
-    document.getElementById('scannerTabEvent').className = 'btn btn-p btn-s';
-    renderEvents();  // Render events when opening
+    renderEvents();
   } else if (type === 'pead') {
-    document.getElementById('scanner-pead').style.display = 'block';
-    document.getElementById('scannerTabPEAD').className = 'btn btn-p btn-s';
-    renderPEAD();  // Render PEAD when opening
+    renderPEAD();
   } else if (type === 'impulse') {
-    document.getElementById('scanner-impulse').style.display = 'block';
-    document.getElementById('scannerTabImpulse').className = 'btn btn-p btn-s';
-    renderImpulse();  // Render Impulse when opening
-  } else if (type === 'manage') {
-    document.getElementById('scanner-manage').style.display = 'block';
-    document.getElementById('scannerTabManage').className = 'btn btn-p btn-s';
+    renderImpulse();
   }
 }
 
@@ -2506,7 +2546,7 @@ async function syncFromGithub() {
     if (data) { 
       applyData(data); 
       loadSetsUI(); loadGhUI(); loadFhKeyUI(); initChecklist(); 
-      renderDash(); renderTrades(); renderWL(); renderQ(); renderRsiScan(); 
+      renderDash(); renderTrades(); renderWL(); renderQ(); renderRsiScan(); renderScannerTabs(); 
       // Load regime
       const trend = cache.regime?.spyTrend;
       if (trend) { 
@@ -6070,10 +6110,12 @@ function saveImpulse() {
     atr,
     relVol,
     metrics,
+    entry: metrics.direction === 'LONG' ? d0.H + 0.1 * atr : d0.L - 0.1 * atr,  // Calculate entry immediately
     d1: null,  // Will be filled later
     pattern: null,
-    entry: null,
-    stop: null,
+    stop: null,  // Will be calculated after D+1
+    target1: null,
+    target2: null,
     status: 'WAITING_D1',
     created: new Date().toISOString()
   };
@@ -6088,7 +6130,7 @@ function saveImpulse() {
   closeImpulseForm();
   renderImpulse();
   scheduleSave();
-  toast(`✓ Impulse ${ticker} добавлен (${metrics.direction}, ${(metrics.impulse * 100).toFixed(1)}%)`);
+  toast(`✓ Impulse ${ticker} добавлен (${metrics.direction}, ${(metrics.impulse * 100).toFixed(1)}%)\nEntry: $${impulse.entry.toFixed(2)} — ордер можно ставить сейчас`);
 }
 
 function calculateImpulseD0Metrics(d_1, d0, atr, relVol) {
@@ -6169,6 +6211,21 @@ function renderImpulse() {
       'REJECTED': '❌ Rejected'
     }[c.status] || c.status;
     
+    // Entry note for WAITING_D1
+    let entryNote = '';
+    if (c.status === 'WAITING_D1' && c.entry) {
+      const expectedStop = c.direction === 'LONG' 
+        ? `~$${(c.entry - 0.5 * c.atr).toFixed(2)}`
+        : `~$${(c.entry + 0.5 * c.atr).toFixed(2)}`;
+      entryNote = `
+        <tr style="background:var(--bg2)">
+          <td colspan="12" style="padding:10px;font-family:var(--mono);font-size:10px;color:var(--t2)">
+            💡 <b style="color:var(--text)">Entry известен:</b> $${c.entry.toFixed(2)} — можно ставить ${c.direction === 'LONG' ? 'buy-stop' : 'sell-stop'} ордер сейчас<br>
+            <span style="margin-left:16px">Stop будет рассчитан после D+1 (ожидается ${expectedStop})</span>
+          </td>
+        </tr>`;
+    }
+    
     return `<tr>
       <td><b>${c.ticker}</b></td>
       <td style="font-family:var(--mono);font-size:10px">${c.d0Date}</td>
@@ -6177,6 +6234,7 @@ function renderImpulse() {
       <td style="font-family:var(--mono);font-size:10px">${m.clv.toFixed(2)}</td>
       <td style="font-family:var(--mono);font-size:10px">${m.body.toFixed(2)}</td>
       <td style="font-family:var(--mono);font-size:10px">${c.relVol.toFixed(1)}×</td>
+      <td style="font-size:10px">${statusText}</td>
       <td style="font-size:10px">${c.pattern || '—'}</td>
       <td style="font-family:var(--mono);font-size:10px">${c.entry ? '$' + c.entry.toFixed(2) : '—'}</td>
       <td style="font-family:var(--mono);font-size:10px">${c.stop ? '$' + c.stop.toFixed(2) : '—'}</td>
@@ -6184,7 +6242,7 @@ function renderImpulse() {
         ${c.status === 'WAITING_D1' ? `<button class="btn btn-g btn-s" onclick="addD1Data('${c.id}')" style="font-size:9px">+ D+1</button>` : ''}
         <button class="btn btn-r btn-s" onclick="deleteImpulse('${c.id}')" style="font-size:9px">×</button>
       </td>
-    </tr>`;
+    </tr>${entryNote}`;
   }).join('');
 }
 
@@ -7036,7 +7094,8 @@ init();
       </div>
 
       <div style="font-family:var(--mono);font-size:10px;color:var(--t2);margin-top:16px;padding:10px;background:var(--bg3);border-radius:6px">
-        <b>Auto-calculated:</b> Impulse%, CLV, Body, Mid_D0, Direction
+        <b>Auto-calculated сразу:</b> Impulse%, CLV, Body, Mid_D0, Direction, <b>Entry</b><br>
+        <b>После D+1:</b> Pattern, Stop, Risk validation
       </div>
       
       <!-- Error display -->
