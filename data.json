@@ -9018,6 +9018,46 @@
           "created": "2026-04-26T06:50:54.148Z"
         }
       ]
+    },
+    "pead": {
+      "trades": [],
+      "earnings": [
+        {
+          "id": "INTC_2026-04-24",
+          "ticker": "INTC",
+          "earningsDate": "2026-04-24",
+          "direction": "LONG",
+          "t1": {
+            "C": 66.78,
+            "ATR": 5.2,
+            "SMA50": 50.35,
+            "AvgVol": 110.57
+          },
+          "t0": {
+            "C": 82.54,
+            "L": 79.62,
+            "H": 85.22,
+            "V": 281.41
+          },
+          "epsConsensus": 0.02,
+          "epsActual": 0.29,
+          "metrics": {
+            "sue": 5.399999999999999,
+            "ear": 23.599880203653793,
+            "volSpike": 2.5450845618160445,
+            "rangePct": 6.784589290041184,
+            "atrPct": 7.786762503743636,
+            "rangeCheck": true,
+            "direction": "LONG"
+          },
+          "stop": 78.32000000000001,
+          "target1": 90.34,
+          "target2": 98.14000000000001,
+          "stopDistance": 6.603200000000001,
+          "status": "READY_ENTRY",
+          "created": "2026-04-26T07:35:01.443Z"
+        }
+      ]
     }
   },
   "analytics": [
@@ -9138,6 +9178,51 @@
       "data": {
         "from": "impulse",
         "to": "impulse"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T07:20:54.074Z",
+      "strategy": "pead",
+      "event": "strategy_switch",
+      "data": {
+        "from": "pead",
+        "to": "pead"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T07:20:58.894Z",
+      "strategy": "event_continuation",
+      "event": "strategy_switch",
+      "data": {
+        "from": "event_continuation",
+        "to": "event_continuation"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T07:21:09.812Z",
+      "strategy": "pead",
+      "event": "strategy_switch",
+      "data": {
+        "from": "pead",
+        "to": "pead"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T07:22:58.905Z",
+      "strategy": "impulse",
+      "event": "strategy_switch",
+      "data": {
+        "from": "impulse",
+        "to": "impulse"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T07:25:48.998Z",
+      "strategy": "pead",
+      "event": "strategy_switch",
+      "data": {
+        "from": "pead",
+        "to": "pead"
       }
     }
   ],
