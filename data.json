@@ -8983,40 +8983,6 @@
           "shares": 521
         },
         {
-          "id": "TSCO_2026-04-21",
-          "ticker": "TSCO",
-          "d0Date": "2026-04-21",
-          "direction": "SHORT",
-          "d_1": {
-            "C": 44.81
-          },
-          "d0": {
-            "O": 42.6,
-            "H": 42.9,
-            "L": 38.92,
-            "C": 39.57,
-            "V": 13.84
-          },
-          "atr": 4.3,
-          "relVol": 3.89,
-          "metrics": {
-            "impulse": -0.1169381834411962,
-            "clv": 0.16331658291457263,
-            "body": 0.7613065326633175,
-            "mid": 40.91,
-            "range": 3.979999999999997,
-            "direction": "SHORT"
-          },
-          "entry": 38.49,
-          "d1": null,
-          "pattern": null,
-          "stop": null,
-          "target1": null,
-          "target2": null,
-          "status": "WAITING_D1",
-          "created": "2026-04-26T05:36:02.734Z"
-        },
-        {
           "id": "EW_2026-04-24",
           "ticker": "EW",
           "d0Date": "2026-04-24",
