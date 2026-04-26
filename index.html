@@ -399,6 +399,63 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
 /* RULES SECTIONS */
 .rules-section{animation:fadeIn .2s}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* MODAL WINDOWS */
+.modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:1000;
+  background:rgba(0,0,0,0.85);
+  backdrop-filter:blur(8px);
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  overflow-y:auto
+}
+.modal-c{
+  background:var(--bg2);
+  border:1px solid var(--line);
+  border-radius:12px;
+  max-width:600px;
+  width:100%;
+  max-height:90vh;
+  display:flex;
+  flex-direction:column;
+  box-shadow:0 20px 60px rgba(0,0,0,0.5)
+}
+.modal-h{
+  padding:20px 24px;
+  border-bottom:1px solid var(--line);
+  display:flex;
+  align-items:center;
+  justify-content:space-between
+}
+.modal-b{
+  padding:24px;
+  overflow-y:auto;
+  flex:1
+}
+.modal-f{
+  padding:16px 24px;
+  border-top:1px solid var(--line);
+  display:flex;
+  gap:10px;
+  justify-content:flex-end
+}
+.cls{
+  width:32px;
+  height:32px;
+  border-radius:6px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:24px;
+  color:var(--t2);
+  cursor:pointer;
+  transition:all .2s
+}
+.cls:hover{background:var(--bg3);color:var(--text)}
 </style>
 </head>
 <body>
@@ -594,7 +651,7 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
   </div>
 
   <!-- IBS Daily RSI Scanner -->
-  <div id="scanner-ibs" class="scanner-section">
+  <div id="scanner-ibs" class="scanner-section" style="display:none">
   
   <!-- SPY MARKET DATA -->
   <div class="card" style="margin-bottom:20px">
@@ -6042,7 +6099,18 @@ function deletePEAD(id) {
 // ═══════════════════════════════════════════════════════════
 
 function openImpulseForm() {
-  document.getElementById('impulseModal').style.display = 'flex';
+  console.log('[Impulse] openImpulseForm called');
+  const modal = document.getElementById('impulseModal');
+  console.log('[Impulse] Modal element:', modal);
+  
+  if (!modal) {
+    alert('Ошибка: модальное окно Impulse не найдено!');
+    return;
+  }
+  
+  modal.style.display = 'flex';
+  console.log('[Impulse] Modal display set to flex');
+  
   // Clear form
   ['impTicker','impD0Date','impD_1_C','impD0_O','impD0_H','impD0_L','impD0_C','impD0_V','impATR','impRelVol'].forEach(id => {
     const el = document.getElementById(id);
@@ -6054,6 +6122,8 @@ function openImpulseForm() {
     errorsEl.style.display = 'none';
     errorsEl.innerHTML = '';
   }
+  
+  console.log('[Impulse] Form opened successfully');
 }
 
 function closeImpulseForm() {
