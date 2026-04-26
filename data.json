@@ -9015,6 +9015,40 @@
           "target2": null,
           "status": "WAITING_D1",
           "created": "2026-04-26T05:36:02.734Z"
+        },
+        {
+          "id": "EW_2026-04-24",
+          "ticker": "EW",
+          "d0Date": "2026-04-24",
+          "direction": "LONG",
+          "d_1": {
+            "C": 79.72
+          },
+          "d0": {
+            "O": 82.5,
+            "H": 84.74,
+            "L": 82.12,
+            "C": 84.15,
+            "V": 11.82
+          },
+          "atr": 2.82,
+          "relVol": 2.13,
+          "metrics": {
+            "impulse": 0.05556949322629211,
+            "clv": 0.7748091603053469,
+            "body": 0.6297709923664168,
+            "mid": 83.43,
+            "range": 2.6199999999999903,
+            "direction": "LONG"
+          },
+          "entry": 85.02199999999999,
+          "d1": null,
+          "pattern": null,
+          "stop": null,
+          "target1": null,
+          "target2": null,
+          "status": "WAITING_D1",
+          "created": "2026-04-26T06:50:54.148Z"
         }
       ]
     }
