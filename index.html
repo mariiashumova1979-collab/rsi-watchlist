@@ -787,11 +787,12 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
             <th>VolSpike</th>
             <th>Status</th>
             <th>Entry</th>
+            <th>Stop</th>
             <th>Target 1</th>
             <th>Actions</th>
           </tr></thead>
           <tbody id="peadTbody">
-            <tr><td colspan="10" style="text-align:center;color:var(--t2);padding:30px">Нет earnings событий — добавьте первое</td></tr>
+            <tr><td colspan="11" style="text-align:center;color:var(--t2);padding:30px">Нет earnings событий — добавьте первое</td></tr>
           </tbody>
         </table>
       </div>
@@ -2081,13 +2082,23 @@ const STRATEGY_RULES = {
     universe: {
       title: 'Universe (Screener Settings)',
       rules: [
-        'Market: US',
-        'Price ≥ $20',
-        'Avg Volume ≥ 2,000,000',
-        'Market Cap ≥ $2B',
-        'LONG: Day Change +5% to +12%',
-        'SHORT: Day Change −5% to −12%',
-        'Relative Volume ≥ 1.5 (приоритет ≥ 2.0)'
+        '<b>Для LONG:</b>',
+        '• Market: US',
+        '• Price ≥ $20',
+        '• Avg Volume ≥ 2,000,000',
+        '• Market Cap ≥ $2B',
+        '• Day Change ≥ +5% AND ≤ +12%',
+        '• Relative Volume ≥ 1.5',
+        '',
+        '<b>Для SHORT:</b>',
+        '• Market: US',
+        '• Price ≥ $20',
+        '• Avg Volume ≥ 2,000,000',
+        '• Market Cap ≥ $2B',
+        '• Day Change ≤ −5% AND ≥ −12%',
+        '• Relative Volume ≥ 1.5',
+        '',
+        '<i>Приоритет: RelVol ≥ 1.8 — сильнее, ≥ 2.0 — приоритетнее</i>'
       ]
     },
     d0Criteria: {
@@ -6088,9 +6099,11 @@ function renderPEAD() {
       <td style="font-family:var(--mono);font-size:10px;color:${m.ear >= 0 ? 'var(--acc)' : 'var(--acc2)'}">${m.ear >= 0 ? '+' : ''}${m.ear.toFixed(1)}%</td>
       <td style="font-family:var(--mono);font-size:10px">${m.volSpike.toFixed(1)}×</td>
       <td style="font-size:10px">${statusText}</td>
-      <td style="font-family:var(--mono);font-size:10px">$${e.t0.C.toFixed(2)}</td>
+      <td style="font-family:var(--mono);font-size:10px;color:var(--t2)">Open D+1</td>
+      <td style="font-family:var(--mono);font-size:10px">$${e.stop.toFixed(2)}</td>
       <td style="font-family:var(--mono);font-size:10px">$${e.target1.toFixed(2)}</td>
       <td>
+        ${e.status === 'READY_ENTRY' ? `<button class="btn btn-p btn-s" onclick="openPEADTradeForm('${e.id}')" style="font-size:9px">+ Сделка</button>` : ''}
         <button class="btn btn-r btn-s" onclick="deletePEAD('${e.id}')" style="font-size:9px">×</button>
       </td>
     </tr>`;
@@ -6104,6 +6117,197 @@ function deletePEAD(id) {
   renderPEAD();
   scheduleSave();
   toast('Earnings событие удалено');
+}
+
+// ═══════════════════════════════════════════════════════════
+// PEAD TRADE FUNCTIONS
+// ═══════════════════════════════════════════════════════════
+
+let currentPEADTradeId = null;
+
+function openPEADTradeForm(earningId) {
+  const e = cache.strategies?.pead?.earnings?.find(x => x.id === earningId);
+  if (!e) return;
+  currentPEADTradeId = earningId;
+
+  const dirColor = e.direction === 'LONG' ? 'var(--acc)' : 'var(--acc2)';
+  document.getElementById('peadTradeInfo').innerHTML = `
+    <div><b style="color:${dirColor}">${e.direction}</b> &nbsp;|&nbsp; <b>${e.ticker}</b> &nbsp;|&nbsp; Earnings: ${e.earningsDate}</div>
+    <div>SUE: <b>${(e.metrics.sue * 100).toFixed(1)}%</b> &nbsp;|&nbsp; EAR: <b>${e.metrics.ear.toFixed(1)}%</b> &nbsp;|&nbsp; VolSpike: <b>${e.metrics.volSpike.toFixed(1)}×</b></div>
+    <div>Stop расчётный: <b style="color:var(--acc2)">$${e.stop.toFixed(2)}</b></div>
+    <div>Target 1: <b>$${e.target1.toFixed(2)}</b> &nbsp;|&nbsp; Target 2: <b>$${e.target2.toFixed(2)}</b></div>
+    <div style="color:var(--acc3);font-size:10px">⚠ Entry = Open D+1 — введи фактическую цену открытия</div>
+    <div style="color:var(--t2);font-size:10px" id="peadTradeGapLimit"></div>
+  `;
+
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('peadTradeDate').value = today;
+  document.getElementById('peadTradeEntry').value = '';
+  document.getElementById('peadTradeRisk').value = 100;
+  document.getElementById('peadTradeComm').value = '';
+  document.getElementById('peadTradeSummary').style.display = 'none';
+  document.getElementById('peadTradeErrors').style.display = 'none';
+
+  document.getElementById('peadTradeModal').style.display = 'flex';
+
+  // Показываем порог фильтра-отмены
+  const limitEl = document.getElementById('peadTradeGapLimit');
+  if (limitEl) {
+    const closeT0 = e.t0.C;
+    if (e.direction === 'LONG') {
+      limitEl.innerHTML = `🚫 Фильтр-отмена если Open D+1 ≥ $${(closeT0 * 1.03).toFixed(2)} (Close T0 × 1.03)`;
+    } else {
+      limitEl.innerHTML = `🚫 Фильтр-отмена если Open D+1 ≤ $${(closeT0 * 0.97).toFixed(2)} (Close T0 × 0.97)`;
+    }
+  }
+}
+
+function closePEADTradeForm() {
+  document.getElementById('peadTradeModal').style.display = 'none';
+  currentPEADTradeId = null;
+}
+
+function calcPEADTrade() {
+  const errEl = document.getElementById('peadTradeErrors');
+  const e = cache.strategies?.pead?.earnings?.find(x => x.id === currentPEADTradeId);
+  if (!e) return;
+
+  const entry = parseNum(document.getElementById('peadTradeEntry').value);
+  if (isNaN(entry) || entry <= 0) {
+    errEl.style.display = 'block';
+    errEl.innerHTML = '❌ Введи фактический Open D+1 (цену входа)';
+    return;
+  }
+
+  const riskAmount = parseNum(document.getElementById('peadTradeRisk').value) || 100;
+
+  // Фильтр-отмена: слишком большой гэп на открытии D+1
+  const closeT0 = e.t0.C;
+  if (e.direction === 'LONG' && entry >= closeT0 * 1.03) {
+    errEl.style.display = 'block';
+    errEl.innerHTML = `❌ Фильтр-отмена: Open D+1 $${entry.toFixed(2)} ≥ Close T0 × 1.03 ($${(closeT0 * 1.03).toFixed(2)})<br>Слишком много forward-дрейфа уже в цене — сделки нет.`;
+    document.getElementById('peadTradeSummary').style.display = 'none';
+    return;
+  }
+  if (e.direction === 'SHORT' && entry <= closeT0 * 0.97) {
+    errEl.style.display = 'block';
+    errEl.innerHTML = `❌ Фильтр-отмена: Open D+1 $${entry.toFixed(2)} ≤ Close T0 × 0.97 ($${(closeT0 * 0.97).toFixed(2)})<br>Слишком много forward-дрейфа уже в цене — сделки нет.`;
+    document.getElementById('peadTradeSummary').style.display = 'none';
+    return;
+  }
+  const atr = e.t1.ATR;
+  let stop, target1, target2;
+  if (e.direction === 'LONG') {
+    stop = Math.max(entry - 2.0 * atr, e.t0.L - 0.25 * atr);
+    target1 = entry + 1.5 * atr;
+    target2 = entry + 3.0 * atr;
+  } else {
+    stop = Math.min(entry + 2.0 * atr, e.t0.H + 0.25 * atr);
+    target1 = entry - 1.5 * atr;
+    target2 = entry - 3.0 * atr;
+  }
+
+  const riskPerShare = e.direction === 'LONG' ? (entry - stop) : (stop - entry);
+  if (riskPerShare <= 0) {
+    errEl.style.display = 'block';
+    errEl.innerHTML = '❌ RiskPerShare ≤ 0: проверь Entry';
+    return;
+  }
+
+  const shares = Math.floor(riskAmount / riskPerShare);
+  const dirColor = e.direction === 'LONG' ? 'var(--acc)' : 'var(--acc2)';
+
+  const summary = document.getElementById('peadTradeSummary');
+  summary.style.display = 'block';
+  summary.innerHTML = `
+    <div style="font-weight:700;margin-bottom:6px;color:${dirColor}">Позиция</div>
+    <div>Entry (Open D+1): <b>$${entry.toFixed(2)}</b></div>
+    <div>Stop: <b style="color:var(--acc2)">$${stop.toFixed(2)}</b> &nbsp;|&nbsp; Risk/share: <b>$${riskPerShare.toFixed(2)}</b></div>
+    <div>Акций: <b>${shares}</b> &nbsp;|&nbsp; Риск ($): <b style="color:var(--acc2)">$${(riskPerShare * shares).toFixed(2)}</b></div>
+    <div>Target 1 (50%): <b>$${target1.toFixed(2)}</b></div>
+    <div>Target 2 (50%): <b>$${target2.toFixed(2)}</b></div>
+  `;
+  errEl.style.display = 'none';
+
+  // Сохраняем рассчитанные значения для savePEADTrade
+  document.getElementById('peadTradeEntry')._calc = { stop, target1, target2, shares, riskPerShare };
+}
+
+function savePEADTrade() {
+  const errEl = document.getElementById('peadTradeErrors');
+  const e = cache.strategies?.pead?.earnings?.find(x => x.id === currentPEADTradeId);
+  if (!e) return;
+
+  const date = document.getElementById('peadTradeDate').value;
+  const entry = parseNum(document.getElementById('peadTradeEntry').value);
+  const commission = parseNum(document.getElementById('peadTradeComm').value) || 0;
+  const riskAmount = parseNum(document.getElementById('peadTradeRisk').value) || 100;
+
+  if (!date) { errEl.style.display = 'block'; errEl.innerHTML = '❌ Укажи дату входа'; return; }
+  if (isNaN(entry) || entry <= 0) { errEl.style.display = 'block'; errEl.innerHTML = '❌ Введи фактический Open D+1'; return; }
+
+  // Фильтр-отмена
+  const closeT0 = e.t0.C;
+  if (e.direction === 'LONG' && entry >= closeT0 * 1.03) {
+    errEl.style.display = 'block';
+    errEl.innerHTML = `❌ Фильтр-отмена: Open D+1 $${entry.toFixed(2)} ≥ Close T0 × 1.03 ($${(closeT0 * 1.03).toFixed(2)})<br>Слишком много forward-дрейфа — сделки нет.`;
+    return;
+  }
+  if (e.direction === 'SHORT' && entry <= closeT0 * 0.97) {
+    errEl.style.display = 'block';
+    errEl.innerHTML = `❌ Фильтр-отмена: Open D+1 $${entry.toFixed(2)} ≤ Close T0 × 0.97 ($${(closeT0 * 0.97).toFixed(2)})<br>Слишком много forward-дрейфа — сделки нет.`;
+    return;
+  }
+
+  // Пересчитать от реального entry
+  const atr = e.t1.ATR;
+  let stop, target1, target2;
+  if (e.direction === 'LONG') {
+    stop = Math.max(entry - 2.0 * atr, e.t0.L - 0.25 * atr);
+    target1 = entry + 1.5 * atr;
+    target2 = entry + 3.0 * atr;
+  } else {
+    stop = Math.min(entry + 2.0 * atr, e.t0.H + 0.25 * atr);
+    target1 = entry - 1.5 * atr;
+    target2 = entry - 3.0 * atr;
+  }
+
+  const riskPerShare = e.direction === 'LONG' ? (entry - stop) : (stop - entry);
+  if (riskPerShare <= 0) { errEl.style.display = 'block'; errEl.innerHTML = '❌ RiskPerShare ≤ 0'; return; }
+
+  const shares = Math.floor(riskAmount / riskPerShare);
+  if (shares < 1) { errEl.style.display = 'block'; errEl.innerHTML = `❌ Слишком мало акций (${shares}): увеличь риск`; return; }
+
+  const trade = {
+    id: Date.now().toString(),
+    createdAt: Date.now(),
+    ticker: e.ticker,
+    type: e.direction,
+    entryDate: date,
+    entry: entry,
+    shares: shares,
+    stop: stop.toFixed(2),
+    target1: target1.toFixed(2),
+    target2: target2.toFixed(2),
+    status: 'OPEN',
+    strategy: 'pead',
+    commission: commission,
+    notes: `Earnings: ${e.earningsDate} | SUE: ${(e.metrics.sue*100).toFixed(1)}% | EAR: ${e.metrics.ear.toFixed(1)}% | VolSpike: ${e.metrics.volSpike.toFixed(1)}×`,
+    atrPct: ((atr / entry) * 100).toFixed(2)
+  };
+
+  if (!cache.trades) cache.trades = [];
+  cache.trades.push(trade);
+
+  e.status = 'ENTERED';
+  e.tradeId = trade.id;
+
+  closePEADTradeForm();
+  renderPEAD();
+  renderTrades();
+  renderDash();
+  scheduleSave();
+  toast(`✅ PEAD сделка ${e.ticker} ${e.direction} добавлена · ${shares} акций · Entry $${entry.toFixed(2)}`);
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -7179,20 +7383,20 @@ init();
 
       <div style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--text);margin:20px 0 12px">Day E-1 (предыдущий день)</div>
       <div class="fgrid" style="grid-template-columns:repeat(5,1fr)">
-        <div class="fg"><label>Open</label><input id="evE1_O" type="number" step="0.01"></div>
-        <div class="fg"><label>High</label><input id="evE1_H" type="number" step="0.01"></div>
-        <div class="fg"><label>Low</label><input id="evE1_L" type="number" step="0.01"></div>
-        <div class="fg"><label>Close</label><input id="evE1_C" type="number" step="0.01"></div>
-        <div class="fg"><label>Volume</label><input id="evE1_V" type="number" step="1"></div>
+        <div class="fg"><label>Open</label><input id="evE1_O" type="text" inputmode="decimal"></div>
+        <div class="fg"><label>High</label><input id="evE1_H" type="text" inputmode="decimal"></div>
+        <div class="fg"><label>Low</label><input id="evE1_L" type="text" inputmode="decimal"></div>
+        <div class="fg"><label>Close</label><input id="evE1_C" type="text" inputmode="decimal"></div>
+        <div class="fg"><label>Volume</label><input id="evE1_V" type="text" inputmode="numeric"></div>
       </div>
 
       <div style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--text);margin:20px 0 12px">Day E (событие)</div>
       <div class="fgrid" style="grid-template-columns:repeat(5,1fr)">
-        <div class="fg"><label>Open</label><input id="evE_O" type="number" step="0.01"></div>
-        <div class="fg"><label>High</label><input id="evE_H" type="number" step="0.01"></div>
-        <div class="fg"><label>Low</label><input id="evE_L" type="number" step="0.01"></div>
-        <div class="fg"><label>Close</label><input id="evE_C" type="number" step="0.01"></div>
-        <div class="fg"><label>Volume</label><input id="evE_V" type="number" step="1"></div>
+        <div class="fg"><label>Open</label><input id="evE_O" type="text" inputmode="decimal"></div>
+        <div class="fg"><label>High</label><input id="evE_H" type="text" inputmode="decimal"></div>
+        <div class="fg"><label>Low</label><input id="evE_L" type="text" inputmode="decimal"></div>
+        <div class="fg"><label>Close</label><input id="evE_C" type="text" inputmode="decimal"></div>
+        <div class="fg"><label>Volume</label><input id="evE_V" type="text" inputmode="numeric"></div>
       </div>
 
       <div style="font-family:var(--mono);font-size:10px;color:var(--t2);margin-top:16px;padding:10px;background:var(--bg3);border-radius:6px">
@@ -7232,11 +7436,11 @@ init();
       </div>
 
       <div class="fgrid" style="grid-template-columns:repeat(5,1fr)">
-        <div class="fg"><label>Open</label><input id="pb_O" type="number" step="0.01"></div>
-        <div class="fg"><label>High</label><input id="pb_H" type="number" step="0.01"></div>
-        <div class="fg"><label>Low</label><input id="pb_L" type="number" step="0.01"></div>
-        <div class="fg"><label>Close</label><input id="pb_C" type="number" step="0.01"></div>
-        <div class="fg"><label>Volume</label><input id="pb_V" type="number" step="1"></div>
+        <div class="fg"><label>Open</label><input id="pb_O" type="text" inputmode="decimal"></div>
+        <div class="fg"><label>High</label><input id="pb_H" type="text" inputmode="decimal"></div>
+        <div class="fg"><label>Low</label><input id="pb_L" type="text" inputmode="decimal"></div>
+        <div class="fg"><label>Close</label><input id="pb_C" type="text" inputmode="decimal"></div>
+        <div class="fg"><label>Volume</label><input id="pb_V" type="text" inputmode="numeric"></div>
       </div>
 
       <div style="font-family:var(--mono);font-size:10px;color:var(--t2);margin-top:16px;padding:10px;background:var(--bg3);border-radius:6px">
@@ -7276,18 +7480,18 @@ init();
 
       <div style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--text);margin:20px 0 12px">Day T-1 (предыдущий день)</div>
       <div class="fgrid" style="grid-template-columns:repeat(4,1fr)">
-        <div class="fg"><label>Close</label><input id="peadT1_C" type="number" step="0.01"></div>
-        <div class="fg"><label>ATR14</label><input id="peadT1_ATR" type="number" step="0.01"></div>
-        <div class="fg"><label>SMA50</label><input id="peadT1_SMA50" type="number" step="0.01"></div>
-        <div class="fg"><label>AvgVol20</label><input id="peadT1_AvgVol" type="number" step="1"></div>
+        <div class="fg"><label>Close</label><input id="peadT1_C" type="text" inputmode="decimal"></div>
+        <div class="fg"><label>ATR14</label><input id="peadT1_ATR" type="text" inputmode="decimal"></div>
+        <div class="fg"><label>SMA50</label><input id="peadT1_SMA50" type="text" inputmode="decimal"></div>
+        <div class="fg"><label>AvgVol20</label><input id="peadT1_AvgVol" type="text" inputmode="numeric"></div>
       </div>
 
       <div style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--text);margin:20px 0 12px">Day T0 (earnings day)</div>
       <div class="fgrid" style="grid-template-columns:repeat(4,1fr)">
-        <div class="fg"><label>Close</label><input id="peadT0_C" type="number" step="0.01"></div>
-        <div class="fg"><label>Low</label><input id="peadT0_L" type="number" step="0.01"></div>
-        <div class="fg"><label>High</label><input id="peadT0_H" type="number" step="0.01"></div>
-        <div class="fg"><label>Volume</label><input id="peadT0_V" type="number" step="1"></div>
+        <div class="fg"><label>Close</label><input id="peadT0_C" type="text" inputmode="decimal"></div>
+        <div class="fg"><label>Low</label><input id="peadT0_L" type="text" inputmode="decimal"></div>
+        <div class="fg"><label>High</label><input id="peadT0_H" type="text" inputmode="decimal"></div>
+        <div class="fg"><label>Volume</label><input id="peadT0_V" type="text" inputmode="numeric"></div>
       </div>
 
       <div style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--text);margin:20px 0 12px">Earnings Data</div>
@@ -7317,8 +7521,53 @@ init();
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════ -->
-<!-- IMPULSE MODAL -->
+<!-- PEAD TRADE MODAL -->
 <!-- ═══════════════════════════════════════════════════════════ -->
+<div id="peadTradeModal" class="modal">
+  <div class="modal-c" style="max-width:520px">
+    <div class="modal-h">
+      <div style="font-size:18px;font-weight:700">📈 Открыть PEAD сделку</div>
+      <div class="cls" onclick="closePEADTradeForm()">×</div>
+    </div>
+    <div class="modal-b">
+
+      <!-- Summary -->
+      <div id="peadTradeInfo" style="padding:14px;background:var(--bg3);border-radius:8px;border:1px solid var(--line);margin-bottom:20px;font-family:var(--mono);font-size:11px;line-height:2"></div>
+
+      <div class="fgrid" style="grid-template-columns:1fr 1fr;margin-bottom:16px">
+        <div class="fg">
+          <label>Дата входа (D+1) *</label>
+          <input id="peadTradeDate" type="date">
+        </div>
+        <div class="fg">
+          <label>Open D+1 — фактический вход *</label>
+          <input id="peadTradeEntry" type="text" inputmode="decimal" placeholder="Цена открытия D+1">
+        </div>
+      </div>
+
+      <div class="fgrid" style="grid-template-columns:1fr 1fr">
+        <div class="fg">
+          <label>Риск на сделку ($)</label>
+          <input id="peadTradeRisk" type="text" inputmode="numeric" placeholder="100">
+        </div>
+        <div class="fg">
+          <label>Комиссия ($)</label>
+          <input id="peadTradeComm" type="text" inputmode="decimal" placeholder="0">
+        </div>
+      </div>
+
+      <div id="peadTradeSummary" style="display:none;margin-top:16px;padding:14px;background:var(--bg3);border-radius:8px;border:1px solid var(--line);font-family:var(--mono);font-size:11px;line-height:2"></div>
+      <div id="peadTradeErrors" style="display:none;margin-top:12px;padding:12px;background:#ff000010;border:1px solid #ff000040;border-radius:6px;font-family:var(--mono);font-size:10px;line-height:1.8;color:#ff4444"></div>
+    </div>
+    <div class="modal-f">
+      <button class="btn btn-g" onclick="closePEADTradeForm()">Отмена</button>
+      <button class="btn btn-g" onclick="calcPEADTrade()" style="border-color:var(--acc3);color:var(--acc3)">🧮 Рассчитать</button>
+      <button class="btn btn-p" onclick="savePEADTrade()">✅ Добавить сделку</button>
+    </div>
+  </div>
+</div>
+
+</body>
 <div id="impulseModal" class="modal">
   <div class="modal-c" style="max-width:700px">
     <div class="modal-h">
@@ -7339,22 +7588,22 @@ init();
 
       <div style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--text);margin:20px 0 12px">Day D-1 (предыдущий)</div>
       <div class="fgrid" style="grid-template-columns:1fr">
-        <div class="fg"><label>Close</label><input id="impD_1_C" type="number" step="0.01"></div>
+        <div class="fg"><label>Close</label><input id="impD_1_C" type="text" inputmode="decimal"></div>
       </div>
 
       <div style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--text);margin:20px 0 12px">Day D0 (Impulse Day)</div>
       <div class="fgrid" style="grid-template-columns:repeat(5,1fr)">
-        <div class="fg"><label>Open</label><input id="impD0_O" type="number" step="0.01"></div>
-        <div class="fg"><label>High</label><input id="impD0_H" type="number" step="0.01"></div>
-        <div class="fg"><label>Low</label><input id="impD0_L" type="number" step="0.01"></div>
-        <div class="fg"><label>Close</label><input id="impD0_C" type="number" step="0.01"></div>
-        <div class="fg"><label>Volume</label><input id="impD0_V" type="number" step="1"></div>
+        <div class="fg"><label>Open</label><input id="impD0_O" type="text" inputmode="decimal"></div>
+        <div class="fg"><label>High</label><input id="impD0_H" type="text" inputmode="decimal"></div>
+        <div class="fg"><label>Low</label><input id="impD0_L" type="text" inputmode="decimal"></div>
+        <div class="fg"><label>Close</label><input id="impD0_C" type="text" inputmode="decimal"></div>
+        <div class="fg"><label>Volume</label><input id="impD0_V" type="text" inputmode="numeric"></div>
       </div>
 
       <div style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--text);margin:20px 0 12px">D0 Metrics</div>
       <div class="fgrid" style="grid-template-columns:1fr 1fr">
-        <div class="fg"><label>ATR(14)</label><input id="impATR" type="number" step="0.01"></div>
-        <div class="fg"><label>Relative Volume</label><input id="impRelVol" type="number" step="0.1"></div>
+        <div class="fg"><label>ATR(14)</label><input id="impATR" type="text" inputmode="decimal"></div>
+        <div class="fg"><label>Relative Volume</label><input id="impRelVol" type="text" inputmode="decimal"></div>
       </div>
 
       <div style="font-family:var(--mono);font-size:10px;color:var(--t2);margin-top:16px;padding:10px;background:var(--bg3);border-radius:6px">
@@ -7395,10 +7644,10 @@ init();
       </div>
 
       <div class="fgrid" style="grid-template-columns:repeat(4,1fr)">
-        <div class="fg"><label>Open</label><input id="impD1_O" type="number" step="0.01"></div>
-        <div class="fg"><label>High</label><input id="impD1_H" type="number" step="0.01"></div>
-        <div class="fg"><label>Low</label><input id="impD1_L" type="number" step="0.01"></div>
-        <div class="fg"><label>Close</label><input id="impD1_C" type="number" step="0.01"></div>
+        <div class="fg"><label>Open</label><input id="impD1_O" type="text" inputmode="decimal"></div>
+        <div class="fg"><label>High</label><input id="impD1_H" type="text" inputmode="decimal"></div>
+        <div class="fg"><label>Low</label><input id="impD1_L" type="text" inputmode="decimal"></div>
+        <div class="fg"><label>Close</label><input id="impD1_C" type="text" inputmode="decimal"></div>
       </div>
 
       <div style="font-family:var(--mono);font-size:10px;color:var(--t2);margin-top:16px;padding:10px;background:var(--bg3);border-radius:6px">
@@ -7437,7 +7686,7 @@ init();
         </div>
         <div class="fg">
           <label>Фактический вход</label>
-          <input id="impTradeEntryActual" type="number" step="0.01" placeholder="Если отличается от расчётного">
+          <input id="impTradeEntryActual" type="text" inputmode="decimal" placeholder="Если отличается от расчётного">
         </div>
       </div>
 
@@ -7445,11 +7694,11 @@ init();
       <div class="fgrid" style="grid-template-columns:1fr 1fr">
         <div class="fg">
           <label>Риск на сделку ($)</label>
-          <input id="impTradeRisk" type="number" step="1" placeholder="100">
+          <input id="impTradeRisk" type="text" inputmode="numeric" placeholder="100">
         </div>
         <div class="fg">
           <label>Комиссия ($)</label>
-          <input id="impTradeComm" type="number" step="0.01" placeholder="0">
+          <input id="impTradeComm" type="text" inputmode="decimal" placeholder="0">
         </div>
       </div>
 
