@@ -6541,7 +6541,7 @@ function renderImpulse() {
       <td style="font-family:var(--mono);font-size:10px">${c.stop ? '$' + c.stop.toFixed(2) : '—'}</td>
       <td>
         ${c.status === 'WAITING_D1' ? `<button class="btn btn-g btn-s" onclick="addD1Data('${c.id}')" style="font-size:9px">+ D+1</button>` : ''}
-        ${c.status === 'READY_ENTRY' ? `<button class="btn btn-p btn-s" onclick="openImpulseTradeForm('${c.id}')" style="font-size:9px">+ Сделка</button>` : ''}
+        ${(c.entry && c.stop && c.status !== 'ENTERED') ? `<button class="btn btn-p btn-s" onclick="openImpulseTradeForm('${c.id}')" style="font-size:9px">+ Сделка</button>` : ''}
         <button class="btn btn-r btn-s" onclick="deleteImpulse('${c.id}')" style="font-size:9px">×</button>
       </td>
     </tr>${entryNote}`;
