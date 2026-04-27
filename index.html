@@ -4453,6 +4453,23 @@ function renderDash() {
           <span>−0.5 ATR: <span class="r">$${(entry * (1 - dir * atrPct * 0.5 / 100)).toFixed(2)}</span></span>
         </div>` : ''}
         
+        <!-- Impulse-specific: 0.2×ATR step for trailing stop -->
+        ${t.strategy === 'impulse' && t.atrAbs ? `<div style="margin-top:6px;padding:8px 10px;background:rgba(231,76,60,.08);border-radius:6px;border:1px solid rgba(231,76,60,.2);font-family:var(--mono);font-size:10px">
+          <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center">
+            <span style="color:var(--acc3);font-weight:700">🚀 IMPULSE</span>
+            <span>ATR: <b style="color:var(--text)">$${t.atrAbs.toFixed(2)}</b></span>
+            <span>0.2×ATR: <b style="color:var(--acc3)">$${(0.2 * t.atrAbs).toFixed(2)}</b></span>
+            <span>Якорь: <b>$${t.impulseAnchor ? Number(t.impulseAnchor).toFixed(2) : '—'}</b> <span style="color:var(--t3)">(${t.type === 'LONG' ? 'Low' : 'High'})</span></span>
+            <span>Стоп: <b class="r">$${stop || '—'}</b></span>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px;padding-top:8px;border-top:1px solid rgba(231,76,60,.2)">
+            <span style="color:var(--t2)">Перестановка: ${t.type === 'LONG' ? 'Low' : 'High'} текущего дня →</span>
+            <input type="text" inputmode="decimal" id="impTrail_${t.id}" placeholder="${t.type === 'LONG' ? 'Low' : 'High'}" style="width:80px;padding:3px 6px;background:var(--bg);border:1px solid var(--line);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:10px">
+            <button onclick="impulseTrailStop('${t.id}')" class="btn btn-g btn-s" style="font-size:9px;padding:3px 8px">Рассчитать</button>
+            <span id="impTrailResult_${t.id}" style="color:var(--t2)"></span>
+          </div>
+        </div>` : ''}
+        
         <!-- Trailing stop row (after Target 1 hit) -->
         ${t.partialExit || t.status === 'PARTIAL' ? (() => {
           const lp = livePrices[t.ticker];
@@ -6120,7 +6137,65 @@ function deletePEAD(id) {
 }
 
 // ═══════════════════════════════════════════════════════════
-// PEAD TRADE FUNCTIONS
+// IMPULSE TRAILING STOP (для перестановки стопа по дням)
+// ═══════════════════════════════════════════════════════════
+
+function impulseTrailStop(tradeId) {
+  const t = (cache.trades || []).find(x => x.id === tradeId);
+  if (!t) return;
+
+  const input = document.getElementById('impTrail_' + tradeId);
+  const result = document.getElementById('impTrailResult_' + tradeId);
+  const newAnchor = parseNum(input.value);
+
+  if (isNaN(newAnchor) || newAnchor <= 0) {
+    result.innerHTML = '<span style="color:#ff4444">Введи число</span>';
+    return;
+  }
+
+  const atr = t.atrAbs;
+  const oldAnchor = Number(t.impulseAnchor);
+  const oldStop = parseFloat(t.stop);
+
+  // Проверка: можно ли двинуть якорь?
+  if (t.type === 'LONG') {
+    // LONG: новый Low должен быть ВЫШЕ старого Low (якоря)
+    if (newAnchor <= oldAnchor) {
+      result.innerHTML = `<span style="color:var(--t2)">Low ${newAnchor.toFixed(2)} ≤ якоря ${oldAnchor.toFixed(2)} — стоп не двигается</span>`;
+      return;
+    }
+  } else {
+    // SHORT: новый High должен быть НИЖЕ старого High (якоря)
+    if (newAnchor >= oldAnchor) {
+      result.innerHTML = `<span style="color:var(--t2)">High ${newAnchor.toFixed(2)} ≥ якоря ${oldAnchor.toFixed(2)} — стоп не двигается</span>`;
+      return;
+    }
+  }
+
+  // Считаем новый стоп
+  const newStop = t.type === 'LONG' ? newAnchor - 0.2 * atr : newAnchor + 0.2 * atr;
+
+  // Подтверждение
+  const confirmMsg = `Передвинуть стоп?\nСтарый: $${oldStop.toFixed(2)} (якорь ${oldAnchor.toFixed(2)})\nНовый: $${newStop.toFixed(2)} (якорь ${newAnchor.toFixed(2)})`;
+  if (!confirm(confirmMsg)) {
+    result.innerHTML = `<span style="color:var(--t2)">Расчёт: новый стоп = <b style="color:var(--acc)">$${newStop.toFixed(2)}</b> (отменено)</span>`;
+    return;
+  }
+
+  // Применяем
+  t.stop = newStop.toFixed(2);
+  t.impulseAnchor = newAnchor;
+
+  // Лог в notes
+  const dt = new Date().toISOString().split('T')[0];
+  const trailNote = ` | Trail ${dt}: anchor ${newAnchor.toFixed(2)} → stop ${newStop.toFixed(2)}`;
+  t.notes = (t.notes || '') + trailNote;
+
+  scheduleSave();
+  renderTrades();
+  toast(`✅ Стоп ${t.ticker}: $${oldStop.toFixed(2)} → $${newStop.toFixed(2)}`);
+}
+
 // ═══════════════════════════════════════════════════════════
 
 let currentPEADTradeId = null;
@@ -6541,7 +6616,7 @@ function renderImpulse() {
       <td style="font-family:var(--mono);font-size:10px">${c.stop ? '$' + c.stop.toFixed(2) : '—'}</td>
       <td>
         ${c.status === 'WAITING_D1' ? `<button class="btn btn-g btn-s" onclick="addD1Data('${c.id}')" style="font-size:9px">+ D+1</button>` : ''}
-        ${(c.entry && c.stop && c.status !== 'ENTERED') ? `<button class="btn btn-p btn-s" onclick="openImpulseTradeForm('${c.id}')" style="font-size:9px">+ Сделка</button>` : ''}
+        ${(c.entry && c.status !== 'ENTERED') ? `<button class="btn btn-p btn-s" onclick="openImpulseTradeForm('${c.id}')" style="font-size:9px">+ Сделка</button>` : ''}
         <button class="btn btn-r btn-s" onclick="deleteImpulse('${c.id}')" style="font-size:9px">×</button>
       </td>
     </tr>${entryNote}`;
@@ -6748,13 +6823,30 @@ function openImpulseTradeForm(candidateId) {
 
   // Fill info block
   const dirColor = c.direction === 'LONG' ? 'var(--acc)' : 'var(--acc2)';
-  const riskPerShare = c.direction === 'LONG' ? (c.entry - c.stop) : (c.stop - c.entry);
+  const hasD1 = c.d1 != null;
+  const hasStop = c.stop != null;
+  const riskPerShare = hasStop ? (c.direction === 'LONG' ? (c.entry - c.stop) : (c.stop - c.entry)) : null;
+
   document.getElementById('impTradeInfo').innerHTML = `
-    <div><b style="color:${dirColor}">${c.direction}</b> &nbsp;|&nbsp; <b>${c.ticker}</b> &nbsp;|&nbsp; Паттерн: ${c.pattern}</div>
-    <div>Entry: <b style="color:var(--acc)">$${c.entry.toFixed(2)}</b> &nbsp;|&nbsp; Stop: <b style="color:var(--acc2)">$${c.stop.toFixed(2)}</b></div>
-    <div>Risk/share: <b>$${riskPerShare.toFixed(2)}</b> &nbsp;|&nbsp; ATR: $${c.atr.toFixed(2)}</div>
-    <div>Target 1: <b>$${c.target1.toFixed(2)}</b> &nbsp;|&nbsp; Target 2: <b>$${c.target2.toFixed(2)}</b></div>
+    <div><b style="color:${dirColor}">${c.direction}</b> &nbsp;|&nbsp; <b>${c.ticker}</b> &nbsp;|&nbsp; ${c.pattern ? 'Паттерн: ' + c.pattern : '<span style="color:var(--acc3)">⚠ D+1 ещё не подтверждён — введи Low/High D+1 для расчёта стопа</span>'}</div>
+    <div>Entry: <b style="color:var(--acc)">$${c.entry.toFixed(2)}</b> ${hasStop ? `&nbsp;|&nbsp; Stop: <b style="color:var(--acc2)">$${c.stop.toFixed(2)}</b>` : ''}</div>
+    <div>${hasStop ? `Risk/share: <b>$${riskPerShare.toFixed(2)}</b> &nbsp;|&nbsp; ` : ''}ATR: $${c.atr.toFixed(2)} &nbsp;|&nbsp; 0.2×ATR: <b style="color:var(--acc3)">$${(0.2 * c.atr).toFixed(2)}</b></div>
+    ${hasStop ? `<div>Target 1: <b>$${c.target1.toFixed(2)}</b> &nbsp;|&nbsp; Target 2: <b>$${c.target2.toFixed(2)}</b></div>` : ''}
   `;
+
+  // Anchor label and prefill (Low D0 for LONG, High D0 for SHORT)
+  const anchorLabel = document.getElementById('impTradeAnchorLabel');
+  const anchorInput = document.getElementById('impTradeAnchor');
+  const formula = document.getElementById('impTradeStopFormula');
+  if (c.direction === 'LONG') {
+    anchorLabel.textContent = 'Low D0 *';
+    formula.textContent = 'Stop = Low_D0 − 0.2×ATR (держится весь день входа)';
+    anchorInput.value = c.d0.L.toFixed(2);
+  } else {
+    anchorLabel.textContent = 'High D0 *';
+    formula.textContent = 'Stop = High_D0 + 0.2×ATR (держится весь день входа)';
+    anchorInput.value = c.d0.H.toFixed(2);
+  }
 
   // Defaults
   const today = new Date().toISOString().split('T')[0];
@@ -6777,22 +6869,40 @@ function calcImpulseTrade() {
   const c = cache.strategies?.impulse?.candidates?.find(x => x.id === currentImpulseTradeId);
   if (!c) return;
 
+  const errEl = document.getElementById('impTradeErrors');
   const riskAmount = parseNum(document.getElementById('impTradeRisk').value) || 100;
   const entryActual = parseNum(document.getElementById('impTradeEntryActual').value);
   const entry = (!isNaN(entryActual) && entryActual > 0) ? entryActual : c.entry;
+  const anchor = parseNum(document.getElementById('impTradeAnchor').value);
 
-  const riskPerShare = c.direction === 'LONG' ? (entry - c.stop) : (c.stop - entry);
-  if (riskPerShare <= 0) {
-    document.getElementById('impTradeErrors').style.display = 'block';
-    document.getElementById('impTradeErrors').innerHTML = '❌ RiskPerShare ≤ 0: проверь Entry и Stop';
+  if (isNaN(anchor) || anchor <= 0) {
+    errEl.style.display = 'block';
+    errEl.innerHTML = `❌ Введи ${c.direction === 'LONG' ? 'Low' : 'High'} D0`;
     return;
+  }
+
+  // Stop по правилу: LONG = Low_D0 - 0.2×ATR, SHORT = High_D0 + 0.2×ATR
+  const stop = c.direction === 'LONG' ? anchor - 0.2 * c.atr : anchor + 0.2 * c.atr;
+
+  const riskPerShare = c.direction === 'LONG' ? (entry - stop) : (stop - entry);
+  if (riskPerShare <= 0) {
+    errEl.style.display = 'block';
+    errEl.innerHTML = '❌ RiskPerShare ≤ 0: проверь Entry и anchor';
+    return;
+  }
+
+  // Risk/ATR validation
+  const ratio = riskPerShare / c.atr;
+  if (ratio > 1.5) {
+    errEl.style.display = 'block';
+    errEl.innerHTML = `⚠ Риск превышает лимит: RiskPerShare/ATR = ${ratio.toFixed(2)} > 1.5<br>По правилам стратегии — сделка отменяется. Можно продолжить, но будь осторожен.`;
+  } else {
+    errEl.style.display = 'none';
   }
 
   const shares = Math.floor(riskAmount / riskPerShare);
   const positionValue = entry * shares;
   const riskActual = riskPerShare * shares;
-
-  // Recalculate targets from actual entry
   const t1 = c.direction === 'LONG' ? entry + riskPerShare : entry - riskPerShare;
   const t2 = c.direction === 'LONG' ? entry + 2 * riskPerShare : entry - 2 * riskPerShare;
 
@@ -6803,12 +6913,12 @@ function calcImpulseTrade() {
     <div style="font-weight:700;margin-bottom:6px;color:${dirColor}">Позиция</div>
     <div>Акций: <b>${shares}</b> &nbsp;|&nbsp; Entry: <b>$${entry.toFixed(2)}</b></div>
     <div>Размер позиции: <b>$${positionValue.toFixed(0)}</b></div>
-    <div>Риск ($): <b style="color:var(--acc2)">$${riskActual.toFixed(2)}</b></div>
-    <div>Stop: <b>$${c.stop.toFixed(2)}</b></div>
+    <div>Риск ($): <b style="color:var(--acc2)">$${riskActual.toFixed(2)}</b> &nbsp;|&nbsp; Risk/ATR: <b>${ratio.toFixed(2)}</b></div>
+    <div>Stop: <b>$${stop.toFixed(2)}</b> <span style="color:var(--t2)">(${c.direction === 'LONG' ? 'Low' : 'High'}_D0 ${c.direction === 'LONG' ? '−' : '+'} 0.2×ATR = ${anchor.toFixed(2)} ${c.direction === 'LONG' ? '−' : '+'} ${(0.2 * c.atr).toFixed(2)})</span></div>
     <div>Target 1 (50%): <b>$${t1.toFixed(2)}</b></div>
     <div>Target 2 (50%): <b>$${t2.toFixed(2)}</b></div>
+    <div style="color:var(--t2);font-size:10px;margin-top:6px">📌 Стоп держится весь D+1. На закрытии: если ${c.direction === 'LONG' ? 'Low_D+1 > Low_D0' : 'High_D+1 < High_D0'} → новый якорь</div>
   `;
-  document.getElementById('impTradeErrors').style.display = 'none';
 }
 
 function saveImpulseTrade() {
@@ -6826,26 +6936,35 @@ function saveImpulseTrade() {
   const riskAmount = parseNum(document.getElementById('impTradeRisk').value) || 100;
   const entryActual = parseNum(document.getElementById('impTradeEntryActual').value);
   const entry = (!isNaN(entryActual) && entryActual > 0) ? entryActual : c.entry;
+  const anchor = parseNum(document.getElementById('impTradeAnchor').value);
   const commission = parseNum(document.getElementById('impTradeComm').value) || 0;
 
-  const riskPerShare = c.direction === 'LONG' ? (entry - c.stop) : (c.stop - entry);
+  if (isNaN(anchor) || anchor <= 0) {
+    errEl.style.display = 'block';
+    errEl.innerHTML = `❌ Введи ${c.direction === 'LONG' ? 'Low' : 'High'} D0`;
+    return;
+  }
+
+  // Stop по правилу
+  const stop = c.direction === 'LONG' ? anchor - 0.2 * c.atr : anchor + 0.2 * c.atr;
+
+  const riskPerShare = c.direction === 'LONG' ? (entry - stop) : (stop - entry);
   if (riskPerShare <= 0) {
     errEl.style.display = 'block';
-    errEl.innerHTML = '❌ RiskPerShare ≤ 0: проверь Entry и Stop';
+    errEl.innerHTML = '❌ RiskPerShare ≤ 0: проверь Entry и anchor';
     return;
   }
 
   const shares = Math.floor(riskAmount / riskPerShare);
   if (shares < 1) {
     errEl.style.display = 'block';
-    errEl.innerHTML = `❌ Слишком мало акций (${shares}): увеличь риск или проверь Entry/Stop`;
+    errEl.innerHTML = `❌ Слишком мало акций (${shares}): увеличь риск`;
     return;
   }
 
   const t1 = c.direction === 'LONG' ? entry + riskPerShare : entry - riskPerShare;
   const t2 = c.direction === 'LONG' ? entry + 2 * riskPerShare : entry - 2 * riskPerShare;
 
-  // Build trade object (same structure as regular trades)
   const trade = {
     id: Date.now().toString(),
     createdAt: Date.now(),
@@ -6854,20 +6973,21 @@ function saveImpulseTrade() {
     entryDate: date,
     entry: entry,
     shares: shares,
-    stop: c.stop.toFixed(2),
+    stop: stop.toFixed(2),
     target1: t1.toFixed(2),
     target2: t2.toFixed(2),
     status: 'OPEN',
     strategy: 'impulse',
     commission: commission,
-    notes: `D0: ${c.d0Date} | Паттерн D+1: ${c.pattern} | ATR: ${c.atr.toFixed(2)} | Impulse: ${(c.metrics.impulse * 100).toFixed(1)}%`,
-    atrPct: ((c.atr / entry) * 100).toFixed(2)
+    notes: `D0: ${c.d0Date} | Паттерн D+1: ${c.pattern || 'не подтверждён'} | ATR: ${c.atr.toFixed(2)} | Impulse: ${(c.metrics.impulse * 100).toFixed(1)}% | Anchor (${c.direction === 'LONG' ? 'Low' : 'High'} D0): ${anchor.toFixed(2)}`,
+    atrPct: ((c.atr / entry) * 100).toFixed(2),
+    atrAbs: c.atr,             // Абсолютное значение ATR для карточки
+    impulseAnchor: anchor       // Якорь для перестановки стопа
   };
 
   if (!cache.trades) cache.trades = [];
   cache.trades.push(trade);
 
-  // Mark candidate as entered
   c.status = 'ENTERED';
   c.tradeId = trade.id;
 
@@ -7687,6 +7807,15 @@ init();
         <div class="fg">
           <label>Фактический вход</label>
           <input id="impTradeEntryActual" type="text" inputmode="decimal" placeholder="Если отличается от расчётного">
+        </div>
+      </div>
+
+      <!-- D0 anchor for stop calculation -->
+      <div class="fgrid" style="grid-template-columns:1fr;margin-bottom:16px">
+        <div class="fg">
+          <label id="impTradeAnchorLabel">Low D0 *</label>
+          <input id="impTradeAnchor" type="text" inputmode="decimal" placeholder="">
+          <div style="font-family:var(--mono);font-size:9px;color:var(--t2);margin-top:4px" id="impTradeStopFormula">Stop = Low_D0 − 0.2×ATR (рассчитается автоматически)</div>
         </div>
       </div>
 
