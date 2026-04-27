@@ -840,6 +840,48 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
     </div>
   </div><!-- end scanner-impulse -->
 
+  <!-- RSPC Scanner -->
+  <div id="scanner-rspc" class="scanner-section" style="display:none">
+    <div style="margin-bottom:24px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div class="sh">🎯 RSPC Scanner
+          <span style="font-family:var(--mono);font-size:9px;color:var(--t2);font-weight:400">Range-Strength Pullback Continuation</span>
+        </div>
+        <button class="btn btn-p btn-s" onclick="openRSPCForm()" style="background:#f39c12;border-color:#f39c12">+ ДОБАВИТЬ КАНДИДАТА</button>
+      </div>
+      
+      <div style="font-family:var(--mono);font-size:9px;color:var(--t2);margin:12px 0;padding:10px 14px;background:var(--bg3);border-radius:8px;border:1px solid var(--line);line-height:1.7">
+        <b>D0 (вчера) — все 6 условий:</b> Range/ATR ≥ 1.30, CLV ≥ 0.80 (LONG) или ≤ 0.20 (SHORT), VolRatio ≥ 1.70, цвет, пробой 10D, SPY-фильтр<br>
+        <b>D+1 (сегодня):</b> кто не отдал движение — Inside Day / Weak Pullback / Compression<br>
+        <b>Entry:</b> High_D0 + 0.1×ATR (LONG) | <b>Stop:</b> Low_D0 − 0.2×ATR
+      </div>
+
+      <!-- RSPC Candidates Table -->
+      <div class="tw">
+        <table>
+          <thead><tr>
+            <th>Ticker</th>
+            <th>D0 Date</th>
+            <th>Dir</th>
+            <th>Range/ATR</th>
+            <th>CLV</th>
+            <th>VolRatio</th>
+            <th>10D</th>
+            <th>SPY%</th>
+            <th>Status</th>
+            <th>Pattern</th>
+            <th>Entry</th>
+            <th>Stop</th>
+            <th>Actions</th>
+          </tr></thead>
+          <tbody id="rspcTbody">
+            <tr><td colspan="13" style="text-align:center;color:var(--t2);padding:30px">Нет RSPC кандидатов — добавьте первого</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div><!-- end scanner-rspc -->
+
   <!-- Manage Watchlist -->
   <div id="scanner-manage" class="scanner-section" style="display:none">
   <!-- WATCHLIST CARDS -->
@@ -1707,6 +1749,13 @@ const STRATEGIES = {
     color: '#e74c3c',
     description: 'Импульсное движение D0 с подтверждением на D+1'
   },
+  rspc: {
+    id: 'rspc',
+    name: 'RSPC',
+    icon: '🎯',
+    color: '#f39c12',
+    description: 'Range-Strength Pullback Continuation — вчерашний impulse + сегодняшний контролируемый откат'
+  },
   momentum: {
     id: 'momentum',
     name: 'Momentum',
@@ -2109,6 +2158,7 @@ const STRATEGY_RULES = {
         'SHORT: Impulse ≤ −5% AND ≥ −12%',
         'CLV = (Close − Low) / (High − Low)',
         'LONG: CLV > 0.70 (закрытие в верхней части)',
+        'SHORT: CLV < 0.30 (закрытие в нижней части)',
         'Body = |Close − Open| / Range',
         'Body > 0.50 (не дожи)',
         'RelVol ≥ 1.5',
@@ -2170,6 +2220,103 @@ const STRATEGY_RULES = {
       ]
     }
   },
+  rspc: {
+    name: 'RSPC — Range-Strength Pullback Continuation',
+    description: 'Вчерашний impulse + сегодняшний контролируемый откат',
+    universe: {
+      title: 'Universe (Screener Settings)',
+      rules: [
+        '<b>Базовые фильтры:</b>',
+        '• Market: US stocks',
+        '• Price: $20–$500',
+        '• AvgVolume20 ≥ 2,000,000',
+        '• MarketCap ≥ $5B',
+        '',
+        '<b>Исключить:</b>',
+        '• Earnings в ближайшие 5 дней',
+        '• ATR% < 1.5% (мёртвые) или > 8% (хаос)',
+        '• Тонкий объём, гэп-мусор small caps',
+        '• Биотехи с новостями',
+        '',
+        '<i>Идея: ищем вчерашних победителей и проигравших — кто не отдал движение</i>'
+      ]
+    },
+    d0Criteria: {
+      title: 'D0 (Вчерашний impulse) — все 6 условий обязательны',
+      rules: [
+        '<b>LONG:</b>',
+        '1. Range/ATR ≥ 1.30 (большая свеча): (High − Low) / ATR14 ≥ 1.30',
+        '2. Закрытие в верхних 20%: (High − Close) / Range ≤ 0.20 → CLV ≥ 0.80',
+        '3. День зелёный: Close > Open',
+        '4. VolRatio ≥ 1.70: Volume / AvgVolume20 ≥ 1.70',
+        '5. Пробой 10-дневного максимума: High ≥ MAX(High последних 10 дней)',
+        '6. Рынок не слабый: SPY вчера ≥ −0.5%',
+        '',
+        '<b>SHORT (зеркально):</b>',
+        '1. Range/ATR ≥ 1.30',
+        '2. Закрытие в нижних 20%: CLV ≤ 0.20',
+        '3. День красный: Close < Open',
+        '4. VolRatio ≥ 1.70',
+        '5. Пробой 10-дневного минимума: Low ≤ MIN(Low последних 10 дней)',
+        '6. Рынок не сильный вверх: SPY вчера ≤ +0.5%',
+        '',
+        '<b>Приоритет (чистые сигналы):</b>',
+        '• Range/ATR ≥ 1.5',
+        '• VolRatio ≥ 2.0',
+        '• Large cap',
+        '',
+        'Брать максимум 3 LONG + 3 SHORT в день'
+      ]
+    },
+    d1Patterns: {
+      title: 'D+1 (Сегодня) — контролируемый откат',
+      rules: [
+        '<b>Главный принцип:</b> кто НЕ отдал движение D0',
+        '',
+        '<b>Что искать:</b>',
+        '• откат слабый / controlled',
+        '• не сломали вчерашнюю свечу',
+        '• вход по продолжению',
+        '',
+        '<b>Паттерны (один из):</b>',
+        '1. Inside Day: High_D+1 ≤ High_D0, Low_D+1 ≥ Low_D0',
+        '2. Weak Pullback: LONG — Low_D+1 > Mid_D0, Close_D+1 > Mid_D0',
+        '3. Compression: Range_D+1 / Range_D0 < 0.5'
+      ]
+    },
+    entry: {
+      title: 'Entry',
+      rules: [
+        'LONG: Entry = High_D0 + 0.1×ATR (buy-stop ордер)',
+        'SHORT: Entry = Low_D0 − 0.1×ATR (sell-stop ордер)',
+        'Ордер ставится после закрытия D+1 на следующий день'
+      ]
+    },
+    stop: {
+      title: 'Stop',
+      rules: [
+        'LONG: Stop = Low_D0 − 0.2×ATR (держится весь день входа)',
+        'SHORT: Stop = High_D0 + 0.2×ATR',
+        'Ограничение: RiskPerShare / ATR ≤ 1.5',
+        'На закрытии каждого дня: подтягивать только в одну сторону'
+      ]
+    },
+    size: {
+      title: 'Position Size',
+      rules: [
+        'PositionSize = RiskAmount / |Entry − Stop|',
+        'Стандарт: 1% риска от капитала'
+      ]
+    },
+    exit: {
+      title: 'Targets',
+      rules: [
+        'TP1 (50%): Entry + 1R',
+        'TP2 (50%): Entry + 2R',
+        'После TP1: trailing 0.2×ATR от нового Low/High'
+      ]
+    }
+  },
   options_flow: {
     name: 'Options Flow',
     description: 'Unusual options activity (скоро)',
@@ -2219,7 +2366,7 @@ function renderStrategyTabs() {
   
   container.innerHTML = Object.values(STRATEGIES).map(s => {
     const isActive = currentStrategy === s.id;
-    const isImplemented = s.id === 'ibs_swing' || s.id === 'event_continuation' || s.id === 'pead' || s.id === 'impulse';  // 4 strategies
+    const isImplemented = s.id === 'ibs_swing' || s.id === 'event_continuation' || s.id === 'pead' || s.id === 'impulse' || s.id === 'rspc';
     
     // Count open trades for this strategy
     let openCount = 0;
@@ -2231,6 +2378,8 @@ function renderStrategyTabs() {
       openCount = (cache.strategies?.pead?.earnings || []).filter(e => e.status === 'READY_ENTRY').length;
     } else if (s.id === 'impulse') {
       openCount = (cache.strategies?.impulse?.candidates || []).filter(c => c.status === 'READY_ENTRY').length;
+    } else if (s.id === 'rspc') {
+      openCount = (cache.strategies?.rspc?.candidates || []).filter(c => c.status === 'READY_ENTRY').length;
     }
     
     return `
@@ -2283,7 +2432,8 @@ function switchStrategy(strategyId) {
     'ibs_swing': 'ibs',
     'event_continuation': 'event',
     'pead': 'pead',
-    'impulse': 'impulse'
+    'impulse': 'impulse',
+    'rspc': 'rspc'
   };
   
   const scannerType = scannerMap[strategyId];
@@ -2333,7 +2483,8 @@ function renderScannerTabs() {
     'ibs_swing': { type: 'ibs', icon: '📊', label: 'Daily RSI Scan' },
     'event_continuation': { type: 'event', icon: '⚡', label: 'Event Scanner' },
     'pead': { type: 'pead', icon: '📈', label: 'Earnings Scanner' },
-    'impulse': { type: 'impulse', icon: '🚀', label: 'Impulse Scanner' }
+    'impulse': { type: 'impulse', icon: '🚀', label: 'Impulse Scanner' },
+    'rspc': { type: 'rspc', icon: '🎯', label: 'RSPC Scanner' }
   };
   
   const config = scannerConfig[currentStrategy];
@@ -2379,6 +2530,8 @@ function showScanner(type) {
     renderPEAD();
   } else if (type === 'impulse') {
     renderImpulse();
+  } else if (type === 'rspc') {
+    renderRSPC();
   }
 }
 
@@ -2644,7 +2797,8 @@ async function syncFromGithub() {
       'ibs_swing': 'ibs',
       'event_continuation': 'event',
       'pead': 'pead',
-      'impulse': 'impulse'
+      'impulse': 'impulse',
+      'rspc': 'rspc'
     };
     const scannerType = scannerMap[currentStrategy] || 'ibs';
     showScanner(scannerType);
@@ -6197,6 +6351,338 @@ function impulseTrailStop(tradeId) {
 }
 
 // ═══════════════════════════════════════════════════════════
+// RSPC STRATEGY FUNCTIONS
+// ═══════════════════════════════════════════════════════════
+
+let currentRSPCId = null;
+
+function openRSPCForm() {
+  const modal = document.getElementById('rspcModal');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  
+  ['rspcTicker','rspcD0Date','rspcD0_O','rspcD0_H','rspcD0_L','rspcD0_C','rspcD0_V','rspcATR','rspcAvgVol','rspc10DExt','rspcSPYChg'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  
+  const errorsEl = document.getElementById('rspcErrors');
+  if (errorsEl) { errorsEl.style.display = 'none'; errorsEl.innerHTML = ''; }
+}
+
+function closeRSPCForm() {
+  document.getElementById('rspcModal').style.display = 'none';
+  const errorsEl = document.getElementById('rspcErrors');
+  if (errorsEl) { errorsEl.style.display = 'none'; errorsEl.innerHTML = ''; }
+}
+
+function saveRSPC() {
+  const errorsEl = document.getElementById('rspcErrors');
+  
+  const ticker = document.getElementById('rspcTicker').value.trim().toUpperCase();
+  const d0Date = document.getElementById('rspcD0Date').value;
+  
+  if (!ticker || !d0Date) {
+    errorsEl.style.display = 'block';
+    errorsEl.innerHTML = '<b>❌ Ошибка:</b><br>Заполните ticker и дату D0';
+    return;
+  }
+  
+  const d0 = {
+    O: parseNum(document.getElementById('rspcD0_O').value),
+    H: parseNum(document.getElementById('rspcD0_H').value),
+    L: parseNum(document.getElementById('rspcD0_L').value),
+    C: parseNum(document.getElementById('rspcD0_C').value),
+    V: parseNum(document.getElementById('rspcD0_V').value)
+  };
+  
+  const atr = parseNum(document.getElementById('rspcATR').value);
+  const avgVol = parseNum(document.getElementById('rspcAvgVol').value);
+  const ext10D = parseNum(document.getElementById('rspc10DExt').value);
+  const spyChg = parseNum(document.getElementById('rspcSPYChg').value);
+  
+  if (Object.values(d0).some(isNaN) || isNaN(atr) || isNaN(avgVol) || isNaN(ext10D) || isNaN(spyChg)) {
+    errorsEl.style.display = 'block';
+    errorsEl.innerHTML = '<b>❌ Ошибка:</b><br>Заполните все поля (D0 OHLCV, ATR, AvgVol, 10D экстремум, SPY change)';
+    return;
+  }
+  
+  const metrics = calculateRSPCMetrics(d0, atr, avgVol, ext10D, spyChg);
+  const validation = validateRSPC(metrics, d0, ext10D, spyChg);
+  
+  if (!validation.valid) {
+    errorsEl.style.display = 'block';
+    errorsEl.innerHTML = `<b>❌ D0 критерии не выполнены:</b><br>${validation.errors.map(e => `• ${e}`).join('<br>')}`;
+    return;
+  }
+  
+  const candidate = {
+    id: `${ticker}_${d0Date}`,
+    ticker, d0Date,
+    direction: metrics.direction,
+    d0, atr, avgVol, ext10D, spyChg, metrics,
+    entry: metrics.direction === 'LONG' ? d0.H + 0.1 * atr : d0.L - 0.1 * atr,
+    d1: null, pattern: null, stop: null, target1: null, target2: null,
+    status: 'WAITING_D1',
+    created: new Date().toISOString()
+  };
+  
+  if (!cache.strategies) cache.strategies = {};
+  if (!cache.strategies.rspc) cache.strategies.rspc = { trades: [], candidates: [] };
+  if (!cache.strategies.rspc.candidates) cache.strategies.rspc.candidates = [];
+  
+  cache.strategies.rspc.candidates.push(candidate);
+  
+  closeRSPCForm();
+  renderRSPC();
+  scheduleSave();
+  toast(`✓ RSPC ${ticker} (${metrics.direction}) добавлен\nEntry: $${candidate.entry.toFixed(2)} — ордер можно ставить сейчас`);
+}
+
+function calculateRSPCMetrics(d0, atr, avgVol, ext10D, spyChg) {
+  const range = d0.H - d0.L;
+  const rangeATR = atr > 0 ? range / atr : 0;
+  const clv = range > 0 ? (d0.C - d0.L) / range : 0;
+  const body = range > 0 ? Math.abs(d0.C - d0.O) / range : 0;
+  const mid = (d0.H + d0.L) / 2;
+  const volRatio = avgVol > 0 ? d0.V / avgVol : 0;
+  const isGreen = d0.C > d0.O;
+  const isRed = d0.C < d0.O;
+  const breaks10D_long = d0.H >= ext10D;
+  const breaks10D_short = d0.L <= ext10D;
+  const spyOK_long = spyChg >= -0.5;
+  const spyOK_short = spyChg <= 0.5;
+  
+  let direction = null;
+  const longOK = rangeATR >= 1.30 && clv >= 0.80 && isGreen && volRatio >= 1.70 && breaks10D_long && spyOK_long;
+  const shortOK = rangeATR >= 1.30 && clv <= 0.20 && isRed && volRatio >= 1.70 && breaks10D_short && spyOK_short;
+  if (longOK) direction = 'LONG';
+  else if (shortOK) direction = 'SHORT';
+  
+  return { range, rangeATR, clv, body, mid, volRatio, isGreen, isRed, breaks10D_long, breaks10D_short, spyOK_long, spyOK_short, direction };
+}
+
+function validateRSPC(metrics, d0, ext10D, spyChg) {
+  const errors = [];
+  const m = metrics;
+  
+  if (m.rangeATR < 1.30) errors.push(`Range/ATR ${m.rangeATR.toFixed(2)} < 1.30 (свеча мелкая)`);
+  if (m.volRatio < 1.70) errors.push(`VolRatio ${m.volRatio.toFixed(2)} < 1.70 (объём слабый)`);
+  
+  const longCount = [m.rangeATR >= 1.30, m.clv >= 0.80, m.isGreen, m.volRatio >= 1.70, m.breaks10D_long, m.spyOK_long].filter(Boolean).length;
+  const shortCount = [m.rangeATR >= 1.30, m.clv <= 0.20, m.isRed, m.volRatio >= 1.70, m.breaks10D_short, m.spyOK_short].filter(Boolean).length;
+  
+  if (longCount >= shortCount) {
+    if (m.clv < 0.80) errors.push(`LONG: CLV ${m.clv.toFixed(2)} < 0.80 (закрытие не в верхних 20%)`);
+    if (!m.isGreen) errors.push(`LONG: день не зелёный (Close ${d0.C} ≤ Open ${d0.O})`);
+    if (!m.breaks10D_long) errors.push(`LONG: пробой 10-дневного максимума не сделан (High ${d0.H} < ${ext10D})`);
+    if (!m.spyOK_long) errors.push(`LONG: SPY ${spyChg.toFixed(2)}% < −0.5% — рынок слабый`);
+  } else {
+    if (m.clv > 0.20) errors.push(`SHORT: CLV ${m.clv.toFixed(2)} > 0.20 (закрытие не в нижних 20%)`);
+    if (!m.isRed) errors.push(`SHORT: день не красный (Close ${d0.C} ≥ Open ${d0.O})`);
+    if (!m.breaks10D_short) errors.push(`SHORT: пробой 10-дневного минимума не сделан (Low ${d0.L} > ${ext10D})`);
+    if (!m.spyOK_short) errors.push(`SHORT: SPY ${spyChg.toFixed(2)}% > +0.5% — рынок сильный вверх`);
+  }
+  
+  return { valid: errors.length === 0 && m.direction !== null, errors };
+}
+
+function renderRSPC() {
+  const candidates = cache.strategies?.rspc?.candidates || [];
+  const tbody = document.getElementById('rspcTbody');
+  if (!tbody) return;
+  
+  if (!candidates.length) {
+    tbody.innerHTML = '<tr><td colspan="13" style="text-align:center;color:var(--t2);padding:30px">Нет RSPC кандидатов — добавьте первого</td></tr>';
+    return;
+  }
+  
+  tbody.innerHTML = candidates.map(c => {
+    const m = c.metrics;
+    const dirColor = c.direction === 'LONG' ? 'var(--acc)' : 'var(--acc2)';
+    const statusText = {
+      'WAITING_D1': '⏳ Ждём D+1',
+      'READY_ENTRY': '🎯 Готов вход',
+      'REJECTED': '❌ Rejected',
+      'ENTERED': '✅ В сделке'
+    }[c.status] || c.status;
+    
+    let entryNote = '';
+    if (c.status === 'WAITING_D1' && c.entry) {
+      const expectedStop = c.direction === 'LONG' 
+        ? `~$${(c.d0.L - 0.2 * c.atr).toFixed(2)}`
+        : `~$${(c.d0.H + 0.2 * c.atr).toFixed(2)}`;
+      entryNote = `
+        <tr style="background:var(--bg2)">
+          <td colspan="13" style="padding:10px;font-family:var(--mono);font-size:10px;color:var(--t2)">
+            💡 <b style="color:var(--text)">Entry известен:</b> $${c.entry.toFixed(2)} — ${c.direction === 'LONG' ? 'buy-stop' : 'sell-stop'} ордер можно ставить сейчас<br>
+            <span style="margin-left:16px">Stop: ${expectedStop} (${c.direction === 'LONG' ? 'Low' : 'High'}_D0 ${c.direction === 'LONG' ? '−' : '+'} 0.2×ATR)</span>
+          </td>
+        </tr>`;
+    }
+    
+    const breaks10D = c.direction === 'LONG' ? m.breaks10D_long : m.breaks10D_short;
+    
+    return `<tr>
+      <td><b>${c.ticker}</b></td>
+      <td style="font-family:var(--mono);font-size:10px">${c.d0Date}</td>
+      <td><span style="color:${dirColor};font-weight:700">${c.direction}</span></td>
+      <td style="font-family:var(--mono);font-size:10px">${m.rangeATR.toFixed(2)}</td>
+      <td style="font-family:var(--mono);font-size:10px">${m.clv.toFixed(2)}</td>
+      <td style="font-family:var(--mono);font-size:10px">${m.volRatio.toFixed(1)}×</td>
+      <td style="font-family:var(--mono);font-size:10px">${breaks10D ? '✓' : '×'}</td>
+      <td style="font-family:var(--mono);font-size:10px;color:${c.spyChg >= 0 ? 'var(--acc)' : 'var(--acc2)'}">${c.spyChg >= 0 ? '+' : ''}${c.spyChg.toFixed(2)}%</td>
+      <td style="font-size:10px">${statusText}</td>
+      <td style="font-size:10px">${c.pattern || '—'}</td>
+      <td style="font-family:var(--mono);font-size:10px">${c.entry ? '$' + c.entry.toFixed(2) : '—'}</td>
+      <td style="font-family:var(--mono);font-size:10px">${c.stop ? '$' + Number(c.stop).toFixed(2) : '—'}</td>
+      <td>
+        ${c.status === 'WAITING_D1' ? `<button class="btn btn-g btn-s" onclick="addRSPCD1Data('${c.id}')" style="font-size:9px">+ D+1</button>` : ''}
+        ${(c.entry && c.status !== 'ENTERED') ? `<button class="btn btn-p btn-s" onclick="openImpulseTradeForm_RSPC('${c.id}')" style="font-size:9px;background:#f39c12;border-color:#f39c12">+ Сделка</button>` : ''}
+        <button class="btn btn-r btn-s" onclick="deleteRSPC('${c.id}')" style="font-size:9px">×</button>
+      </td>
+    </tr>${entryNote}`;
+  }).join('');
+}
+
+function addRSPCD1Data(candidateId) {
+  currentRSPCId = candidateId;
+  const c = cache.strategies.rspc.candidates.find(x => x.id === candidateId);
+  if (!c) return;
+  
+  document.getElementById('rspcD1Modal').style.display = 'flex';
+  document.getElementById('rspcD1Info').textContent = `${c.ticker} — D0: ${c.d0Date} (${c.direction})`;
+  
+  ['rspcD1Date','rspcD1_O','rspcD1_H','rspcD1_L','rspcD1_C'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  
+  const w = document.getElementById('rspcD1Warnings');
+  if (w) { w.style.display = 'none'; w.innerHTML = ''; }
+}
+
+function closeRSPCD1Form() {
+  document.getElementById('rspcD1Modal').style.display = 'none';
+  currentRSPCId = null;
+}
+
+function saveRSPCD1() {
+  const w = document.getElementById('rspcD1Warnings');
+  const c = cache.strategies.rspc.candidates.find(x => x.id === currentRSPCId);
+  if (!c) return;
+  
+  const date = document.getElementById('rspcD1Date').value;
+  const d1 = {
+    date,
+    O: parseNum(document.getElementById('rspcD1_O').value),
+    H: parseNum(document.getElementById('rspcD1_H').value),
+    L: parseNum(document.getElementById('rspcD1_L').value),
+    C: parseNum(document.getElementById('rspcD1_C').value)
+  };
+  
+  if (!date || Object.values(d1).slice(1).some(isNaN)) {
+    w.style.display = 'block';
+    w.innerHTML = '<b>⚠️ Ошибка:</b><br>Заполните все поля OHLC';
+    return;
+  }
+  
+  // Используем ту же логику паттернов что у Impulse
+  const patternCheck = checkImpulseD1Patterns(c.d0, d1, c.metrics, c.direction);
+  
+  if (!patternCheck.valid) {
+    w.style.display = 'block';
+    w.innerHTML = `<b>❌ D+1 паттерны не выполнены — отдали движение:</b><br>${patternCheck.errors.map(e => `• ${e}`).join('<br>')}`;
+    return;
+  }
+  
+  // Stop = Low_D0 − 0.2×ATR (LONG) или High_D0 + 0.2×ATR (SHORT)
+  const stop = c.direction === 'LONG' ? c.d0.L - 0.2 * c.atr : c.d0.H + 0.2 * c.atr;
+  const riskPerShare = c.direction === 'LONG' ? c.entry - stop : stop - c.entry;
+  
+  // Risk validation
+  if (riskPerShare / c.atr > 1.5) {
+    w.style.display = 'block';
+    w.innerHTML = `<b>❌ Стоп слишком широкий:</b><br>• Risk/ATR = ${(riskPerShare/c.atr).toFixed(2)} > 1.5<br><br><i>Сделка отменяется</i>`;
+    setTimeout(() => {
+      c.status = 'REJECTED';
+      closeRSPCD1Form();
+      renderRSPC();
+      scheduleSave();
+    }, 3000);
+    return;
+  }
+  
+  c.d1 = d1;
+  c.pattern = patternCheck.pattern;
+  c.stop = stop;
+  c.target1 = c.direction === 'LONG' ? c.entry + riskPerShare : c.entry - riskPerShare;
+  c.target2 = c.direction === 'LONG' ? c.entry + 2 * riskPerShare : c.entry - 2 * riskPerShare;
+  c.status = 'READY_ENTRY';
+  
+  closeRSPCD1Form();
+  renderRSPC();
+  scheduleSave();
+  toast(`🎯 ${c.ticker} готов к входу! Паттерн: ${patternCheck.pattern}`);
+}
+
+function deleteRSPC(id) {
+  if (!confirm('Удалить этого RSPC кандидата?')) return;
+  cache.strategies.rspc.candidates = cache.strategies.rspc.candidates.filter(c => c.id !== id);
+  renderRSPC();
+  scheduleSave();
+  toast('RSPC удалён');
+}
+
+// Открытие сделки для RSPC — используем форму Impulse Trade Modal
+function openImpulseTradeForm_RSPC(candidateId) {
+  const c = cache.strategies?.rspc?.candidates?.find(x => x.id === candidateId);
+  if (!c) return;
+  
+  // Сохраняем для saveImpulseTrade что это RSPC
+  window._rspcTradeContext = c;
+  currentImpulseTradeId = '_rspc_' + c.id;
+  
+  // Заполняем форму
+  const dirColor = c.direction === 'LONG' ? 'var(--acc)' : 'var(--acc2)';
+  const stopVal = c.direction === 'LONG' ? c.d0.L - 0.2 * c.atr : c.d0.H + 0.2 * c.atr;
+  const riskPerShare = c.direction === 'LONG' ? (c.entry - stopVal) : (stopVal - c.entry);
+  const t1 = c.direction === 'LONG' ? c.entry + riskPerShare : c.entry - riskPerShare;
+  const t2 = c.direction === 'LONG' ? c.entry + 2 * riskPerShare : c.entry - 2 * riskPerShare;
+  
+  document.getElementById('impTradeInfo').innerHTML = `
+    <div><b style="color:${dirColor}">${c.direction}</b> &nbsp;|&nbsp; <b>${c.ticker}</b> &nbsp;|&nbsp; <span style="color:#f39c12;font-weight:700">RSPC</span> &nbsp;|&nbsp; ${c.pattern || 'D+1 не подтверждён'}</div>
+    <div>Entry: <b style="color:var(--acc)">$${c.entry.toFixed(2)}</b> &nbsp;|&nbsp; Stop: <b style="color:var(--acc2)">$${stopVal.toFixed(2)}</b></div>
+    <div>Risk/share: <b>$${riskPerShare.toFixed(2)}</b> &nbsp;|&nbsp; ATR: $${c.atr.toFixed(2)} &nbsp;|&nbsp; 0.2×ATR: <b style="color:var(--acc3)">$${(0.2 * c.atr).toFixed(2)}</b></div>
+    <div>Target 1: <b>$${t1.toFixed(2)}</b> &nbsp;|&nbsp; Target 2: <b>$${t2.toFixed(2)}</b></div>
+  `;
+  
+  // Подставляем якорь — Low_D0 (LONG) или High_D0 (SHORT)
+  const anchorLabel = document.getElementById('impTradeAnchorLabel');
+  const anchorInput = document.getElementById('impTradeAnchor');
+  const formula = document.getElementById('impTradeStopFormula');
+  if (c.direction === 'LONG') {
+    anchorLabel.textContent = 'Low D0 *';
+    formula.textContent = 'Stop = Low_D0 − 0.2×ATR (держится весь день входа)';
+    anchorInput.value = c.d0.L.toFixed(2);
+  } else {
+    anchorLabel.textContent = 'High D0 *';
+    formula.textContent = 'Stop = High_D0 + 0.2×ATR (держится весь день входа)';
+    anchorInput.value = c.d0.H.toFixed(2);
+  }
+  
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('impTradeDate').value = today;
+  document.getElementById('impTradeEntryActual').value = '';
+  document.getElementById('impTradeRisk').value = 100;
+  document.getElementById('impTradeComm').value = '';
+  document.getElementById('impTradeSummary').style.display = 'none';
+  document.getElementById('impTradeErrors').style.display = 'none';
+  
+  document.getElementById('impulseTradeModal').style.display = 'flex';
+}
+
+// ═══════════════════════════════════════════════════════════
 
 let currentPEADTradeId = null;
 
@@ -6485,17 +6971,16 @@ function saveImpulse() {
     atr,
     relVol,
     metrics,
-    entry: metrics.direction === 'LONG' ? d0.H + 0.1 * atr : d0.L - 0.1 * atr,  // Calculate entry immediately
-    d1: null,  // Will be filled later
+    entry: metrics.direction === 'LONG' ? d0.H + 0.1 * atr : d0.L - 0.1 * atr,
+    d1: null,
     pattern: null,
-    stop: null,  // Will be calculated after D+1
+    stop: null,
     target1: null,
     target2: null,
     status: 'WAITING_D1',
     created: new Date().toISOString()
   };
   
-  // Save to cache
   if (!cache.strategies) cache.strategies = {};
   if (!cache.strategies.impulse) cache.strategies.impulse = { trades: [], candidates: [] };
   if (!cache.strategies.impulse.candidates) cache.strategies.impulse.candidates = [];
@@ -6509,29 +6994,16 @@ function saveImpulse() {
 }
 
 function calculateImpulseD0Metrics(d_1, d0, atr, relVol) {
-  // Impulse
   const impulse = (d0.C - d_1.C) / d_1.C;
-  
-  // Range
   const range = d0.H - d0.L;
-  
-  // CLV (Close Location Value)
   const clv = range > 0 ? (d0.C - d0.L) / range : 0;
-  
-  // Body
   const body = range > 0 ? Math.abs(d0.C - d0.O) / range : 0;
-  
-  // Mid
   const mid = (d0.H + d0.L) / 2;
   
-  // Direction
   let direction = null;
-  // LONG: Impulse +5% to +12%, CLV > 0.70, Body > 0.50, RelVol >= 1.5
   if (impulse >= 0.05 && impulse <= 0.12 && clv > 0.70 && body > 0.50 && relVol >= 1.5) {
     direction = 'LONG';
-  } 
-  // SHORT: Impulse -5% to -12%, CLV < 0.30 (closes near low), Body > 0.50, RelVol >= 1.5
-  else if (impulse <= -0.05 && impulse >= -0.12 && clv < 0.30 && body > 0.50 && relVol >= 1.5) {
+  } else if (impulse <= -0.05 && impulse >= -0.12 && clv < 0.30 && body > 0.50 && relVol >= 1.5) {
     direction = 'SHORT';
   }
   
@@ -6540,7 +7012,6 @@ function calculateImpulseD0Metrics(d_1, d0, atr, relVol) {
 
 function validateImpulseD0(d_1, d0, metrics) {
   const errors = [];
-  
   const isLongCandidate = metrics.impulse >= 0.05;
   const isShortCandidate = metrics.impulse <= -0.05;
   
@@ -6549,7 +7020,6 @@ function validateImpulseD0(d_1, d0, metrics) {
     return { valid: false, errors };
   }
   
-  // LONG validation
   if (isLongCandidate) {
     if (metrics.impulse < 0.05) errors.push(`LONG: Impulse ${(metrics.impulse * 100).toFixed(1)}% < 5%`);
     if (metrics.impulse > 0.12) errors.push(`LONG: Impulse ${(metrics.impulse * 100).toFixed(1)}% > 12%`);
@@ -6557,7 +7027,6 @@ function validateImpulseD0(d_1, d0, metrics) {
     if (metrics.body <= 0.50) errors.push(`LONG: Body ${metrics.body.toFixed(2)} ≤ 0.50`);
   }
   
-  // SHORT validation
   if (isShortCandidate) {
     if (metrics.impulse > -0.05) errors.push(`SHORT: Impulse ${(metrics.impulse * 100).toFixed(1)}% > −5%`);
     if (metrics.impulse < -0.12) errors.push(`SHORT: Impulse ${(metrics.impulse * 100).toFixed(1)}% < −12%`);
@@ -6613,7 +7082,7 @@ function renderImpulse() {
       <td style="font-size:10px">${statusText}</td>
       <td style="font-size:10px">${c.pattern || '—'}</td>
       <td style="font-family:var(--mono);font-size:10px">${c.entry ? '$' + c.entry.toFixed(2) : '—'}</td>
-      <td style="font-family:var(--mono);font-size:10px">${c.stop ? '$' + c.stop.toFixed(2) : '—'}</td>
+      <td style="font-family:var(--mono);font-size:10px">${c.stop ? '$' + Number(c.stop).toFixed(2) : '—'}</td>
       <td>
         ${c.status === 'WAITING_D1' ? `<button class="btn btn-g btn-s" onclick="addD1Data('${c.id}')" style="font-size:9px">+ D+1</button>` : ''}
         ${(c.entry && c.status !== 'ENTERED') ? `<button class="btn btn-p btn-s" onclick="openImpulseTradeForm('${c.id}')" style="font-size:9px">+ Сделка</button>` : ''}
@@ -6866,7 +7335,11 @@ function closeImpulseTradeForm() {
 }
 
 function calcImpulseTrade() {
-  const c = cache.strategies?.impulse?.candidates?.find(x => x.id === currentImpulseTradeId);
+  // Определяем источник — RSPC или Impulse
+  const isRSPC = currentImpulseTradeId && currentImpulseTradeId.startsWith('_rspc_');
+  const c = isRSPC 
+    ? window._rspcTradeContext 
+    : cache.strategies?.impulse?.candidates?.find(x => x.id === currentImpulseTradeId);
   if (!c) return;
 
   const errEl = document.getElementById('impTradeErrors');
@@ -6923,7 +7396,11 @@ function calcImpulseTrade() {
 
 function saveImpulseTrade() {
   const errEl = document.getElementById('impTradeErrors');
-  const c = cache.strategies?.impulse?.candidates?.find(x => x.id === currentImpulseTradeId);
+  // Определяем источник
+  const isRSPC = currentImpulseTradeId && currentImpulseTradeId.startsWith('_rspc_');
+  const c = isRSPC 
+    ? window._rspcTradeContext 
+    : cache.strategies?.impulse?.candidates?.find(x => x.id === currentImpulseTradeId);
   if (!c) return;
 
   const date = document.getElementById('impTradeDate').value;
@@ -6965,6 +7442,15 @@ function saveImpulseTrade() {
   const t1 = c.direction === 'LONG' ? entry + riskPerShare : entry - riskPerShare;
   const t2 = c.direction === 'LONG' ? entry + 2 * riskPerShare : entry - 2 * riskPerShare;
 
+  // Notes для разных стратегий
+  let notes;
+  if (isRSPC) {
+    const m = c.metrics;
+    notes = `RSPC | D0: ${c.d0Date} | Паттерн D+1: ${c.pattern || 'не подтверждён'} | ATR: ${c.atr.toFixed(2)} | Range/ATR: ${m.rangeATR.toFixed(2)} | VolRatio: ${m.volRatio.toFixed(1)}× | SPY: ${c.spyChg.toFixed(2)}% | Anchor: ${anchor.toFixed(2)}`;
+  } else {
+    notes = `D0: ${c.d0Date} | Паттерн D+1: ${c.pattern || 'не подтверждён'} | ATR: ${c.atr.toFixed(2)} | Impulse: ${(c.metrics.impulse * 100).toFixed(1)}% | Anchor (${c.direction === 'LONG' ? 'Low' : 'High'} D0): ${anchor.toFixed(2)}`;
+  }
+
   const trade = {
     id: Date.now().toString(),
     createdAt: Date.now(),
@@ -6977,12 +7463,12 @@ function saveImpulseTrade() {
     target1: t1.toFixed(2),
     target2: t2.toFixed(2),
     status: 'OPEN',
-    strategy: 'impulse',
+    strategy: isRSPC ? 'rspc' : 'impulse',
     commission: commission,
-    notes: `D0: ${c.d0Date} | Паттерн D+1: ${c.pattern || 'не подтверждён'} | ATR: ${c.atr.toFixed(2)} | Impulse: ${(c.metrics.impulse * 100).toFixed(1)}% | Anchor (${c.direction === 'LONG' ? 'Low' : 'High'} D0): ${anchor.toFixed(2)}`,
+    notes: notes,
     atrPct: ((c.atr / entry) * 100).toFixed(2),
-    atrAbs: c.atr,             // Абсолютное значение ATR для карточки
-    impulseAnchor: anchor       // Якорь для перестановки стопа
+    atrAbs: c.atr,
+    impulseAnchor: anchor
   };
 
   if (!cache.trades) cache.trades = [];
@@ -6992,7 +7478,13 @@ function saveImpulseTrade() {
   c.tradeId = trade.id;
 
   closeImpulseTradeForm();
-  renderImpulse();
+  if (isRSPC) {
+    window._rspcTradeContext = null;
+    currentImpulseTradeId = null;
+    renderRSPC();
+  } else {
+    renderImpulse();
+  }
   renderTrades();
   renderDash();
   scheduleSave();
@@ -7840,6 +8332,103 @@ init();
       <button class="btn btn-g" onclick="closeImpulseTradeForm()">Отмена</button>
       <button class="btn btn-g" onclick="calcImpulseTrade()" style="border-color:var(--acc3);color:var(--acc3)">🧮 Рассчитать</button>
       <button class="btn btn-p" onclick="saveImpulseTrade()">✅ Добавить сделку</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- RSPC MODAL (D0 + контекст) -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="rspcModal" class="modal">
+  <div class="modal-c" style="max-width:780px">
+    <div class="modal-h">
+      <div style="font-size:18px;font-weight:700">🎯 Добавить RSPC кандидата</div>
+      <div class="cls" onclick="closeRSPCForm()">×</div>
+    </div>
+    <div class="modal-b">
+      <div class="fgrid" style="grid-template-columns:1fr 1fr;margin-bottom:16px">
+        <div class="fg">
+          <label>Ticker *</label>
+          <input id="rspcTicker" placeholder="AAPL" style="text-transform:uppercase">
+        </div>
+        <div class="fg">
+          <label>D0 Date (вчерашний impulse) *</label>
+          <input id="rspcD0Date" type="date">
+        </div>
+      </div>
+
+      <div style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--text);margin:20px 0 12px">Day D0 (вчера, impulse day)</div>
+      <div class="fgrid" style="grid-template-columns:repeat(5,1fr)">
+        <div class="fg"><label>Open</label><input id="rspcD0_O" type="text" inputmode="decimal"></div>
+        <div class="fg"><label>High</label><input id="rspcD0_H" type="text" inputmode="decimal"></div>
+        <div class="fg"><label>Low</label><input id="rspcD0_L" type="text" inputmode="decimal"></div>
+        <div class="fg"><label>Close</label><input id="rspcD0_C" type="text" inputmode="decimal"></div>
+        <div class="fg"><label>Volume</label><input id="rspcD0_V" type="text" inputmode="numeric"></div>
+      </div>
+
+      <div style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--text);margin:20px 0 12px">D0 Metrics</div>
+      <div class="fgrid" style="grid-template-columns:1fr 1fr">
+        <div class="fg"><label>ATR(14)</label><input id="rspcATR" type="text" inputmode="decimal"></div>
+        <div class="fg"><label>AvgVolume20</label><input id="rspcAvgVol" type="text" inputmode="numeric" placeholder="Средний объём за 20 дней"></div>
+      </div>
+
+      <div style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--text);margin:20px 0 12px">Контекст рынка и тренда</div>
+      <div class="fgrid" style="grid-template-columns:1fr 1fr">
+        <div class="fg">
+          <label>10-дневный экстремум *</label>
+          <input id="rspc10DExt" type="text" inputmode="decimal" placeholder="LONG: MAX(High); SHORT: MIN(Low)">
+        </div>
+        <div class="fg">
+          <label>SPY change за D0 (%)</label>
+          <input id="rspcSPYChg" type="text" inputmode="decimal" placeholder="Например: 0.3 или -0.4">
+        </div>
+      </div>
+
+      <div style="font-family:var(--mono);font-size:10px;color:var(--t2);margin-top:16px;padding:10px;background:var(--bg3);border-radius:6px">
+        <b>Auto-check:</b> Range/ATR ≥ 1.30, CLV ≥ 0.80 (LONG) или ≤ 0.20 (SHORT), VolRatio ≥ 1.70, цвет дня, пробой 10D, SPY-фильтр<br>
+        <b>Entry известен сразу:</b> High_D0 + 0.1×ATR (LONG) или Low_D0 − 0.1×ATR (SHORT)
+      </div>
+      
+      <div id="rspcErrors" style="display:none;margin-top:16px;padding:12px;background:#ff000010;border:1px solid #ff000040;border-radius:6px;font-family:var(--mono);font-size:10px;line-height:1.8;color:#ff4444"></div>
+    </div>
+    <div class="modal-f">
+      <button class="btn btn-g" onclick="closeRSPCForm()">Отмена</button>
+      <button class="btn btn-p" onclick="saveRSPC()" style="background:#f39c12;border-color:#f39c12">💾 Сохранить D0</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- RSPC D+1 MODAL -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="rspcD1Modal" class="modal">
+  <div class="modal-c" style="max-width:600px">
+    <div class="modal-h">
+      <div style="font-size:18px;font-weight:700">📊 RSPC: добавить D+1</div>
+      <div class="cls" onclick="closeRSPCD1Form()">×</div>
+    </div>
+    <div class="modal-b">
+      <div style="font-family:var(--mono);font-size:11px;color:var(--t2);margin-bottom:16px;padding:12px;background:var(--bg3);border-radius:6px">
+        <div><b style="color:var(--text)" id="rspcD1Info"></b></div>
+        <div style="margin-top:6px">Проверяем: кто не отдал движение D0 (Inside Day / Weak Pullback / Compression)</div>
+      </div>
+
+      <div class="fgrid" style="grid-template-columns:1fr;margin-bottom:16px">
+        <div class="fg"><label>D+1 Date *</label><input id="rspcD1Date" type="date"></div>
+      </div>
+
+      <div class="fgrid" style="grid-template-columns:repeat(4,1fr)">
+        <div class="fg"><label>Open</label><input id="rspcD1_O" type="text" inputmode="decimal"></div>
+        <div class="fg"><label>High</label><input id="rspcD1_H" type="text" inputmode="decimal"></div>
+        <div class="fg"><label>Low</label><input id="rspcD1_L" type="text" inputmode="decimal"></div>
+        <div class="fg"><label>Close</label><input id="rspcD1_C" type="text" inputmode="decimal"></div>
+      </div>
+      
+      <div id="rspcD1Warnings" style="display:none;margin-top:16px;padding:12px;background:#ff990010;border:1px solid #ff990040;border-radius:6px;font-family:var(--mono);font-size:10px;line-height:1.8;color:#ff9900"></div>
+    </div>
+    <div class="modal-f">
+      <button class="btn btn-g" onclick="closeRSPCD1Form()">Отмена</button>
+      <button class="btn btn-p" onclick="saveRSPCD1()" style="background:#f39c12;border-color:#f39c12">💾 Добавить D+1</button>
     </div>
   </div>
 </div>
