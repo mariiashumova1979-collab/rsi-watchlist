@@ -4180,6 +4180,12 @@
       "JD_sma200": 31.1,
       "CRWD_sma200": 463.13,
       "_migration_done": true
+    },
+    "2026-04-27": {
+      "spy_close": 713.94,
+      "spy_sma20": null,
+      "spy_sma50": null,
+      "spy_sma200": null
     }
   },
   "strategies": {
@@ -9296,6 +9302,24 @@
       "data": {
         "from": "impulse",
         "to": "impulse"
+      }
+    },
+    {
+      "timestamp": "2026-04-27T05:58:44.986Z",
+      "strategy": "event_continuation",
+      "event": "strategy_switch",
+      "data": {
+        "from": "event_continuation",
+        "to": "event_continuation"
+      }
+    },
+    {
+      "timestamp": "2026-04-27T05:58:46.313Z",
+      "strategy": "ibs_swing",
+      "event": "strategy_switch",
+      "data": {
+        "from": "ibs_swing",
+        "to": "ibs_swing"
       }
     }
   ],
