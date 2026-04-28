@@ -4248,6 +4248,70 @@
       "JD_sma200": 31.1,
       "CRWD_sma200": 463.13,
       "_migration_done": true
+    },
+    "2026-04-28": {
+      "WBD_sma200": 22.29,
+      "PFE_sma200": 25.64,
+      "PCG_sma200": 16.03,
+      "MSFT_sma200": 473.11,
+      "OXY_sma200": 46.28,
+      "MPLX_sma200": 53.24,
+      "COP_sma200": 99.55,
+      "WMB_sma200": 63.09,
+      "VZ_sma200": 43.52,
+      "NEE_sma200": 81.8,
+      "URI_sma200": 860.17,
+      "CDNS_sma200": 321.56,
+      "MDT_sma200": 94.46,
+      "SYK_sma200": 369.74,
+      "DIS_sma200": 111.21,
+      "AXP_sma200": 335.63,
+      "META_sma200": 682.03,
+      "WAT_sma200": 336.93,
+      "ELV_sma200": 326.9,
+      "NVDA_sma200": 180.15,
+      "UNH_sma200": 312.48,
+      "ROK_sma200": 369.93,
+      "PSA_sma200": 284.83,
+      "SHW_sma200": 343.14,
+      "MELI_sma200": 2165.05,
+      "NFLX_sma200": 105.52,
+      "CHTR_sma200": 253.08,
+      "KHC_sma200": 25.27,
+      "HUM_sma200": 244.68,
+      "LPLA_sma200": 353.12,
+      "CI_sma200": 287.29,
+      "TEL_sma200": 213.82,
+      "TMO_sma200": 515.73,
+      "BAC_sma200": 51.24,
+      "JPM_sma200": 301.57,
+      "SF_sma200": 77.16,
+      "FCNCA_sma200": 1949.85,
+      "ZM_sma200": 81.74,
+      "AGJ_sma200": 272.4,
+      "SCHW_sma200": 95.38,
+      "APO_sma200": 133.86,
+      "WFC_sma200": 84.26,
+      "TLN_sma200": 361.27,
+      "SYF_sma200": 73.11,
+      "CARR_sma200": 61.99,
+      "ARM_sma200": 138.09,
+      "BX_sma200": 150.94,
+      "LMT_sma200": 505.54,
+      "HON_sma200": 210.2,
+      "AMGN_sma200": 315.66,
+      "LLY_sma200": 890.03,
+      "IBM_sma200": 279.21,
+      "MRK_sma200": 93.88,
+      "NTAP_sma200": 109.02,
+      "CPNG_sma200": 26.85,
+      "ABBV_sma200": 214.78,
+      "AAPL_sma200": 245.85,
+      "PANW_sma200": 187.41,
+      "DKNG_sma200": 35.97,
+      "JD_sma200": 31.1,
+      "CRWD_sma200": 463.13,
+      "_migration_done": true
     }
   },
   "strategies": {
@@ -9213,6 +9277,75 @@
           "status": "ENTERED",
           "created": "2026-04-26T06:50:54.148Z",
           "tradeId": "1777301343580"
+        },
+        {
+          "id": "RMBS_2026-04-27",
+          "ticker": "RMBS",
+          "d0Date": "2026-04-27",
+          "direction": "SHORT",
+          "d_1": {
+            "C": 158.4
+          },
+          "d0": {
+            "O": 156.49,
+            "H": 157.04,
+            "L": 141.02,
+            "C": 141.31,
+            "V": 5.6
+          },
+          "atr": 5.84,
+          "relVol": 2.87,
+          "metrics": {
+            "impulse": -0.10789141414141416,
+            "clv": 0.01810237203495583,
+            "body": 0.9475655430711626,
+            "mid": 149.03,
+            "range": 16.019999999999982,
+            "direction": "SHORT"
+          },
+          "entry": 140.436,
+          "d1": null,
+          "pattern": null,
+          "stop": null,
+          "target1": null,
+          "target2": null,
+          "status": "WAITING_D1",
+          "created": "2026-04-28T06:12:46.939Z"
+        },
+        {
+          "id": "FLR_2026-04-27",
+          "ticker": "FLR",
+          "d0Date": "2026-04-27",
+          "direction": "LONG",
+          "d_1": {
+            "C": 48.23
+          },
+          "d0": {
+            "O": 48.46,
+            "H": 51.82,
+            "L": 48.46,
+            "C": 51.68,
+            "V": 3.51
+          },
+          "atr": 3.49,
+          "relVol": 2.07,
+          "metrics": {
+            "impulse": 0.07153224134356216,
+            "clv": 0.9583333333333331,
+            "body": 0.9583333333333331,
+            "mid": 50.14,
+            "range": 3.3599999999999994,
+            "relVol": 2.07,
+            "direction": "LONG"
+          },
+          "entry": 52.169,
+          "d1": null,
+          "pattern": null,
+          "stop": null,
+          "target1": null,
+          "target2": null,
+          "status": "WAITING_D1",
+          "created": "2026-04-28T08:04:04.934Z"
         }
       ]
     },
@@ -9451,6 +9584,96 @@
     },
     {
       "timestamp": "2026-04-27T14:48:03.259Z",
+      "strategy": "impulse",
+      "event": "strategy_switch",
+      "data": {
+        "from": "impulse",
+        "to": "impulse"
+      }
+    },
+    {
+      "timestamp": "2026-04-27T19:10:27.497Z",
+      "strategy": "impulse",
+      "event": "strategy_switch",
+      "data": {
+        "from": "impulse",
+        "to": "impulse"
+      }
+    },
+    {
+      "timestamp": "2026-04-27T19:10:48.733Z",
+      "strategy": "rspc",
+      "event": "strategy_switch",
+      "data": {
+        "from": "rspc",
+        "to": "rspc"
+      }
+    },
+    {
+      "timestamp": "2026-04-27T19:17:04.074Z",
+      "strategy": "impulse",
+      "event": "strategy_switch",
+      "data": {
+        "from": "impulse",
+        "to": "impulse"
+      }
+    },
+    {
+      "timestamp": "2026-04-27T19:17:11.642Z",
+      "strategy": "ibs_swing",
+      "event": "strategy_switch",
+      "data": {
+        "from": "ibs_swing",
+        "to": "ibs_swing"
+      }
+    },
+    {
+      "timestamp": "2026-04-27T19:17:17.592Z",
+      "strategy": "impulse",
+      "event": "strategy_switch",
+      "data": {
+        "from": "impulse",
+        "to": "impulse"
+      }
+    },
+    {
+      "timestamp": "2026-04-27T19:18:41.924Z",
+      "strategy": "pead",
+      "event": "strategy_switch",
+      "data": {
+        "from": "pead",
+        "to": "pead"
+      }
+    },
+    {
+      "timestamp": "2026-04-27T19:21:01.953Z",
+      "strategy": "impulse",
+      "event": "strategy_switch",
+      "data": {
+        "from": "impulse",
+        "to": "impulse"
+      }
+    },
+    {
+      "timestamp": "2026-04-27T19:24:56.396Z",
+      "strategy": "pead",
+      "event": "strategy_switch",
+      "data": {
+        "from": "pead",
+        "to": "pead"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T06:10:16.231Z",
+      "strategy": "impulse",
+      "event": "strategy_switch",
+      "data": {
+        "from": "impulse",
+        "to": "impulse"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T07:18:02.308Z",
       "strategy": "impulse",
       "event": "strategy_switch",
       "data": {
