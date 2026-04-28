@@ -9400,7 +9400,8 @@
           "CEG_high1": 318.5,
           "VST_rsi2": 93.41,
           "VST_close1": 166.58,
-          "VST_low1": 158.74
+          "VST_low1": 158.74,
+          "VST_high1": 168.42
         }
       },
       "config": {}
@@ -15044,7 +15045,8 @@
       "CEG_high1": 318.5,
       "VST_rsi2": 93.41,
       "VST_close1": 166.58,
-      "VST_low1": 158.74
+      "VST_low1": 158.74,
+      "VST_high1": 168.42
     }
   },
   "quarterly": {},
