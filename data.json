@@ -1,6 +1,16 @@
 {
   "watchlist": [
     {
+      "ticker": "VST",
+      "sector": "Utilities",
+      "cap": "56.4",
+      "atr": "4.21",
+      "earningsDate": "2026-05-07",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1777381935639
+    },
+    {
       "ticker": "CEG",
       "sector": "Utilities",
       "cap": "114.18",
