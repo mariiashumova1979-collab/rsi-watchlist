@@ -9386,7 +9386,8 @@
           "CRWD_close2": 463.13,
           "CEG_rsi2": 93.97,
           "CEG_close1": 315.17,
-          "CEG_low1": 304.12
+          "CEG_low1": 304.12,
+          "CEG_high1": 318.5
         }
       },
       "config": {}
@@ -15026,7 +15027,8 @@
       "CRWD_close2": 463.13,
       "CEG_rsi2": 93.97,
       "CEG_close1": 315.17,
-      "CEG_low1": 304.12
+      "CEG_low1": 304.12,
+      "CEG_high1": 318.5
     }
   },
   "quarterly": {},
