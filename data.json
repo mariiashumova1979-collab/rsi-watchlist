@@ -5942,22 +5942,27 @@
         },
         {
           "id": "1777301343580",
-          "createdAt": 1777301343580,
+          "createdAt": 1777385642145,
           "ticker": "EW",
           "type": "LONG",
           "entryDate": "2026-04-27",
           "entry": 83.6,
           "shares": 48,
-          "stop": "81.56",
+          "stop": "79.37",
           "target1": "85.64",
           "target2": "87.69",
-          "status": "OPEN",
-          "strategy": "impulse",
-          "commission": 0,
-          "notes": "D0: 2026-04-24 | Паттерн D+1: не подтверждён | ATR: 2.82 | Impulse: 5.6% | Anchor (Low D0): 82.12",
+          "rsi2": "",
           "atrPct": "3.37",
-          "atrAbs": 2.82,
-          "impulseAnchor": 82.12
+          "trend": "",
+          "status": "CLOSED",
+          "exitPrice": 83.14,
+          "exitReason": "STOP",
+          "commission": 9,
+          "notes": "D0: 2026-04-24 | Паттерн D+1: не подтверждён | ATR: 2.82 | Impulse: 5.6% | Anchor (Low D0): 82.12",
+          "strategy": "impulse",
+          "pnlNet": -31.08,
+          "pnlPct": -0.77,
+          "result": "LOSS"
         },
         {
           "id": "1777383847458",
@@ -10006,6 +10011,20 @@
         "from": "impulse",
         "to": "impulse"
       }
+    },
+    {
+      "timestamp": "2026-04-28T14:14:02.145Z",
+      "strategy": "impulse",
+      "event": "trade_close",
+      "data": {
+        "id": "1777301343580",
+        "ticker": "EW",
+        "type": "LONG",
+        "entry": 83.6,
+        "exit": 83.14,
+        "pnlPct": -0.77,
+        "reason": "STOP"
+      }
     }
   ],
   "settings": {
@@ -11619,22 +11638,27 @@
     },
     {
       "id": "1777301343580",
-      "createdAt": 1777301343580,
+      "createdAt": 1777385642145,
       "ticker": "EW",
       "type": "LONG",
       "entryDate": "2026-04-27",
       "entry": 83.6,
       "shares": 48,
-      "stop": "81.56",
+      "stop": "79.37",
       "target1": "85.64",
       "target2": "87.69",
-      "status": "OPEN",
-      "strategy": "impulse",
-      "commission": 0,
-      "notes": "D0: 2026-04-24 | Паттерн D+1: не подтверждён | ATR: 2.82 | Impulse: 5.6% | Anchor (Low D0): 82.12",
+      "rsi2": "",
       "atrPct": "3.37",
-      "atrAbs": 2.82,
-      "impulseAnchor": 82.12
+      "trend": "",
+      "status": "CLOSED",
+      "exitPrice": 83.14,
+      "exitReason": "STOP",
+      "commission": 9,
+      "notes": "D0: 2026-04-24 | Паттерн D+1: не подтверждён | ATR: 2.82 | Impulse: 5.6% | Anchor (Low D0): 82.12",
+      "strategy": "impulse",
+      "pnlNet": -31.08,
+      "pnlPct": -0.77,
+      "result": "LOSS"
     },
     {
       "id": "1777383847458",
