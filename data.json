@@ -9300,7 +9300,8 @@
           "NVDA_rsi2": 93.86,
           "NVDA_close1": 216.61,
           "NVDA_low1": 207.38,
-          "NVDA_high1": 216.83
+          "NVDA_high1": 216.83,
+          "NVDA_sma200_20": 190.84
         }
       },
       "config": {}
@@ -14874,7 +14875,8 @@
       "NVDA_rsi2": 93.86,
       "NVDA_close1": 216.61,
       "NVDA_low1": 207.38,
-      "NVDA_high1": 216.83
+      "NVDA_high1": 216.83,
+      "NVDA_sma200_20": 190.84
     }
   },
   "quarterly": {},
