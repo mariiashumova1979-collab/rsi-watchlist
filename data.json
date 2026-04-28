@@ -1,6 +1,16 @@
 {
   "watchlist": [
     {
+      "ticker": "CEG",
+      "sector": "Utilities",
+      "cap": "114.18",
+      "atr": "4.16",
+      "earningsDate": "2026-05-11",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1777380397494
+    },
+    {
       "ticker": "QCOM",
       "sector": "Technology",
       "cap": "160.33",
