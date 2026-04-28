@@ -4319,7 +4319,7 @@
       "trades": [
         {
           "id": "1776948555097",
-          "createdAt": 1776948555097,
+          "createdAt": 1777379519591,
           "ticker": "PFE",
           "type": "LONG",
           "entryDate": "2026-04-23",
@@ -4331,11 +4331,15 @@
           "rsi2": "",
           "atrPct": "2.06",
           "trend": "",
-          "status": "OPEN",
-          "exitPrice": 0,
-          "exitReason": "",
-          "commission": 0,
-          "notes": ""
+          "status": "CLOSED",
+          "exitPrice": 28.01,
+          "exitReason": "TIME",
+          "commission": 9,
+          "notes": "",
+          "strategy": "ibs_swing",
+          "pnlNet": 130.2,
+          "pnlPct": 4.04,
+          "result": "WIN"
         },
         {
           "id": "1776255613535",
@@ -4358,7 +4362,8 @@
           "notes": "",
           "pnlNet": -27.44,
           "pnlPct": -2.07,
-          "result": "LOSS"
+          "result": "LOSS",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1776255568118",
@@ -4378,7 +4383,8 @@
           "exitPrice": 0,
           "exitReason": "",
           "commission": 0,
-          "notes": ""
+          "notes": "",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1776173615278",
@@ -4398,7 +4404,8 @@
           "exitPrice": 0,
           "exitReason": "",
           "commission": 0,
-          "notes": ""
+          "notes": "",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1776173577086",
@@ -4418,7 +4425,8 @@
           "exitPrice": 0,
           "exitReason": "",
           "commission": 0,
-          "notes": ""
+          "notes": "",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1776087500406",
@@ -4438,7 +4446,8 @@
           "exitPrice": 0,
           "exitReason": "",
           "commission": 0,
-          "notes": ""
+          "notes": "",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1775830083789",
@@ -4461,7 +4470,8 @@
           "notes": "",
           "pnlNet": 4.58,
           "pnlPct": 0.24,
-          "result": "WIN"
+          "result": "WIN",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1775824375734",
@@ -4481,7 +4491,8 @@
           "exitPrice": 0,
           "exitReason": "",
           "commission": 0,
-          "notes": ""
+          "notes": "",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1775741871122",
@@ -4504,7 +4515,8 @@
           "notes": "",
           "pnlNet": -8.44,
           "pnlPct": -0.44,
-          "result": "LOSS"
+          "result": "LOSS",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1775741804761",
@@ -4527,7 +4539,8 @@
           "notes": "",
           "pnlNet": -7.44,
           "pnlPct": -0.24,
-          "result": "LOSS"
+          "result": "LOSS",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1775673132922",
@@ -4550,7 +4563,8 @@
           "notes": "",
           "pnlNet": 2.68,
           "pnlPct": 0.3,
-          "result": "WIN"
+          "result": "WIN",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1775567411507",
@@ -4573,7 +4587,8 @@
           "notes": "",
           "pnlNet": -56.04,
           "pnlPct": -5.3,
-          "result": "LOSS"
+          "result": "LOSS",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1775567296839",
@@ -4596,7 +4611,8 @@
           "notes": "",
           "pnlNet": -47.46,
           "pnlPct": -4.34,
-          "result": "LOSS"
+          "result": "LOSS",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1775507300369",
@@ -4619,7 +4635,8 @@
           "notes": "",
           "pnlNet": 23.95,
           "pnlPct": 1.93,
-          "result": "WIN"
+          "result": "WIN",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1775507268194",
@@ -4642,7 +4659,8 @@
           "notes": "",
           "pnlNet": -98.08,
           "pnlPct": -8.84,
-          "result": "LOSS"
+          "result": "LOSS",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1775141155223",
@@ -4665,7 +4683,8 @@
           "notes": "",
           "pnlNet": -134.1,
           "pnlPct": -7.32,
-          "result": "LOSS"
+          "result": "LOSS",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1775137270705",
@@ -4688,7 +4707,8 @@
           "notes": "",
           "pnlNet": -56.8,
           "pnlPct": -3.44,
-          "result": "LOSS"
+          "result": "LOSS",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1775045009413",
@@ -4711,7 +4731,8 @@
           "notes": "",
           "pnlNet": 63.18,
           "pnlPct": 3.87,
-          "result": "WIN"
+          "result": "WIN",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1775043673736",
@@ -4734,7 +4755,8 @@
           "notes": "",
           "pnlNet": -84.02,
           "pnlPct": -4.82,
-          "result": "LOSS"
+          "result": "LOSS",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1774967155968",
@@ -4757,7 +4779,8 @@
           "notes": "",
           "pnlNet": -5.34,
           "pnlPct": -0.43,
-          "result": "LOSS"
+          "result": "LOSS",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1774533117207",
@@ -4780,7 +4803,8 @@
           "notes": "",
           "pnlNet": 58.82,
           "pnlPct": 3.63,
-          "result": "WIN"
+          "result": "WIN",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1774532993220",
@@ -4803,7 +4827,8 @@
           "notes": "",
           "pnlNet": 28.34,
           "pnlPct": 1.94,
-          "result": "WIN"
+          "result": "WIN",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1774445401874",
@@ -4826,7 +4851,8 @@
           "notes": "",
           "pnlNet": 24.14,
           "pnlPct": 2.44,
-          "result": "WIN"
+          "result": "WIN",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1774445018697",
@@ -4849,7 +4875,8 @@
           "notes": "",
           "pnlNet": 24.56,
           "pnlPct": 1.87,
-          "result": "WIN"
+          "result": "WIN",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1774273773746",
@@ -4872,7 +4899,8 @@
           "notes": "",
           "pnlNet": 2.44,
           "pnlPct": 0.21,
-          "result": "WIN"
+          "result": "WIN",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1774273209201",
@@ -4895,7 +4923,8 @@
           "notes": "",
           "pnlNet": 38.9,
           "pnlPct": 3.14,
-          "result": "WIN"
+          "result": "WIN",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1774018024281",
@@ -4918,7 +4947,8 @@
           "notes": "",
           "pnlNet": -2.52,
           "pnlPct": -0.21,
-          "result": "LOSS"
+          "result": "LOSS",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1774017920430",
@@ -4941,7 +4971,8 @@
           "notes": "",
           "pnlNet": 56.9,
           "pnlPct": 5.66,
-          "result": "WIN"
+          "result": "WIN",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1773927250347",
@@ -4964,7 +4995,8 @@
           "notes": "",
           "pnlNet": 21.74,
           "pnlPct": 1.77,
-          "result": "WIN"
+          "result": "WIN",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1773925029584",
@@ -4987,7 +5019,8 @@
           "notes": "",
           "pnlNet": -77.8,
           "pnlPct": -6.92,
-          "result": "LOSS"
+          "result": "LOSS",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1773841756641",
@@ -5010,7 +5043,8 @@
           "notes": "",
           "pnlNet": 48.68,
           "pnlPct": 3.15,
-          "result": "WIN"
+          "result": "WIN",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1773841155209",
@@ -5033,7 +5067,8 @@
           "notes": "",
           "pnlNet": 1.48,
           "pnlPct": 0.12,
-          "result": "WIN"
+          "result": "WIN",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1773755356014",
@@ -5056,7 +5091,8 @@
           "notes": "",
           "pnlNet": -11.44,
           "pnlPct": -0.7,
-          "result": "LOSS"
+          "result": "LOSS",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1773755030573",
@@ -5079,7 +5115,8 @@
           "notes": "",
           "pnlNet": 45.55,
           "pnlPct": 2.93,
-          "result": "WIN"
+          "result": "WIN",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1773668581006",
@@ -5102,7 +5139,8 @@
           "notes": "",
           "pnlNet": -72.52,
           "pnlPct": -4.67,
-          "result": "LOSS"
+          "result": "LOSS",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1773416418033",
@@ -5125,7 +5163,8 @@
           "notes": "",
           "pnlNet": -7.07,
           "pnlPct": -0.47,
-          "result": "LOSS"
+          "result": "LOSS",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1773322880545",
@@ -5148,7 +5187,8 @@
           "notes": "",
           "pnlNet": -10.99,
           "pnlPct": -0.67,
-          "result": "LOSS"
+          "result": "LOSS",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1773322365260",
@@ -5171,7 +5211,8 @@
           "notes": "",
           "pnlNet": 41.81,
           "pnlPct": 3.13,
-          "result": "WIN"
+          "result": "WIN",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1773249368511",
@@ -5194,7 +5235,8 @@
           "notes": "",
           "pnlNet": 4.72,
           "pnlPct": 0.29,
-          "result": "WIN"
+          "result": "WIN",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1773249339990",
@@ -5217,7 +5259,8 @@
           "notes": "",
           "pnlNet": -98.94,
           "pnlPct": -6.24,
-          "result": "LOSS"
+          "result": "LOSS",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1773178956259",
@@ -5249,7 +5292,8 @@
           },
           "pnlNet": 66.3,
           "pnlPct": 4.07,
-          "result": "WIN"
+          "result": "WIN",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1773077633032",
@@ -5272,7 +5316,8 @@
           "notes": "",
           "pnlNet": -66.34,
           "pnlPct": -4.31,
-          "result": "LOSS"
+          "result": "LOSS",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1773077551742",
@@ -5295,7 +5340,8 @@
           "notes": "",
           "pnlNet": -76.47,
           "pnlPct": -4.64,
-          "result": "LOSS"
+          "result": "LOSS",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1773077507614",
@@ -5327,7 +5373,8 @@
           },
           "pnlNet": 62.19,
           "pnlPct": 3.86,
-          "result": "WIN"
+          "result": "WIN",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1773077468676",
@@ -5350,7 +5397,8 @@
           "notes": "",
           "pnlNet": -79.6,
           "pnlPct": -4.9,
-          "result": "LOSS"
+          "result": "LOSS",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1773077427075",
@@ -5373,7 +5421,8 @@
           "notes": "",
           "pnlNet": -70.45,
           "pnlPct": -4.35,
-          "result": "LOSS"
+          "result": "LOSS",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1772039941723",
@@ -5397,7 +5446,8 @@
           "notes": "",
           "pnlNet": -69.11,
           "pnlPct": -5.93,
-          "result": "LOSS"
+          "result": "LOSS",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1771514449001",
@@ -5420,7 +5470,8 @@
           "notes": "",
           "pnlNet": -4.33,
           "pnlPct": -0.44,
-          "result": "LOSS"
+          "result": "LOSS",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1771514140657",
@@ -5443,7 +5494,8 @@
           "notes": "",
           "pnlNet": -46.2,
           "pnlPct": -4.38,
-          "result": "LOSS"
+          "result": "LOSS",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1771425654604",
@@ -5475,7 +5527,8 @@
           },
           "pnlNet": 30.4,
           "pnlPct": 2.93,
-          "result": "WIN"
+          "result": "WIN",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1771425524241",
@@ -5498,7 +5551,8 @@
           "notes": "",
           "pnlNet": -34.55,
           "pnlPct": -3.16,
-          "result": "LOSS"
+          "result": "LOSS",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1771425486400",
@@ -5521,7 +5575,8 @@
           "notes": "",
           "pnlNet": 113.86,
           "pnlPct": 10.74,
-          "result": "WIN"
+          "result": "WIN",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1771340787192",
@@ -5553,7 +5608,8 @@
           },
           "pnlNet": 21.04,
           "pnlPct": 1.92,
-          "result": "WIN"
+          "result": "WIN",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1771340669382",
@@ -5576,7 +5632,8 @@
           "notes": "",
           "pnlNet": -45.11,
           "pnlPct": -4.17,
-          "result": "LOSS"
+          "result": "LOSS",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1771338901626",
@@ -5599,7 +5656,8 @@
           "notes": "",
           "pnlNet": -38.2,
           "pnlPct": -4.2,
-          "result": "LOSS"
+          "result": "LOSS",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1770993844517",
@@ -5622,7 +5680,8 @@
           "notes": "",
           "pnlNet": -19.28,
           "pnlPct": -2.11,
-          "result": "LOSS"
+          "result": "LOSS",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1770993435675",
@@ -5654,7 +5713,8 @@
           },
           "pnlNet": 34.24,
           "pnlPct": 3.27,
-          "result": "WIN"
+          "result": "WIN",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1770907976444",
@@ -5677,7 +5737,8 @@
           "notes": "",
           "pnlNet": 31.36,
           "pnlPct": 3.31,
-          "result": "WIN"
+          "result": "WIN",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1770846083889",
@@ -5709,7 +5770,8 @@
           },
           "pnlNet": 43.42,
           "pnlPct": 3.96,
-          "result": "WIN"
+          "result": "WIN",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1770803316220",
@@ -5732,7 +5794,8 @@
           "notes": "",
           "pnlNet": 13.19,
           "pnlPct": 1.36,
-          "result": "WIN"
+          "result": "WIN",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1770803244882",
@@ -5755,7 +5818,8 @@
           "notes": "",
           "pnlNet": 9.56,
           "pnlPct": 0.99,
-          "result": "WIN"
+          "result": "WIN",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1770803148736",
@@ -5778,7 +5842,8 @@
           "notes": "",
           "pnlNet": 12.92,
           "pnlPct": 1.18,
-          "result": "WIN"
+          "result": "WIN",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1770803009916",
@@ -5801,7 +5866,8 @@
           "notes": "",
           "pnlPct": -4.49,
           "pnlNet": -41.96,
-          "result": "LOSS"
+          "result": "LOSS",
+          "strategy": "ibs_swing"
         },
         {
           "id": "1770800006232",
@@ -5824,7 +5890,44 @@
           "notes": "",
           "pnlPct": -4.98,
           "pnlNet": -44.04,
-          "result": "LOSS"
+          "result": "LOSS",
+          "strategy": "ibs_swing"
+        },
+        {
+          "id": "1777187887672",
+          "createdAt": 1777187887672,
+          "ticker": "TSCO",
+          "type": "SHORT",
+          "entryDate": "2026-04-22",
+          "entry": 39.34,
+          "shares": 78,
+          "stop": "40.61",
+          "target1": "38.07",
+          "target2": "36.81",
+          "status": "OPEN",
+          "strategy": "impulse",
+          "commission": 0,
+          "notes": "D0: 2026-04-20 | Паттерн D+1: Weak Pullback | ATR: 2.33 | Impulse: -11.7%",
+          "atrPct": "5.92"
+        },
+        {
+          "id": "1777301343580",
+          "createdAt": 1777301343580,
+          "ticker": "EW",
+          "type": "LONG",
+          "entryDate": "2026-04-27",
+          "entry": 83.6,
+          "shares": 48,
+          "stop": "81.56",
+          "target1": "85.64",
+          "target2": "87.69",
+          "status": "OPEN",
+          "strategy": "impulse",
+          "commission": 0,
+          "notes": "D0: 2026-04-24 | Паттерн D+1: не подтверждён | ATR: 2.82 | Impulse: 5.6% | Anchor (Low D0): 82.12",
+          "atrPct": "3.37",
+          "atrAbs": 2.82,
+          "impulseAnchor": 82.12
         }
       ],
       "scans": {
@@ -9680,6 +9783,83 @@
         "from": "impulse",
         "to": "impulse"
       }
+    },
+    {
+      "timestamp": "2026-04-28T10:53:30.460Z",
+      "strategy": "rspc",
+      "event": "strategy_switch",
+      "data": {
+        "from": "rspc",
+        "to": "rspc"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T12:12:44.217Z",
+      "strategy": "impulse",
+      "event": "strategy_switch",
+      "data": {
+        "from": "impulse",
+        "to": "impulse"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T12:20:07.109Z",
+      "strategy": "event_continuation",
+      "event": "strategy_switch",
+      "data": {
+        "from": "event_continuation",
+        "to": "event_continuation"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T12:20:08.781Z",
+      "strategy": "pead",
+      "event": "strategy_switch",
+      "data": {
+        "from": "pead",
+        "to": "pead"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T12:20:10.052Z",
+      "strategy": "impulse",
+      "event": "strategy_switch",
+      "data": {
+        "from": "impulse",
+        "to": "impulse"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T12:20:10.741Z",
+      "strategy": "rspc",
+      "event": "strategy_switch",
+      "data": {
+        "from": "rspc",
+        "to": "rspc"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T12:20:12.741Z",
+      "strategy": "impulse",
+      "event": "strategy_switch",
+      "data": {
+        "from": "impulse",
+        "to": "impulse"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T12:31:59.592Z",
+      "strategy": "ibs_swing",
+      "event": "trade_close",
+      "data": {
+        "id": "1776948555097",
+        "ticker": "PFE",
+        "type": "LONG",
+        "entry": 26.85,
+        "exit": 28.01,
+        "pnlPct": 4.04,
+        "reason": "TIME"
+      }
     }
   ],
   "settings": {
@@ -9700,7 +9880,7 @@
   "trades": [
     {
       "id": "1776948555097",
-      "createdAt": 1776948555097,
+      "createdAt": 1777379519591,
       "ticker": "PFE",
       "type": "LONG",
       "entryDate": "2026-04-23",
@@ -9712,12 +9892,15 @@
       "rsi2": "",
       "atrPct": "2.06",
       "trend": "",
-      "status": "OPEN",
-      "exitPrice": 0,
-      "exitReason": "",
-      "commission": 0,
+      "status": "CLOSED",
+      "exitPrice": 28.01,
+      "exitReason": "TIME",
+      "commission": 9,
       "notes": "",
-      "strategy": "ibs_swing"
+      "strategy": "ibs_swing",
+      "pnlNet": 130.2,
+      "pnlPct": 4.04,
+      "result": "WIN"
     },
     {
       "id": "1776255613535",
