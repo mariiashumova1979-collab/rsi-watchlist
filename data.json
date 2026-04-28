@@ -9296,7 +9296,8 @@
           "DKNG_sma200": 35.97,
           "JD_sma200": 31.1,
           "CRWD_sma200": 463.13,
-          "_migration_done": true
+          "_migration_done": true,
+          "NVDA_rsi2": 93.86
         }
       },
       "config": {}
@@ -9859,6 +9860,15 @@
         "exit": 28.01,
         "pnlPct": 4.04,
         "reason": "TIME"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T12:32:33.520Z",
+      "strategy": "ibs_swing",
+      "event": "strategy_switch",
+      "data": {
+        "from": "ibs_swing",
+        "to": "ibs_swing"
       }
     }
   ],
@@ -14857,7 +14867,8 @@
       "DKNG_sma200": 35.97,
       "JD_sma200": 31.1,
       "CRWD_sma200": 463.13,
-      "_migration_done": true
+      "_migration_done": true,
+      "NVDA_rsi2": 93.86
     }
   },
   "quarterly": {},
