@@ -9397,7 +9397,8 @@
           "CEG_rsi2": 93.97,
           "CEG_close1": 315.17,
           "CEG_low1": 304.12,
-          "CEG_high1": 318.5
+          "CEG_high1": 318.5,
+          "VST_rsi2": 93.41
         }
       },
       "config": {}
@@ -15038,7 +15039,8 @@
       "CEG_rsi2": 93.97,
       "CEG_close1": 315.17,
       "CEG_low1": 304.12,
-      "CEG_high1": 318.5
+      "CEG_high1": 318.5,
+      "VST_rsi2": 93.41
     }
   },
   "quarterly": {},
