@@ -9299,7 +9299,8 @@
           "_migration_done": true,
           "NVDA_rsi2": 93.86,
           "NVDA_close1": 216.61,
-          "NVDA_low1": 207.38
+          "NVDA_low1": 207.38,
+          "NVDA_high1": 216.83
         }
       },
       "config": {}
@@ -14872,7 +14873,8 @@
       "_migration_done": true,
       "NVDA_rsi2": 93.86,
       "NVDA_close1": 216.61,
-      "NVDA_low1": 207.38
+      "NVDA_low1": 207.38,
+      "NVDA_high1": 216.83
     }
   },
   "quarterly": {},
