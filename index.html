@@ -810,9 +810,11 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
       </div>
       
       <div style="font-family:var(--mono);font-size:9px;color:var(--t2);margin:12px 0;padding:10px 14px;background:var(--bg3);border-radius:8px;border:1px solid var(--line);line-height:1.7">
-        <b>D0:</b> Move +5% to +12%, CLV > 0.70, Body > 0.50, RelVol ≥ 1.5<br>
+        <b>D0 LONG:</b> Move +5% to +12%, CLV > 0.70, Body > 0.50, RelVol ≥ 1.5<br>
+        <b>D0 SHORT:</b> Move −5% to −12%, CLV < 0.30, Body > 0.50, RelVol ≥ 1.5<br>
         <b>D+1:</b> Inside Day OR Weak Pullback OR Compression<br>
-        <b>Entry D+2:</b> High_D0 + 0.1×ATR, Stop = Low_D+1 − 0.2×ATR
+        <b>Entry D+2 (LONG):</b> High_D0 + 0.1×ATR, Stop = Low_D0 − 0.2×ATR<br>
+        <b>Entry D+2 (SHORT):</b> Low_D0 − 0.1×ATR, Stop = High_D0 + 0.2×ATR
       </div>
 
       <!-- Impulse Candidates Table -->
@@ -6509,14 +6511,25 @@ function renderRSPC() {
     
     let entryNote = '';
     if (c.status === 'WAITING_D1' && c.entry) {
-      const expectedStop = c.direction === 'LONG' 
-        ? `~$${(c.d0.L - 0.2 * c.atr).toFixed(2)}`
-        : `~$${(c.d0.H + 0.2 * c.atr).toFixed(2)}`;
+      const projStop = c.direction === 'LONG' ? c.d0.L - 0.2 * c.atr : c.d0.H + 0.2 * c.atr;
+      const riskPerShare = c.direction === 'LONG' ? c.entry - projStop : projStop - c.entry;
+      const riskAtr = riskPerShare / c.atr;
+      const riskAmt = 100;
+      const projShares = riskPerShare > 0 ? Math.floor(riskAmt / riskPerShare) : 0;
+      const posValue = projShares * c.entry;
+      const projT1 = c.direction === 'LONG' ? c.entry + riskPerShare : c.entry - riskPerShare;
+      const projT2 = c.direction === 'LONG' ? c.entry + 2 * riskPerShare : c.entry - 2 * riskPerShare;
+      const riskWarn = riskAtr > 1.5 ? `<span style="color:#ff9900">⚠ Risk/ATR=${riskAtr.toFixed(2)} > 1.5</span>` : '';
+      
       entryNote = `
         <tr style="background:var(--bg2)">
-          <td colspan="13" style="padding:10px;font-family:var(--mono);font-size:10px;color:var(--t2)">
-            💡 <b style="color:var(--text)">Entry известен:</b> $${c.entry.toFixed(2)} — ${c.direction === 'LONG' ? 'buy-stop' : 'sell-stop'} ордер можно ставить сейчас<br>
-            <span style="margin-left:16px">Stop: ${expectedStop} (${c.direction === 'LONG' ? 'Low' : 'High'}_D0 ${c.direction === 'LONG' ? '−' : '+'} 0.2×ATR)</span>
+          <td colspan="13" style="padding:10px;font-family:var(--mono);font-size:10px;color:var(--t2);line-height:1.7">
+            💡 <b style="color:var(--text)">Entry:</b> <span style="color:var(--acc)">$${c.entry.toFixed(2)}</span> — ${c.direction === 'LONG' ? 'buy-stop' : 'sell-stop'} ордер можно ставить сейчас<br>
+            <span style="margin-left:16px">📍 <b>Прогноз позиции (риск $100):</b></span><br>
+            <span style="margin-left:32px">Stop: <b style="color:var(--acc2)">$${projStop.toFixed(2)}</b> (${c.direction === 'LONG' ? 'Low' : 'High'}_D0 ${c.direction === 'LONG' ? '−' : '+'} 0.2×ATR) ${riskWarn}</span><br>
+            <span style="margin-left:32px">Risk/share: <b>$${riskPerShare.toFixed(2)}</b> &nbsp;|&nbsp; Risk/ATR: <b>${riskAtr.toFixed(2)}</b></span><br>
+            <span style="margin-left:32px">Акций: <b style="color:var(--text)">${projShares}</b> &nbsp;|&nbsp; Размер: <b>$${posValue.toFixed(0)}</b></span><br>
+            <span style="margin-left:32px">Target 1: <b style="color:var(--acc)">$${projT1.toFixed(2)}</b> (+1R) &nbsp;|&nbsp; Target 2: <b style="color:var(--acc)">$${projT2.toFixed(2)}</b> (+2R)</span>
           </td>
         </tr>`;
     }
@@ -7007,34 +7020,57 @@ function calculateImpulseD0Metrics(d_1, d0, atr, relVol) {
     direction = 'SHORT';
   }
   
-  return { impulse, clv, body, mid, range, direction };
+  return { impulse, clv, body, mid, range, relVol, direction };
 }
 
 function validateImpulseD0(d_1, d0, metrics) {
   const errors = [];
-  const isLongCandidate = metrics.impulse >= 0.05;
-  const isShortCandidate = metrics.impulse <= -0.05;
+  const m = metrics;
   
-  if (!isLongCandidate && !isShortCandidate) {
-    errors.push('Impulse недостаточен для LONG (+5%) или SHORT (−5%)');
+  if (d_1.C === undefined || d_1.C === 0 || isNaN(d_1.C)) {
+    errors.push('Close D-1: некорректное значение');
     return { valid: false, errors };
   }
   
-  if (isLongCandidate) {
-    if (metrics.impulse < 0.05) errors.push(`LONG: Impulse ${(metrics.impulse * 100).toFixed(1)}% < 5%`);
-    if (metrics.impulse > 0.12) errors.push(`LONG: Impulse ${(metrics.impulse * 100).toFixed(1)}% > 12%`);
-    if (metrics.clv <= 0.70) errors.push(`LONG: CLV ${metrics.clv.toFixed(2)} ≤ 0.70`);
-    if (metrics.body <= 0.50) errors.push(`LONG: Body ${metrics.body.toFixed(2)} ≤ 0.50`);
+  const isLong = m.impulse >= 0.05 && m.impulse <= 0.12;
+  const isShort = m.impulse <= -0.05 && m.impulse >= -0.12;
+  
+  // Если impulse вне обоих диапазонов
+  if (!isLong && !isShort) {
+    if (m.impulse > 0 && m.impulse < 0.05) {
+      errors.push(`Impulse +${(m.impulse * 100).toFixed(1)}% < +5% — слишком слабый для LONG`);
+    } else if (m.impulse > 0.12) {
+      errors.push(`Impulse +${(m.impulse * 100).toFixed(1)}% > +12% — слишком сильный (риск разворота)`);
+    } else if (m.impulse < 0 && m.impulse > -0.05) {
+      errors.push(`Impulse ${(m.impulse * 100).toFixed(1)}% > −5% — слишком слабый для SHORT`);
+    } else if (m.impulse < -0.12) {
+      errors.push(`Impulse ${(m.impulse * 100).toFixed(1)}% < −12% — слишком сильный (риск разворота)`);
+    } else {
+      errors.push(`Impulse ${(m.impulse * 100).toFixed(1)}% — недостаточен для LONG (≥+5%) или SHORT (≤−5%)`);
+    }
+    return { valid: false, errors };
   }
   
-  if (isShortCandidate) {
-    if (metrics.impulse > -0.05) errors.push(`SHORT: Impulse ${(metrics.impulse * 100).toFixed(1)}% > −5%`);
-    if (metrics.impulse < -0.12) errors.push(`SHORT: Impulse ${(metrics.impulse * 100).toFixed(1)}% < −12%`);
-    if (metrics.clv >= 0.30) errors.push(`SHORT: CLV ${metrics.clv.toFixed(2)} ≥ 0.30`);
-    if (metrics.body <= 0.50) errors.push(`SHORT: Body ${metrics.body.toFixed(2)} ≤ 0.50`);
+  // LONG проверки
+  if (isLong) {
+    if (m.clv <= 0.70) errors.push(`LONG: CLV ${m.clv.toFixed(2)} ≤ 0.70 — закрытие не в верхней части свечи (нужно > 0.70)`);
+    if (m.body <= 0.50) errors.push(`LONG: Body ${m.body.toFixed(2)} ≤ 0.50 — свеча слабая/дожи (нужно > 0.50)`);
+    if (m.relVol !== undefined && m.relVol < 1.5) errors.push(`LONG: RelVol ${m.relVol.toFixed(2)} < 1.5 — объём слабый (нужно ≥ 1.5)`);
   }
   
-  return { valid: errors.length === 0, errors };
+  // SHORT проверки
+  if (isShort) {
+    if (m.clv >= 0.30) errors.push(`SHORT: CLV ${m.clv.toFixed(2)} ≥ 0.30 — закрытие не в нижней части свечи (нужно < 0.30)`);
+    if (m.body <= 0.50) errors.push(`SHORT: Body ${m.body.toFixed(2)} ≤ 0.50 — свеча слабая/дожи (нужно > 0.50)`);
+    if (m.relVol !== undefined && m.relVol < 1.5) errors.push(`SHORT: RelVol ${m.relVol.toFixed(2)} < 1.5 — объём слабый (нужно ≥ 1.5)`);
+  }
+  
+  // Жёсткая страховка
+  if (m.direction === null && errors.length === 0) {
+    errors.push('D0 не прошёл проверку — direction не определён');
+  }
+  
+  return { valid: errors.length === 0 && m.direction !== null, errors };
 }
 
 function renderImpulse() {
@@ -7056,17 +7092,35 @@ function renderImpulse() {
       'ENTERED': '✅ В сделке'
     }[c.status] || c.status;
     
-    // Entry note for WAITING_D1
+    // Entry note for WAITING_D1 + предрасчёт позиции
     let entryNote = '';
     if (c.status === 'WAITING_D1' && c.entry) {
-      const expectedStop = c.direction === 'LONG' 
-        ? `~$${(c.entry - 0.5 * c.atr).toFixed(2)}`
-        : `~$${(c.entry + 0.5 * c.atr).toFixed(2)}`;
+      // Стоп от Low_D0 / High_D0 (как в саму сделку)
+      const projStop = c.direction === 'LONG'
+        ? c.d0.L - 0.2 * c.atr
+        : c.d0.H + 0.2 * c.atr;
+      const riskPerShare = c.direction === 'LONG'
+        ? c.entry - projStop
+        : projStop - c.entry;
+      const riskAtr = riskPerShare / c.atr;
+      
+      // Предрасчёт по риску $100 (стандарт)
+      const riskAmt = 100;
+      const projShares = riskPerShare > 0 ? Math.floor(riskAmt / riskPerShare) : 0;
+      const posValue = projShares * c.entry;
+      const projT1 = c.direction === 'LONG' ? c.entry + riskPerShare : c.entry - riskPerShare;
+      const projT2 = c.direction === 'LONG' ? c.entry + 2 * riskPerShare : c.entry - 2 * riskPerShare;
+      const riskWarn = riskAtr > 1.5 ? `<span style="color:#ff9900">⚠ Risk/ATR=${riskAtr.toFixed(2)} > 1.5</span>` : '';
+      
       entryNote = `
         <tr style="background:var(--bg2)">
-          <td colspan="12" style="padding:10px;font-family:var(--mono);font-size:10px;color:var(--t2)">
-            💡 <b style="color:var(--text)">Entry известен:</b> $${c.entry.toFixed(2)} — можно ставить ${c.direction === 'LONG' ? 'buy-stop' : 'sell-stop'} ордер сейчас<br>
-            <span style="margin-left:16px">Stop будет рассчитан после D+1 (ожидается ${expectedStop})</span>
+          <td colspan="12" style="padding:10px;font-family:var(--mono);font-size:10px;color:var(--t2);line-height:1.7">
+            💡 <b style="color:var(--text)">Entry:</b> <span style="color:var(--acc)">$${c.entry.toFixed(2)}</span> — ${c.direction === 'LONG' ? 'buy-stop' : 'sell-stop'} ордер можно ставить сейчас<br>
+            <span style="margin-left:16px">📍 <b>Прогноз позиции (риск $100):</b></span><br>
+            <span style="margin-left:32px">Stop: <b style="color:var(--acc2)">$${projStop.toFixed(2)}</b> (${c.direction === 'LONG' ? 'Low' : 'High'}_D0 ${c.direction === 'LONG' ? '−' : '+'} 0.2×ATR) ${riskWarn}</span><br>
+            <span style="margin-left:32px">Risk/share: <b>$${riskPerShare.toFixed(2)}</b> &nbsp;|&nbsp; Risk/ATR: <b>${riskAtr.toFixed(2)}</b></span><br>
+            <span style="margin-left:32px">Акций: <b style="color:var(--text)">${projShares}</b> &nbsp;|&nbsp; Размер: <b>$${posValue.toFixed(0)}</b></span><br>
+            <span style="margin-left:32px">Target 1: <b style="color:var(--acc)">$${projT1.toFixed(2)}</b> (+1R) &nbsp;|&nbsp; Target 2: <b style="color:var(--acc)">$${projT2.toFixed(2)}</b> (+2R)</span>
           </td>
         </tr>`;
     }
