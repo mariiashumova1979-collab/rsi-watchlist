@@ -5925,20 +5925,27 @@
         },
         {
           "id": "1777187887672",
-          "createdAt": 1777187887672,
+          "createdAt": 1777385686210,
           "ticker": "TSCO",
           "type": "SHORT",
           "entryDate": "2026-04-22",
           "entry": 39.34,
           "shares": 78,
-          "stop": "40.61",
+          "stop": "41.70",
           "target1": "38.07",
           "target2": "36.81",
-          "status": "OPEN",
-          "strategy": "impulse",
-          "commission": 0,
+          "rsi2": "",
+          "atrPct": "5.92",
+          "trend": "",
+          "status": "CLOSED",
+          "exitPrice": 35.36,
+          "exitReason": "TIME",
+          "commission": 5,
           "notes": "D0: 2026-04-20 | Паттерн D+1: Weak Pullback | ATR: 2.33 | Impulse: -11.7%",
-          "atrPct": "5.92"
+          "strategy": "impulse",
+          "pnlNet": 305.44,
+          "pnlPct": 9.95,
+          "result": "WIN"
         },
         {
           "id": "1777301343580",
@@ -10025,6 +10032,20 @@
         "pnlPct": -0.77,
         "reason": "STOP"
       }
+    },
+    {
+      "timestamp": "2026-04-28T14:14:46.210Z",
+      "strategy": "impulse",
+      "event": "trade_close",
+      "data": {
+        "id": "1777187887672",
+        "ticker": "TSCO",
+        "type": "SHORT",
+        "entry": 39.34,
+        "exit": 35.36,
+        "pnlPct": 9.95,
+        "reason": "TIME"
+      }
     }
   ],
   "settings": {
@@ -11621,20 +11642,27 @@
     },
     {
       "id": "1777187887672",
-      "createdAt": 1777187887672,
+      "createdAt": 1777385686210,
       "ticker": "TSCO",
       "type": "SHORT",
       "entryDate": "2026-04-22",
       "entry": 39.34,
       "shares": 78,
-      "stop": "40.61",
+      "stop": "41.70",
       "target1": "38.07",
       "target2": "36.81",
-      "status": "OPEN",
-      "strategy": "impulse",
-      "commission": 0,
+      "rsi2": "",
+      "atrPct": "5.92",
+      "trend": "",
+      "status": "CLOSED",
+      "exitPrice": 35.36,
+      "exitReason": "TIME",
+      "commission": 5,
       "notes": "D0: 2026-04-20 | Паттерн D+1: Weak Pullback | ATR: 2.33 | Impulse: -11.7%",
-      "atrPct": "5.92"
+      "strategy": "impulse",
+      "pnlNet": 305.44,
+      "pnlPct": 9.95,
+      "result": "WIN"
     },
     {
       "id": "1777301343580",
