@@ -5958,6 +5958,25 @@
           "atrPct": "3.37",
           "atrAbs": 2.82,
           "impulseAnchor": 82.12
+        },
+        {
+          "id": "1777383847458",
+          "createdAt": 1777383847458,
+          "ticker": "FLR",
+          "type": "LONG",
+          "entryDate": "2026-04-28",
+          "entry": 50.52,
+          "shares": 36,
+          "stop": "47.76",
+          "target1": "53.28",
+          "target2": "56.04",
+          "status": "OPEN",
+          "strategy": "impulse",
+          "commission": 0,
+          "notes": "D0: 2026-04-27 | Паттерн D+1: не подтверждён | ATR: 3.49 | Impulse: 7.2% | Anchor (Low D0): 48.46",
+          "atrPct": "6.91",
+          "atrAbs": 3.49,
+          "impulseAnchor": 48.46
         }
       ],
       "scans": {
@@ -9555,8 +9574,9 @@
           "stop": null,
           "target1": null,
           "target2": null,
-          "status": "WAITING_D1",
-          "created": "2026-04-28T08:04:04.934Z"
+          "status": "ENTERED",
+          "created": "2026-04-28T08:04:04.934Z",
+          "tradeId": "1777383847458"
         }
       ]
     },
@@ -9976,6 +9996,15 @@
       "data": {
         "from": "ibs_swing",
         "to": "ibs_swing"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T13:36:06.878Z",
+      "strategy": "impulse",
+      "event": "strategy_switch",
+      "data": {
+        "from": "impulse",
+        "to": "impulse"
       }
     }
   ],
@@ -11606,6 +11635,25 @@
       "atrPct": "3.37",
       "atrAbs": 2.82,
       "impulseAnchor": 82.12
+    },
+    {
+      "id": "1777383847458",
+      "createdAt": 1777383847458,
+      "ticker": "FLR",
+      "type": "LONG",
+      "entryDate": "2026-04-28",
+      "entry": 50.52,
+      "shares": 36,
+      "stop": "47.76",
+      "target1": "53.28",
+      "target2": "56.04",
+      "status": "OPEN",
+      "strategy": "impulse",
+      "commission": 0,
+      "notes": "D0: 2026-04-27 | Паттерн D+1: не подтверждён | ATR: 3.49 | Impulse: 7.2% | Anchor (Low D0): 48.46",
+      "atrPct": "6.91",
+      "atrAbs": 3.49,
+      "impulseAnchor": 48.46
     }
   ],
   "rsiScans": {
