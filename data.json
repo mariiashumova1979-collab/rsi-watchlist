@@ -9298,7 +9298,8 @@
           "CRWD_sma200": 463.13,
           "_migration_done": true,
           "NVDA_rsi2": 93.86,
-          "NVDA_close1": 216.61
+          "NVDA_close1": 216.61,
+          "NVDA_low1": 207.38
         }
       },
       "config": {}
@@ -14870,7 +14871,8 @@
       "CRWD_sma200": 463.13,
       "_migration_done": true,
       "NVDA_rsi2": 93.86,
-      "NVDA_close1": 216.61
+      "NVDA_close1": 216.61,
+      "NVDA_low1": 207.38
     }
   },
   "quarterly": {},
