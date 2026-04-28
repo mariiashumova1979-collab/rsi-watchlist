@@ -1,6 +1,16 @@
 {
   "watchlist": [
     {
+      "ticker": "QCOM",
+      "sector": "Technology",
+      "cap": "160.33",
+      "atr": "3.38",
+      "earningsDate": "2026-04-29",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1777380240274
+    },
+    {
       "ticker": "WBD",
       "sector": "Consumer Defensive",
       "cap": "",
