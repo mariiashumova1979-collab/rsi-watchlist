@@ -9983,7 +9983,8 @@
           "HLT_rsi2": 4.66,
           "HLT_close1": 323.36,
           "HLT_low1": 323.05,
-          "HLT_high1": 336.8
+          "HLT_high1": 336.8,
+          "HLT_sma200": 286.12
         }
       },
       "config": {}
@@ -15993,7 +15994,8 @@
       "HLT_rsi2": 4.66,
       "HLT_close1": 323.36,
       "HLT_low1": 323.05,
-      "HLT_high1": 336.8
+      "HLT_high1": 336.8,
+      "HLT_sma200": 286.12
     }
   },
   "quarterly": {},
