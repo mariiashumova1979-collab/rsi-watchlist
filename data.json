@@ -9922,7 +9922,8 @@
           "GLW_close1": 153.05,
           "GLW_low1": 149.75,
           "GLW_high1": 162,
-          "SBUX_rsi2": 8.93
+          "SBUX_rsi2": 8.93,
+          "SBUX_close1": 97.28
         }
       },
       "config": {}
@@ -15901,7 +15902,8 @@
       "GLW_close1": 153.05,
       "GLW_low1": 149.75,
       "GLW_high1": 162,
-      "SBUX_rsi2": 8.93
+      "SBUX_rsi2": 8.93,
+      "SBUX_close1": 97.28
     }
   },
   "quarterly": {},
