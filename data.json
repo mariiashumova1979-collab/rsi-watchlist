@@ -9847,7 +9847,8 @@
           "JD_close2": 31.1,
           "CRWD_close2": 463.13,
           "AVGO_rsi2": 9.35,
-          "AVGO_close1": 399.83
+          "AVGO_close1": 399.83,
+          "AVGO_low1": 394.65
         }
       },
       "config": {}
@@ -15811,7 +15812,8 @@
       "JD_close2": 31.1,
       "CRWD_close2": 463.13,
       "AVGO_rsi2": 9.35,
-      "AVGO_close1": 399.83
+      "AVGO_close1": 399.83,
+      "AVGO_low1": 394.65
     }
   },
   "quarterly": {},
