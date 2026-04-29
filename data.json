@@ -9956,7 +9956,8 @@
           "MAR_close3": 356.15,
           "FCX_rsi2": 4.68,
           "FCX_close1": 58.21,
-          "FCX_low1": 57.87
+          "FCX_low1": 57.87,
+          "FCX_high1": 60.2
         }
       },
       "config": {}
@@ -15949,7 +15950,8 @@
       "MAR_close3": 356.15,
       "FCX_rsi2": 4.68,
       "FCX_close1": 58.21,
-      "FCX_low1": 57.87
+      "FCX_low1": 57.87,
+      "FCX_high1": 60.2
     }
   },
   "quarterly": {},
