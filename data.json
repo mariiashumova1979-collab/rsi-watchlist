@@ -9939,7 +9939,8 @@
           "MAR_rsi2": 4.19,
           "MAR_close1": 358.33,
           "MAR_low1": 356.96,
-          "MAR_high1": 366.5
+          "MAR_high1": 366.5,
+          "MAR_sma200": 300.07
         }
       },
       "config": {}
@@ -15925,7 +15926,8 @@
       "MAR_rsi2": 4.19,
       "MAR_close1": 358.33,
       "MAR_low1": 356.96,
-      "MAR_high1": 366.5
+      "MAR_high1": 366.5,
+      "MAR_sma200": 300.07
     }
   },
   "quarterly": {},
