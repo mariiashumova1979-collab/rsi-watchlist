@@ -1,6 +1,16 @@
 {
   "watchlist": [
     {
+      "ticker": "APH",
+      "sector": "Technology",
+      "cap": "176.69",
+      "atr": "3.57",
+      "earningsDate": "2026-04-29",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1777455306339
+    },
+    {
       "ticker": "BHP",
       "sector": "Basic Materials",
       "cap": "202.24",
