@@ -1,6 +1,16 @@
 {
   "watchlist": [
     {
+      "ticker": "VALE",
+      "sector": "Basic Materials",
+      "cap": "71.98",
+      "atr": "2.49",
+      "earningsDate": "2026-07-23",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1777456681799
+    },
+    {
       "ticker": "HLT",
       "sector": "Consumer Defensive",
       "cap": "73.98",
