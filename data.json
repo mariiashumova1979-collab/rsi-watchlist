@@ -9982,7 +9982,8 @@
           "EMR_close3": 140.38,
           "HLT_rsi2": 4.66,
           "HLT_close1": 323.36,
-          "HLT_low1": 323.05
+          "HLT_low1": 323.05,
+          "HLT_high1": 336.8
         }
       },
       "config": {}
@@ -15991,7 +15992,8 @@
       "EMR_close3": 140.38,
       "HLT_rsi2": 4.66,
       "HLT_close1": 323.36,
-      "HLT_low1": 323.05
+      "HLT_low1": 323.05,
+      "HLT_high1": 336.8
     }
   },
   "quarterly": {},
