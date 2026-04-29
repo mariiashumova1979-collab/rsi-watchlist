@@ -9953,6 +9953,41 @@
           "target2": null,
           "status": "WAITING_D1",
           "created": "2026-04-29T08:39:17.851Z"
+        },
+        {
+          "id": "BEN_2026-04-28",
+          "ticker": "BEN",
+          "d0Date": "2026-04-28",
+          "direction": "LONG",
+          "d_1": {
+            "C": 27.57
+          },
+          "d0": {
+            "O": 27.84,
+            "H": 29.47,
+            "L": 27.6,
+            "C": 29.46,
+            "V": 11.37
+          },
+          "atr": 2.97,
+          "relVol": 2.28,
+          "metrics": {
+            "impulse": 0.06855277475516869,
+            "clv": 0.9946524064171134,
+            "body": 0.8663101604278092,
+            "mid": 28.535,
+            "range": 1.8699999999999974,
+            "relVol": 2.28,
+            "direction": "LONG"
+          },
+          "entry": 29.767,
+          "d1": null,
+          "pattern": null,
+          "stop": null,
+          "target1": null,
+          "target2": null,
+          "status": "WAITING_D1",
+          "created": "2026-04-29T08:59:29.515Z"
         }
       ]
     },
