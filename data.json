@@ -9975,7 +9975,11 @@
           "EMR_low1": 138.08,
           "EMR_high1": 140.79,
           "EMR_sma200": 137.77,
-          "EMR_sma200_20": 140.38
+          "EMR_sma200_20": 140.38,
+          "FCX_close2": 50.53,
+          "FCX_close3": 64.77,
+          "EMR_close2": 137.77,
+          "EMR_close3": 140.38
         }
       },
       "config": {}
@@ -15977,7 +15981,11 @@
       "EMR_low1": 138.08,
       "EMR_high1": 140.79,
       "EMR_sma200": 137.77,
-      "EMR_sma200_20": 140.38
+      "EMR_sma200_20": 140.38,
+      "FCX_close2": 50.53,
+      "FCX_close3": 64.77,
+      "EMR_close2": 137.77,
+      "EMR_close3": 140.38
     }
   },
   "quarterly": {},
