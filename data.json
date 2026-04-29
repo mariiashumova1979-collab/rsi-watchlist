@@ -9979,7 +9979,8 @@
           "FCX_close2": 50.53,
           "FCX_close3": 64.77,
           "EMR_close2": 137.77,
-          "EMR_close3": 140.38
+          "EMR_close3": 140.38,
+          "HLT_rsi2": 4.66
         }
       },
       "config": {}
@@ -15985,7 +15986,8 @@
       "FCX_close2": 50.53,
       "FCX_close3": 64.77,
       "EMR_close2": 137.77,
-      "EMR_close3": 140.38
+      "EMR_close3": 140.38,
+      "HLT_rsi2": 4.66
     }
   },
   "quarterly": {},
