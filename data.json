@@ -9951,7 +9951,9 @@
           "MAR_low1": 356.96,
           "MAR_high1": 366.5,
           "MAR_sma200": 300.07,
-          "MAR_sma200_20": 356.15
+          "MAR_sma200_20": 356.15,
+          "MAR_close2": 300.07,
+          "MAR_close3": 356.15
         }
       },
       "config": {}
@@ -15939,7 +15941,9 @@
       "MAR_low1": 356.96,
       "MAR_high1": 366.5,
       "MAR_sma200": 300.07,
-      "MAR_sma200_20": 356.15
+      "MAR_sma200_20": 356.15,
+      "MAR_close2": 300.07,
+      "MAR_close3": 356.15
     }
   },
   "quarterly": {},
