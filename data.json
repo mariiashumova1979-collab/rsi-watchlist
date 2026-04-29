@@ -9957,7 +9957,8 @@
           "FCX_rsi2": 4.68,
           "FCX_close1": 58.21,
           "FCX_low1": 57.87,
-          "FCX_high1": 60.2
+          "FCX_high1": 60.2,
+          "FCX_sma200": 50.53
         }
       },
       "config": {}
@@ -15951,7 +15952,8 @@
       "FCX_rsi2": 4.68,
       "FCX_close1": 58.21,
       "FCX_low1": 57.87,
-      "FCX_high1": 60.2
+      "FCX_high1": 60.2,
+      "FCX_sma200": 50.53
     }
   },
   "quarterly": {},
