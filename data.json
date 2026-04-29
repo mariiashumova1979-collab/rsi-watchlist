@@ -9908,7 +9908,8 @@
           "SCCO_close1": 170.49,
           "SCCO_low1": 168.72,
           "SCCO_high1": 175.11,
-          "GLW_rsi2": 9.2
+          "GLW_rsi2": 9.2,
+          "GLW_close1": 153.05
         }
       },
       "config": {}
@@ -15883,7 +15884,8 @@
       "SCCO_close1": 170.49,
       "SCCO_low1": 168.72,
       "SCCO_high1": 175.11,
-      "GLW_rsi2": 9.2
+      "GLW_rsi2": 9.2,
+      "GLW_close1": 153.05
     }
   },
   "quarterly": {},
