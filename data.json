@@ -9936,7 +9936,8 @@
           "SBUX_close1": 97.28,
           "SBUX_low1": 96.45,
           "SBUX_high1": 98.68,
-          "MAR_rsi2": 4.19
+          "MAR_rsi2": 4.19,
+          "MAR_close1": 358.33
         }
       },
       "config": {}
@@ -15919,7 +15920,8 @@
       "SBUX_close1": 97.28,
       "SBUX_low1": 96.45,
       "SBUX_high1": 98.68,
-      "MAR_rsi2": 4.19
+      "MAR_rsi2": 4.19,
+      "MAR_close1": 358.33
     }
   },
   "quarterly": {},
