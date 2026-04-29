@@ -9846,7 +9846,8 @@
           "DKNG_close2": 35.97,
           "JD_close2": 31.1,
           "CRWD_close2": 463.13,
-          "AVGO_rsi2": 9.35
+          "AVGO_rsi2": 9.35,
+          "AVGO_close1": 399.83
         }
       },
       "config": {}
@@ -15809,7 +15810,8 @@
       "DKNG_close2": 35.97,
       "JD_close2": 31.1,
       "CRWD_close2": 463.13,
-      "AVGO_rsi2": 9.35
+      "AVGO_rsi2": 9.35,
+      "AVGO_close1": 399.83
     }
   },
   "quarterly": {},
