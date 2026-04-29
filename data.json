@@ -9954,7 +9954,8 @@
           "MAR_sma200_20": 356.15,
           "MAR_close2": 300.07,
           "MAR_close3": 356.15,
-          "FCX_rsi2": 4.68
+          "FCX_rsi2": 4.68,
+          "FCX_close1": 58.21
         }
       },
       "config": {}
@@ -15945,7 +15946,8 @@
       "MAR_sma200_20": 356.15,
       "MAR_close2": 300.07,
       "MAR_close3": 356.15,
-      "FCX_rsi2": 4.68
+      "FCX_rsi2": 4.68,
+      "FCX_close1": 58.21
     }
   },
   "quarterly": {},
