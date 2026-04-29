@@ -10000,7 +10000,8 @@
           "HLT_close3": 324.55,
           "VALE_rsi2": 5.35,
           "VALE_close1": 16.91,
-          "VALE_low1": 16.76
+          "VALE_low1": 16.76,
+          "VALE_high1": 17.02
         }
       },
       "config": {}
@@ -16017,7 +16018,8 @@
       "HLT_close3": 324.55,
       "VALE_rsi2": 5.35,
       "VALE_close1": 16.91,
-      "VALE_low1": 16.76
+      "VALE_low1": 16.76,
+      "VALE_high1": 17.02
     }
   },
   "quarterly": {},
