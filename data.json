@@ -1,6 +1,16 @@
 {
   "watchlist": [
     {
+      "ticker": "BHP",
+      "sector": "Basic Materials",
+      "cap": "202.24",
+      "atr": "2.49",
+      "earningsDate": "2026-08-17",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1777455180288
+    },
+    {
       "ticker": "AZN",
       "sector": "Healthcare",
       "cap": "289.59",
