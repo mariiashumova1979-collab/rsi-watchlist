@@ -9918,6 +9918,41 @@
           "target2": null,
           "status": "WAITING_D1",
           "created": "2026-04-29T07:19:01.917Z"
+        },
+        {
+          "id": "PCAR_2026-04-28",
+          "ticker": "PCAR",
+          "d0Date": "2026-04-28",
+          "direction": "SHORT",
+          "d_1": {
+            "C": 127.2
+          },
+          "d0": {
+            "O": 128.3,
+            "H": 128.3,
+            "L": 118.42,
+            "C": 119.61,
+            "V": 6.22
+          },
+          "atr": 2.93,
+          "relVol": 2.1,
+          "metrics": {
+            "impulse": -0.059669811320754745,
+            "clv": 0.12044534412955431,
+            "body": 0.8795546558704457,
+            "mid": 123.36000000000001,
+            "range": 9.88000000000001,
+            "relVol": 2.1,
+            "direction": "SHORT"
+          },
+          "entry": 118.127,
+          "d1": null,
+          "pattern": null,
+          "stop": null,
+          "target1": null,
+          "target2": null,
+          "status": "WAITING_D1",
+          "created": "2026-04-29T08:39:17.851Z"
         }
       ]
     },
