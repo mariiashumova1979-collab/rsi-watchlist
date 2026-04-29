@@ -9894,7 +9894,8 @@
           "BHP_close1": 78.12,
           "BHP_low1": 77.54,
           "BHP_high1": 79.1,
-          "SCCO_rsi2": 2.97
+          "SCCO_rsi2": 2.97,
+          "SCCO_close1": 170.49
         }
       },
       "config": {}
@@ -15865,7 +15866,8 @@
       "BHP_close1": 78.12,
       "BHP_low1": 77.54,
       "BHP_high1": 79.1,
-      "SCCO_rsi2": 2.97
+      "SCCO_rsi2": 2.97,
+      "SCCO_close1": 170.49
     }
   },
   "quarterly": {},
