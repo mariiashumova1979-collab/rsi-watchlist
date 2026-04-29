@@ -1,6 +1,16 @@
 {
   "watchlist": [
     {
+      "ticker": "SCCO",
+      "sector": "Basic Materials",
+      "cap": "140.84",
+      "atr": "4.98",
+      "earningsDate": "2026-07-29",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1777455522593
+    },
+    {
       "ticker": "APH",
       "sector": "Technology",
       "cap": "176.69",
