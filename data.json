@@ -9719,6 +9719,41 @@
           "status": "ENTERED",
           "created": "2026-04-28T08:04:04.934Z",
           "tradeId": "1777383847458"
+        },
+        {
+          "id": "ZBH_2026-04-28",
+          "ticker": "ZBH",
+          "d0Date": "2026-04-28",
+          "direction": "SHORT",
+          "d_1": {
+            "C": 91.26
+          },
+          "d0": {
+            "O": 87.6,
+            "H": 88.64,
+            "L": 81.35,
+            "C": 82.8,
+            "V": 9.82
+          },
+          "atr": 3.56,
+          "relVol": 4.97,
+          "metrics": {
+            "impulse": -0.09270216962524663,
+            "clv": 0.19890260631001394,
+            "body": 0.6584362139917685,
+            "mid": 84.995,
+            "range": 7.290000000000006,
+            "relVol": 4.97,
+            "direction": "SHORT"
+          },
+          "entry": 80.994,
+          "d1": null,
+          "pattern": null,
+          "stop": null,
+          "target1": null,
+          "target2": null,
+          "status": "WAITING_D1",
+          "created": "2026-04-29T06:18:47.537Z"
         }
       ]
     },
