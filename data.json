@@ -4548,7 +4548,11 @@
       "JD_sma200": 31.1,
       "CRWD_close3": 463.13,
       "CRWD_sma200": 463.13,
-      "_migration_done": true
+      "_migration_done": true,
+      "spy_close": 711.69,
+      "spy_sma20": null,
+      "spy_sma50": null,
+      "spy_sma200": null
     }
   },
   "strategies": {
@@ -10428,6 +10432,15 @@
       "data": {
         "from": "impulse",
         "to": "impulse"
+      }
+    },
+    {
+      "timestamp": "2026-04-29T09:24:35.886Z",
+      "strategy": "ibs_swing",
+      "event": "strategy_switch",
+      "data": {
+        "from": "ibs_swing",
+        "to": "ibs_swing"
       }
     }
   ],
