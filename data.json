@@ -9958,7 +9958,8 @@
           "FCX_close1": 58.21,
           "FCX_low1": 57.87,
           "FCX_high1": 60.2,
-          "FCX_sma200": 50.53
+          "FCX_sma200": 50.53,
+          "FCX_sma200_20": 64.77
         }
       },
       "config": {}
@@ -15953,7 +15954,8 @@
       "FCX_close1": 58.21,
       "FCX_low1": 57.87,
       "FCX_high1": 60.2,
-      "FCX_sma200": 50.53
+      "FCX_sma200": 50.53,
+      "FCX_sma200_20": 64.77
     }
   },
   "quarterly": {},
