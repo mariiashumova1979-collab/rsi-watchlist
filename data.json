@@ -10095,7 +10095,7 @@
           "FCX_low1": 57.87,
           "FCX_high1": 60.2,
           "FCX_sma200": 50.53,
-          "FCX_sma200_20": 64.77,
+          "FCX_sma200_20": 49.13,
           "EMR_rsi2": 3.12,
           "EMR_close1": 138.42,
           "EMR_low1": 138.08,
@@ -10783,6 +10783,15 @@
       "data": {
         "from": "ibs_swing",
         "to": "ibs_swing"
+      }
+    },
+    {
+      "timestamp": "2026-04-29T11:24:39.288Z",
+      "strategy": "impulse",
+      "event": "strategy_switch",
+      "data": {
+        "from": "impulse",
+        "to": "impulse"
       }
     }
   ],
@@ -16113,7 +16122,7 @@
       "FCX_low1": 57.87,
       "FCX_high1": 60.2,
       "FCX_sma200": 50.53,
-      "FCX_sma200_20": 64.77,
+      "FCX_sma200_20": 49.13,
       "EMR_rsi2": 3.12,
       "EMR_close1": 138.42,
       "EMR_low1": 138.08,
