@@ -1,6 +1,16 @@
 {
   "watchlist": [
     {
+      "ticker": "MAR",
+      "sector": "Consumer Defensive",
+      "cap": "94.93",
+      "atr": "2.54",
+      "earningsDate": "2026-05-06",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1777455955940
+    },
+    {
       "ticker": "SBUX",
       "sector": "Consumer Defensive",
       "cap": "110.83",
