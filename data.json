@@ -4748,15 +4748,15 @@
       "MAR_low1": 356.96,
       "MAR_high1": 366.5,
       "MAR_sma200": 300.07,
-      "MAR_sma200_20": 356.15,
+      "MAR_sma200_20": 294.59,
       "MAR_close2": 300.07,
-      "MAR_close3": 356.15,
+      "MAR_close3": 294.59,
       "FCX_rsi2": 4.68,
       "FCX_close1": 58.21,
       "FCX_low1": 57.87,
       "FCX_high1": 60.2,
       "FCX_sma200": 50.53,
-      "FCX_sma200_20": 64.77,
+      "FCX_sma200_20": 49.13,
       "EMR_rsi2": 3.12,
       "EMR_close1": 138.42,
       "EMR_low1": 138.08,
@@ -4784,6 +4784,30 @@
   "strategies": {
     "ibs_swing": {
       "trades": [
+        {
+          "id": "1777464204486",
+          "createdAt": 1777470403781,
+          "ticker": "FCX",
+          "type": "LONG",
+          "entryDate": "2026-04-29",
+          "entry": 58.36,
+          "shares": 28,
+          "stop": "54.86",
+          "target1": "60.69",
+          "target2": "63.03",
+          "rsi2": "",
+          "atrPct": "5.08",
+          "trend": "",
+          "status": "CLOSED",
+          "exitPrice": 57.33,
+          "exitReason": "STOP",
+          "commission": 5,
+          "notes": "",
+          "strategy": "impulse",
+          "pnlNet": -33.84,
+          "pnlPct": -2.07,
+          "result": "LOSS"
+        },
         {
           "id": "1776948555097",
           "createdAt": 1777379519591,
@@ -6426,6 +6450,82 @@
           "atrPct": "6.91",
           "atrAbs": 3.49,
           "impulseAnchor": 48.46
+        },
+        {
+          "id": "1777470139056",
+          "createdAt": 1777470139056,
+          "ticker": "ZBH",
+          "type": "SHORT",
+          "entryDate": "2026-04-29",
+          "entry": 81.96,
+          "shares": 13,
+          "stop": "89.35",
+          "target1": "74.57",
+          "target2": "67.18",
+          "status": "OPEN",
+          "strategy": "impulse",
+          "commission": 0,
+          "notes": "D0: 2026-04-28 | Паттерн D+1: не подтверждён | ATR: 3.56 | Impulse: -9.3% | Anchor (High D0): 88.64",
+          "atrPct": "4.34",
+          "atrAbs": 3.56,
+          "impulseAnchor": 88.64
+        },
+        {
+          "id": "1777470182779",
+          "createdAt": 1777470182779,
+          "ticker": "ARE",
+          "type": "SHORT",
+          "entryDate": "2026-04-29",
+          "entry": 40.68,
+          "shares": 21,
+          "stop": "45.23",
+          "target1": "36.13",
+          "target2": "31.58",
+          "status": "OPEN",
+          "strategy": "impulse",
+          "commission": 0,
+          "notes": "D0: 2026-04-28 | Паттерн D+1: не подтверждён | ATR: 5.49 | Impulse: -11.3% | Anchor (High D0): 44.13",
+          "atrPct": "13.50",
+          "atrAbs": 5.49,
+          "impulseAnchor": 44.13
+        },
+        {
+          "id": "1777470212204",
+          "createdAt": 1777470212204,
+          "ticker": "PCAR",
+          "type": "SHORT",
+          "entryDate": "2026-04-29",
+          "entry": 120.33,
+          "shares": 11,
+          "stop": "128.89",
+          "target1": "111.77",
+          "target2": "103.22",
+          "status": "OPEN",
+          "strategy": "impulse",
+          "commission": 0,
+          "notes": "D0: 2026-04-28 | Паттерн D+1: не подтверждён | ATR: 2.93 | Impulse: -6.0% | Anchor (High D0): 128.30",
+          "atrPct": "2.43",
+          "atrAbs": 2.93,
+          "impulseAnchor": 128.3
+        },
+        {
+          "id": "1777470275434",
+          "createdAt": 1777470275434,
+          "ticker": "BEN",
+          "type": "LONG",
+          "entryDate": "2026-04-29",
+          "entry": 29.77,
+          "shares": 36,
+          "stop": "27.01",
+          "target1": "32.53",
+          "target2": "35.30",
+          "status": "OPEN",
+          "strategy": "impulse",
+          "commission": 0,
+          "notes": "D0: 2026-04-28 | Паттерн D+1: не подтверждён | ATR: 2.97 | Impulse: 6.9% | Anchor (Low D0): 27.60",
+          "atrPct": "9.98",
+          "atrAbs": 2.97,
+          "impulseAnchor": 27.6
         }
       ],
       "scans": {
@@ -10193,8 +10293,9 @@
           "stop": null,
           "target1": null,
           "target2": null,
-          "status": "WAITING_D1",
-          "created": "2026-04-29T06:18:47.537Z"
+          "status": "ENTERED",
+          "created": "2026-04-29T06:18:47.537Z",
+          "tradeId": "1777470139056"
         },
         {
           "id": "ARE_2026-04-28",
@@ -10228,8 +10329,9 @@
           "stop": null,
           "target1": null,
           "target2": null,
-          "status": "WAITING_D1",
-          "created": "2026-04-29T07:19:01.917Z"
+          "status": "ENTERED",
+          "created": "2026-04-29T07:19:01.917Z",
+          "tradeId": "1777470182779"
         },
         {
           "id": "PCAR_2026-04-28",
@@ -10263,8 +10365,9 @@
           "stop": null,
           "target1": null,
           "target2": null,
-          "status": "WAITING_D1",
-          "created": "2026-04-29T08:39:17.851Z"
+          "status": "ENTERED",
+          "created": "2026-04-29T08:39:17.851Z",
+          "tradeId": "1777470212204"
         },
         {
           "id": "BEN_2026-04-28",
@@ -10298,8 +10401,9 @@
           "stop": null,
           "target1": null,
           "target2": null,
-          "status": "WAITING_D1",
-          "created": "2026-04-29T08:59:29.515Z"
+          "status": "ENTERED",
+          "created": "2026-04-29T08:59:29.515Z",
+          "tradeId": "1777470275434"
         }
       ]
     },
@@ -10793,6 +10897,40 @@
         "from": "impulse",
         "to": "impulse"
       }
+    },
+    {
+      "timestamp": "2026-04-29T12:03:24.486Z",
+      "strategy": "impulse",
+      "event": "trade_open",
+      "data": {
+        "id": "1777464204486",
+        "ticker": "FCX",
+        "type": "LONG",
+        "entry": 58.36
+      }
+    },
+    {
+      "timestamp": "2026-04-29T13:44:41.131Z",
+      "strategy": "ibs_swing",
+      "event": "strategy_switch",
+      "data": {
+        "from": "ibs_swing",
+        "to": "ibs_swing"
+      }
+    },
+    {
+      "timestamp": "2026-04-29T13:46:43.781Z",
+      "strategy": "impulse",
+      "event": "trade_close",
+      "data": {
+        "id": "1777464204486",
+        "ticker": "FCX",
+        "type": "LONG",
+        "entry": 58.36,
+        "exit": 57.33,
+        "pnlPct": -2.07,
+        "reason": "STOP"
+      }
     }
   ],
   "settings": {
@@ -10811,6 +10949,30 @@
     "savedAt": "2026-04-09T04:50:25.521Z"
   },
   "trades": [
+    {
+      "id": "1777464204486",
+      "createdAt": 1777470403781,
+      "ticker": "FCX",
+      "type": "LONG",
+      "entryDate": "2026-04-29",
+      "entry": 58.36,
+      "shares": 28,
+      "stop": "54.86",
+      "target1": "60.69",
+      "target2": "63.03",
+      "rsi2": "",
+      "atrPct": "5.08",
+      "trend": "",
+      "status": "CLOSED",
+      "exitPrice": 57.33,
+      "exitReason": "STOP",
+      "commission": 5,
+      "notes": "",
+      "strategy": "impulse",
+      "pnlNet": -33.84,
+      "pnlPct": -2.07,
+      "result": "LOSS"
+    },
     {
       "id": "1776948555097",
       "createdAt": 1777379519591,
@@ -12453,6 +12615,82 @@
       "atrPct": "6.91",
       "atrAbs": 3.49,
       "impulseAnchor": 48.46
+    },
+    {
+      "id": "1777470139056",
+      "createdAt": 1777470139056,
+      "ticker": "ZBH",
+      "type": "SHORT",
+      "entryDate": "2026-04-29",
+      "entry": 81.96,
+      "shares": 13,
+      "stop": "89.35",
+      "target1": "74.57",
+      "target2": "67.18",
+      "status": "OPEN",
+      "strategy": "impulse",
+      "commission": 0,
+      "notes": "D0: 2026-04-28 | Паттерн D+1: не подтверждён | ATR: 3.56 | Impulse: -9.3% | Anchor (High D0): 88.64",
+      "atrPct": "4.34",
+      "atrAbs": 3.56,
+      "impulseAnchor": 88.64
+    },
+    {
+      "id": "1777470182779",
+      "createdAt": 1777470182779,
+      "ticker": "ARE",
+      "type": "SHORT",
+      "entryDate": "2026-04-29",
+      "entry": 40.68,
+      "shares": 21,
+      "stop": "45.23",
+      "target1": "36.13",
+      "target2": "31.58",
+      "status": "OPEN",
+      "strategy": "impulse",
+      "commission": 0,
+      "notes": "D0: 2026-04-28 | Паттерн D+1: не подтверждён | ATR: 5.49 | Impulse: -11.3% | Anchor (High D0): 44.13",
+      "atrPct": "13.50",
+      "atrAbs": 5.49,
+      "impulseAnchor": 44.13
+    },
+    {
+      "id": "1777470212204",
+      "createdAt": 1777470212204,
+      "ticker": "PCAR",
+      "type": "SHORT",
+      "entryDate": "2026-04-29",
+      "entry": 120.33,
+      "shares": 11,
+      "stop": "128.89",
+      "target1": "111.77",
+      "target2": "103.22",
+      "status": "OPEN",
+      "strategy": "impulse",
+      "commission": 0,
+      "notes": "D0: 2026-04-28 | Паттерн D+1: не подтверждён | ATR: 2.93 | Impulse: -6.0% | Anchor (High D0): 128.30",
+      "atrPct": "2.43",
+      "atrAbs": 2.93,
+      "impulseAnchor": 128.3
+    },
+    {
+      "id": "1777470275434",
+      "createdAt": 1777470275434,
+      "ticker": "BEN",
+      "type": "LONG",
+      "entryDate": "2026-04-29",
+      "entry": 29.77,
+      "shares": 36,
+      "stop": "27.01",
+      "target1": "32.53",
+      "target2": "35.30",
+      "status": "OPEN",
+      "strategy": "impulse",
+      "commission": 0,
+      "notes": "D0: 2026-04-28 | Паттерн D+1: не подтверждён | ATR: 2.97 | Impulse: 6.9% | Anchor (Low D0): 27.60",
+      "atrPct": "9.98",
+      "atrAbs": 2.97,
+      "impulseAnchor": 27.6
     }
   ],
   "rsiScans": {
