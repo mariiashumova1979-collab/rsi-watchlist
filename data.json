@@ -9997,7 +9997,8 @@
           "HLT_sma200": 286.12,
           "HLT_sma200_20": 324.55,
           "HLT_close2": 286.12,
-          "HLT_close3": 324.55
+          "HLT_close3": 324.55,
+          "VALE_rsi2": 5.35
         }
       },
       "config": {}
@@ -16011,7 +16012,8 @@
       "HLT_sma200": 286.12,
       "HLT_sma200_20": 324.55,
       "HLT_close2": 286.12,
-      "HLT_close3": 324.55
+      "HLT_close3": 324.55,
+      "VALE_rsi2": 5.35
     }
   },
   "quarterly": {},
