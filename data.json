@@ -1,6 +1,16 @@
 {
   "watchlist": [
     {
+      "ticker": "HLT",
+      "sector": "Consumer Defensive",
+      "cap": "73.98",
+      "atr": "2.43",
+      "earningsDate": "2026-07-29",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1777456530100
+    },
+    {
       "ticker": "FCX",
       "sector": "Basic Materials",
       "cap": "83.66",
