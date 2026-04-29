@@ -9995,7 +9995,9 @@
           "HLT_low1": 323.05,
           "HLT_high1": 336.8,
           "HLT_sma200": 286.12,
-          "HLT_sma200_20": 324.55
+          "HLT_sma200_20": 324.55,
+          "HLT_close2": 286.12,
+          "HLT_close3": 324.55
         }
       },
       "config": {}
@@ -16007,7 +16009,9 @@
       "HLT_low1": 323.05,
       "HLT_high1": 336.8,
       "HLT_sma200": 286.12,
-      "HLT_sma200_20": 324.55
+      "HLT_sma200_20": 324.55,
+      "HLT_close2": 286.12,
+      "HLT_close3": 324.55
     }
   },
   "quarterly": {},
