@@ -1,6 +1,16 @@
 {
   "watchlist": [
     {
+      "ticker": "SBUX",
+      "sector": "Consumer Defensive",
+      "cap": "110.83",
+      "atr": "2.27",
+      "earningsDate": "2026-08-04",
+      "cooldownDate": "",
+      "notes": "",
+      "addedAt": 1777455797424
+    },
+    {
       "ticker": "GLW",
       "sector": "Technology",
       "cap": "131.47",
