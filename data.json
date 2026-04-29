@@ -9962,7 +9962,8 @@
           "FCX_sma200_20": 64.77,
           "EMR_rsi2": 3.12,
           "EMR_close1": 138.42,
-          "EMR_low1": 138.08
+          "EMR_low1": 138.08,
+          "EMR_high1": 140.79
         }
       },
       "config": {}
@@ -15961,7 +15962,8 @@
       "FCX_sma200_20": 64.77,
       "EMR_rsi2": 3.12,
       "EMR_close1": 138.42,
-      "EMR_low1": 138.08
+      "EMR_low1": 138.08,
+      "EMR_high1": 140.79
     }
   },
   "quarterly": {},
