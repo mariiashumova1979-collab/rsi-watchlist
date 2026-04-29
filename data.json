@@ -9960,7 +9960,8 @@
           "FCX_high1": 60.2,
           "FCX_sma200": 50.53,
           "FCX_sma200_20": 64.77,
-          "EMR_rsi2": 3.12
+          "EMR_rsi2": 3.12,
+          "EMR_close1": 138.42
         }
       },
       "config": {}
@@ -15957,7 +15958,8 @@
       "FCX_high1": 60.2,
       "FCX_sma200": 50.53,
       "FCX_sma200_20": 64.77,
-      "EMR_rsi2": 3.12
+      "EMR_rsi2": 3.12,
+      "EMR_close1": 138.42
     }
   },
   "quarterly": {},
