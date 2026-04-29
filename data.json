@@ -9871,7 +9871,8 @@
           "AVGO_low1": 394.65,
           "AVGO_high1": 405.81,
           "BHP_rsi2": 9.56,
-          "BHP_close1": 78.12
+          "BHP_close1": 78.12,
+          "BHP_low1": 77.54
         }
       },
       "config": {}
@@ -15839,7 +15840,8 @@
       "AVGO_low1": 394.65,
       "AVGO_high1": 405.81,
       "BHP_rsi2": 9.56,
-      "BHP_close1": 78.12
+      "BHP_close1": 78.12,
+      "BHP_low1": 77.54
     }
   },
   "quarterly": {},
