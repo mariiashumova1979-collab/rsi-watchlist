@@ -652,72 +652,79 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
 
   <!-- IBS Daily RSI Scanner -->
   <div id="scanner-ibs" class="scanner-section" style="display:none">
-  
-  <!-- SPY MARKET DATA -->
-  <div class="card" style="margin-bottom:20px">
-    <div class="sh">📊 SPY Market Regime <span style="font-family:var(--mono);font-size:9px;color:var(--t2);font-weight:400" id="spyDateLabel"></span></div>
-    <div style="font-family:var(--mono);font-size:9px;color:var(--t2);margin-bottom:12px">
-      Данные SPY для market regime фильтров (IBS: SMA200, Event: EMA20/EMA50)
+    
+    <!-- SPY MARKET DATA -->
+    <div class="card" style="margin-bottom:20px">
+      <div class="sh">📊 SPY Market Regime <span style="font-family:var(--mono);font-size:9px;color:var(--t2);font-weight:400" id="spyDateLabel"></span></div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--t2);margin-bottom:12px">
+        Данные SPY для market regime фильтров (IBS: SMA200, Event: EMA20/EMA50)
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px">
+        <div class="fg"><label>Close SPY</label><input id="spy_close" type="text" inputmode="decimal" placeholder="—" onchange="saveSPYData()"></div>
+        <div class="fg"><label>SMA20</label><input id="spy_sma20" type="text" inputmode="decimal" placeholder="—" onchange="saveSPYData()"></div>
+        <div class="fg"><label>SMA50</label><input id="spy_sma50" type="text" inputmode="decimal" placeholder="—" onchange="saveSPYData()"></div>
+        <div class="fg"><label>SMA200</label><input id="spy_sma200" type="text" inputmode="decimal" placeholder="—" onchange="saveSPYData()"></div>
+      </div>
+      <div id="spyRegimeStatus" style="font-family:var(--mono);font-size:10px;margin-top:12px;padding:8px 12px;border-radius:6px"></div>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px">
-      <div class="fg">
-        <label>Close SPY</label>
-        <input id="spy_close" type="number" step="0.01" placeholder="—" onchange="saveSPYData()">
+
+    <!-- IBS RSI Scanner -->
+    <div style="margin-bottom:24px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div class="sh">📊 IBS RSI(2) Scanner
+          <span style="font-family:var(--mono);font-size:9px;color:var(--t2);font-weight:400">Mean Reversion</span>
+        </div>
+        <button class="btn btn-p btn-s" onclick="openIbsForm()">+ ДОБАВИТЬ КАНДИДАТА</button>
       </div>
-      <div class="fg">
-        <label>SMA20</label>
-        <input id="spy_sma20" type="number" step="0.01" placeholder="—" onchange="saveSPYData()">
+      
+      <div style="font-family:var(--mono);font-size:9px;color:var(--t2);margin:12px 0;padding:10px 14px;background:var(--bg3);border-radius:8px;border:1px solid var(--line);line-height:1.7">
+        <b>LONG:</b> RSI(2)&lt;10, Close&gt;SMA200, SMA200↑ (vs SMA200_{−20}), IBS&lt;0.20, Range&lt;2×ATR<br>
+        <b>SHORT:</b> RSI(2)&gt;90, Close&lt;SMA200, SMA200↓, IBS&gt;0.80, Range&lt;2×ATR<br>
+        <b>Gap отмена:</b> Open D+1 ≥/≤ Close × 1.02/0.98 → отмена<br>
+        <b>Stop:</b> LONG = Low T-1 (минимум сигнального дня), SHORT = High T-1<br>
+        <b>Risk:</b> Risk/share = |Entry − Stop|, Shares = Risk_$ / Risk/share
       </div>
-      <div class="fg">
-        <label>SMA50</label>
-        <input id="spy_sma50" type="number" step="0.01" placeholder="—" onchange="saveSPYData()">
-      </div>
-      <div class="fg">
-        <label>SMA200</label>
-        <input id="spy_sma200" type="number" step="0.01" placeholder="—" onchange="saveSPYData()">
+
+      <div class="tw">
+        <table>
+          <thead><tr>
+            <th>Ticker</th>
+            <th>Date</th>
+            <th>Dir</th>
+            <th>RSI(2)</th>
+            <th>Close T-1</th>
+            <th>IBS</th>
+            <th>Range%</th>
+            <th>SMA↑↓</th>
+            <th>Status</th>
+            <th>Entry</th>
+            <th>Stop</th>
+            <th>Actions</th>
+          </tr></thead>
+          <tbody id="ibsTbody">
+            <tr><td colspan="12" style="text-align:center;color:var(--t2);padding:30px">Нет кандидатов — нажми «+ Добавить кандидата»</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
-    <div id="spyRegimeStatus" style="font-family:var(--mono);font-size:10px;margin-top:12px;padding:8px 12px;border-radius:6px"></div>
-  </div>
-  
-  <!-- RSI SCAN TABLE -->
-  <div style="margin-bottom:24px">
-    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px">
-      <div class="sh" style="margin-bottom:0">Daily RSI Scan
-        <span style="font-family:var(--mono);font-size:9px;color:var(--t2);font-weight:400" id="scanDateLabel"></span>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px">
-        <label style="font-family:var(--mono);font-size:10px;color:var(--t2);display:flex;align-items:center;gap:6px;cursor:pointer">
-          <input type="checkbox" id="scanFilterActive" onchange="renderRsiScan()" style="width:14px;height:14px"> Только активные
-        </label>
-      </div>
-    </div>
-    <div style="font-family:var(--mono);font-size:9px;color:var(--t2);margin-bottom:12px;padding:10px 14px;background:var(--bg3);border-radius:8px;border:1px solid var(--line);line-height:1.7">
-      <b>LONG:</b> RSI(2)&lt;10 + &gt;SMA200 + SMA200↑ + IBS&lt;0.20 + Range&lt;2×ATR<br>
-      <b>SHORT:</b> RSI(2)&gt;90 + &lt;SMA200 + SMA200↓ + IBS&gt;0.80 + Range&lt;2×ATR<br>
-      <b>Gap отмена:</b> ≥2% в нужную сторону → вход отменён
-    </div>
-    <div class="tw">
-      <table>
-        <thead><tr>
-          <th>Ticker</th>
-          <th>RSI(2)<br><span style="font-weight:400;font-size:9px">T0</span></th>
-          <th>Close<br><span style="font-weight:400;font-size:9px">T0</span></th>
-          <th>Low<br><span style="font-weight:400;font-size:9px">T0</span></th>
-          <th>High<br><span style="font-weight:400;font-size:9px">T0</span></th>
-          <th>IBS</th>
-          <th>Range%</th>
-          <th>Open<br><span style="font-weight:400;font-size:9px">D+1</span></th>
-          <th>Gap</th>
-          <th>SMA200</th>
-          <th>SMA↑↓</th>
-          <th>Signal</th>
-        </tr></thead>
-        <tbody id="rsiScanTbody"></tbody>
-      </table>
-    </div>
-  </div>
   </div><!-- end scanner-ibs -->
+
+  <!-- SPY MARKET DATA TEMPLATE (рендерится через #spyMarketData при show scanner-ibs) -->
+  <template id="spyMarketDataTemplate">
+    <div class="card" style="margin-bottom:20px">
+      <div class="sh">📊 SPY Market Regime <span style="font-family:var(--mono);font-size:9px;color:var(--t2);font-weight:400" id="spyDateLabel"></span></div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--t2);margin-bottom:12px">
+        Данные SPY для market regime фильтров (IBS: SMA200, Event: EMA20/EMA50)
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px">
+        <div class="fg"><label>Close SPY</label><input id="spy_close" type="text" inputmode="decimal" placeholder="—" onchange="saveSPYData()"></div>
+        <div class="fg"><label>SMA20</label><input id="spy_sma20" type="text" inputmode="decimal" placeholder="—" onchange="saveSPYData()"></div>
+        <div class="fg"><label>SMA50</label><input id="spy_sma50" type="text" inputmode="decimal" placeholder="—" onchange="saveSPYData()"></div>
+        <div class="fg"><label>SMA200</label><input id="spy_sma200" type="text" inputmode="decimal" placeholder="—" onchange="saveSPYData()"></div>
+      </div>
+      <div id="spyRegimeStatus" style="font-family:var(--mono);font-size:10px;margin-top:12px;padding:8px 12px;border-radius:6px"></div>
+    </div>
+  </template>
 
   <!-- Event Scanner -->
   <div id="scanner-event" class="scanner-section" style="display:none">
@@ -1897,9 +1904,10 @@ const STRATEGY_RULES = {
     stop: {
       title: 'Правила стопа',
       rules: [
-        'StopDistance = min( 1.5 × ATR14_T0, 0.06 × EntryPrice )',
-        'LONG: StopPrice = EntryPrice − StopDistance',
-        'SHORT: StopPrice = EntryPrice + StopDistance',
+        'LONG: Stop = Low_T-1 (минимум сигнального дня)',
+        'SHORT: Stop = High_T-1 (максимум сигнального дня)',
+        'Risk/share = |Entry − Stop|',
+        'PositionSize = Risk_$ / Risk/share',
         'Стоп фиксированный, не двигается до Target 1'
       ]
     },
@@ -5245,7 +5253,471 @@ function computeSignal(w, scan) {
   return { signal: 'none', clv, mid1, gapPct };
 }
 
+// ═══════════════════════════════════════════════════════════
+// IBS RSI MEAN REVERSION — новая система кандидатов
+// ═══════════════════════════════════════════════════════════
+
+// Backwards-compat: renderRsiScan вызывается из других мест — теперь редиректим в renderIbs
 function renderRsiScan() {
+  renderIbs();
+}
+
+function renderIbs() {
+  const tbody = document.getElementById('ibsTbody');
+  if (!tbody) return;
+  
+  const candidates = cache.strategies?.ibs_swing?.candidates || [];
+  if (!candidates.length) {
+    tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;color:var(--t2);padding:30px">Нет кандидатов — нажми «+ Добавить кандидата»</td></tr>';
+    if (typeof renderDashSignals === 'function') renderDashSignals();
+    return;
+  }
+  
+  tbody.innerHTML = candidates.map(c => {
+    const dirColor = c.direction === 'LONG' ? 'var(--acc)' : 'var(--acc2)';
+    const statusText = {
+      'READY_ENTRY': '🎯 Готов вход',
+      'GAP_CANCEL': '🚫 Gap отмена',
+      'WAITING_OPEN': '⏳ Ждём Open D+1',
+      'ENTERED': '✅ В сделке',
+      'REJECTED': '❌ Не прошёл'
+    }[c.status] || c.status;
+    
+    const smaArrow = c.metrics.smaTrend === 'up' ? '↑' : (c.metrics.smaTrend === 'down' ? '↓' : '—');
+    const smaColor = c.metrics.smaTrend === 'up' ? 'var(--acc)' : (c.metrics.smaTrend === 'down' ? 'var(--acc2)' : 'var(--t2)');
+    
+    return `<tr>
+      <td><b>${c.ticker}</b></td>
+      <td style="font-family:var(--mono);font-size:10px">${c.signalDate}</td>
+      <td><span style="color:${dirColor};font-weight:700">${c.direction || '—'}</span></td>
+      <td style="font-family:var(--mono);font-size:10px">${c.rsi2.toFixed(1)}</td>
+      <td style="font-family:var(--mono);font-size:10px">$${c.close1.toFixed(2)}</td>
+      <td style="font-family:var(--mono);font-size:10px">${c.metrics.ibs != null ? c.metrics.ibs.toFixed(2) : '—'}</td>
+      <td style="font-family:var(--mono);font-size:10px">${c.metrics.rangePct != null ? c.metrics.rangePct.toFixed(1) + '%' : '—'}</td>
+      <td style="font-family:var(--mono);font-size:10px;color:${smaColor}">${smaArrow}</td>
+      <td style="font-size:10px">${statusText}</td>
+      <td style="font-family:var(--mono);font-size:10px">${c.entry != null ? '$' + c.entry.toFixed(2) : '—'}</td>
+      <td style="font-family:var(--mono);font-size:10px">${c.stop != null ? '$' + c.stop.toFixed(2) : '—'}</td>
+      <td>
+        ${(c.status === 'READY_ENTRY' || c.status === 'WAITING_OPEN') && c.status !== 'ENTERED' ? `<button class="btn btn-p btn-s" onclick="openIbsTradeForm('${c.id}')" style="font-size:9px">+ Сделка</button>` : ''}
+        <button class="btn btn-r btn-s" onclick="deleteIbs('${c.id}')" style="font-size:9px">×</button>
+      </td>
+    </tr>`;
+  }).join('');
+  
+  if (typeof renderDashSignals === 'function') renderDashSignals();
+}
+
+// Backwards-compat: старая функция updateRsiScan больше не используется
+function updateRsiScan() { /* deprecated */ }
+
+// ───── IBS form: добавление кандидата ─────
+
+function openIbsForm() {
+  const modal = document.getElementById('ibsModal');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  
+  ['ibsTicker','ibsDate','ibsRsi2','ibsSma200','ibsSma200_20','ibsClose1','ibsLow1','ibsHigh1','ibsOpen0','ibsAtrPct','ibsRisk'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  
+  // Default date — сегодня
+  document.getElementById('ibsDate').value = new Date().toISOString().split('T')[0];
+  document.getElementById('ibsRisk').value = 100;
+  
+  const errEl = document.getElementById('ibsErrors');
+  const prEl = document.getElementById('ibsPreview');
+  if (errEl) { errEl.style.display = 'none'; errEl.innerHTML = ''; }
+  if (prEl) { prEl.style.display = 'none'; prEl.innerHTML = ''; }
+}
+
+function closeIbsForm() {
+  document.getElementById('ibsModal').style.display = 'none';
+  const errEl = document.getElementById('ibsErrors');
+  const prEl = document.getElementById('ibsPreview');
+  if (errEl) { errEl.style.display = 'none'; errEl.innerHTML = ''; }
+  if (prEl) { prEl.style.display = 'none'; prEl.innerHTML = ''; }
+}
+
+// Чтение полей формы IBS
+function _readIbsForm() {
+  return {
+    ticker: document.getElementById('ibsTicker').value.trim().toUpperCase(),
+    signalDate: document.getElementById('ibsDate').value,
+    rsi2: parseNum(document.getElementById('ibsRsi2').value),
+    sma200: parseNum(document.getElementById('ibsSma200').value),
+    sma200_20: parseNum(document.getElementById('ibsSma200_20').value),
+    close1: parseNum(document.getElementById('ibsClose1').value),
+    low1: parseNum(document.getElementById('ibsLow1').value),
+    high1: parseNum(document.getElementById('ibsHigh1').value),
+    open0: parseNum(document.getElementById('ibsOpen0').value),
+    atrPct: parseNum(document.getElementById('ibsAtrPct').value),
+    risk: parseNum(document.getElementById('ibsRisk').value) || 100
+  };
+}
+
+// Чистая функция расчёта метрик и валидации IBS
+function calculateIbsCandidate(d) {
+  const errors = [];
+  const m = {
+    ibs: null, rangePct: null, smaTrend: null,
+    longRsi: false, longTrend: false, longSmaUp: false, longIbs: false, longRange: false,
+    shortRsi: false, shortTrend: false, shortSmaDown: false, shortIbs: false, shortRange: false,
+    direction: null
+  };
+  
+  // Required fields
+  if (!d.ticker) errors.push('Ticker не заполнен');
+  if (!d.signalDate) errors.push('Дата сигнала не заполнена');
+  if (isNaN(d.rsi2)) errors.push('RSI(2) не заполнен');
+  if (isNaN(d.sma200)) errors.push('SMA200 не заполнен');
+  if (isNaN(d.sma200_20)) errors.push('SMA200_{−20} не заполнен');
+  if (isNaN(d.close1)) errors.push('Close T-1 не заполнен');
+  if (isNaN(d.low1)) errors.push('Low T-1 не заполнен');
+  if (isNaN(d.high1)) errors.push('High T-1 не заполнен');
+  if (isNaN(d.atrPct) || d.atrPct <= 0) errors.push('ATR% не заполнен (или ≤ 0)');
+  
+  if (errors.length) return { valid: false, errors, metrics: m };
+  
+  // Метрики
+  if (d.high1 !== d.low1) m.ibs = (d.close1 - d.low1) / (d.high1 - d.low1);
+  const range = d.high1 - d.low1;
+  if (d.close1 > 0) m.rangePct = (range / d.close1) * 100;
+  m.smaTrend = d.sma200 > d.sma200_20 ? 'up' : (d.sma200 < d.sma200_20 ? 'down' : 'flat');
+  
+  // LONG условия
+  m.longRsi = d.rsi2 < 10;
+  m.longTrend = d.close1 > d.sma200;
+  m.longSmaUp = m.smaTrend === 'up';
+  m.longIbs = m.ibs != null && m.ibs < 0.20;
+  m.longRange = m.rangePct != null && m.rangePct < (d.atrPct * 2);
+  
+  // SHORT условия
+  m.shortRsi = d.rsi2 > 90;
+  m.shortTrend = d.close1 < d.sma200;
+  m.shortSmaDown = m.smaTrend === 'down';
+  m.shortIbs = m.ibs != null && m.ibs > 0.80;
+  m.shortRange = m.rangePct != null && m.rangePct < (d.atrPct * 2);
+  
+  const longOK = m.longRsi && m.longTrend && m.longSmaUp && m.longIbs && m.longRange;
+  const shortOK = m.shortRsi && m.shortTrend && m.shortSmaDown && m.shortIbs && m.shortRange;
+  
+  if (longOK) m.direction = 'LONG';
+  else if (shortOK) m.direction = 'SHORT';
+  
+  // Если direction не определён — собрать причины
+  if (!m.direction) {
+    // Решаем какое направление "ближе" по RSI
+    if (d.rsi2 < 50) {
+      // LONG candidate
+      if (!m.longRsi) errors.push(`LONG: RSI(2) ${d.rsi2.toFixed(1)} ≥ 10`);
+      if (!m.longTrend) errors.push(`LONG: Close ${d.close1.toFixed(2)} ≤ SMA200 ${d.sma200.toFixed(2)}`);
+      if (!m.longSmaUp) errors.push(`LONG: SMA200 не растёт (${d.sma200.toFixed(2)} ≤ SMA200_{−20} ${d.sma200_20.toFixed(2)})`);
+      if (!m.longIbs && m.ibs != null) errors.push(`LONG: IBS ${m.ibs.toFixed(2)} ≥ 0.20`);
+      if (!m.longRange && m.rangePct != null) errors.push(`LONG: Range ${m.rangePct.toFixed(1)}% ≥ 2×ATR (${(d.atrPct * 2).toFixed(1)}%)`);
+    } else {
+      if (!m.shortRsi) errors.push(`SHORT: RSI(2) ${d.rsi2.toFixed(1)} ≤ 90`);
+      if (!m.shortTrend) errors.push(`SHORT: Close ${d.close1.toFixed(2)} ≥ SMA200 ${d.sma200.toFixed(2)}`);
+      if (!m.shortSmaDown) errors.push(`SHORT: SMA200 не падает (${d.sma200.toFixed(2)} ≥ SMA200_{−20} ${d.sma200_20.toFixed(2)})`);
+      if (!m.shortIbs && m.ibs != null) errors.push(`SHORT: IBS ${m.ibs.toFixed(2)} ≤ 0.80`);
+      if (!m.shortRange && m.rangePct != null) errors.push(`SHORT: Range ${m.rangePct.toFixed(1)}% ≥ 2×ATR (${(d.atrPct * 2).toFixed(1)}%)`);
+    }
+  }
+  
+  // Stop по правилу: LONG = Low_T-1, SHORT = High_T-1
+  const stop = m.direction === 'LONG' ? d.low1 : (m.direction === 'SHORT' ? d.high1 : null);
+  
+  // Entry — Open D+1 (если введён)
+  const entry = !isNaN(d.open0) && d.open0 > 0 ? d.open0 : null;
+  
+  // Gap отмена (если есть Open D+1)
+  let gapPct = null;
+  let status = 'WAITING_OPEN';
+  if (entry != null && d.close1 > 0) {
+    gapPct = ((entry - d.close1) / d.close1) * 100;
+    if (m.direction === 'LONG' && entry >= d.close1 * 1.02) {
+      status = 'GAP_CANCEL';
+    } else if (m.direction === 'SHORT' && entry <= d.close1 * 0.98) {
+      status = 'GAP_CANCEL';
+    } else if (m.direction) {
+      status = 'READY_ENTRY';
+    }
+  }
+  if (!m.direction) status = 'REJECTED';
+  
+  // Risk per share / shares (если есть entry и stop)
+  let riskPerShare = null, shares = null, target1 = null, target2 = null;
+  if (entry != null && stop != null) {
+    riskPerShare = m.direction === 'LONG' ? entry - stop : stop - entry;
+    if (riskPerShare > 0) {
+      shares = Math.floor(d.risk / riskPerShare);
+      target1 = m.direction === 'LONG' ? entry + riskPerShare : entry - riskPerShare;
+      target2 = m.direction === 'LONG' ? entry + 2 * riskPerShare : entry - 2 * riskPerShare;
+    }
+  }
+  
+  return {
+    valid: errors.length === 0 && m.direction !== null,
+    errors,
+    metrics: m,
+    stop, entry, riskPerShare, shares, target1, target2, gapPct, status
+  };
+}
+
+function previewIbs() {
+  const d = _readIbsForm();
+  const r = calculateIbsCandidate(d);
+  
+  const errEl = document.getElementById('ibsErrors');
+  const prEl = document.getElementById('ibsPreview');
+  
+  if (r.errors.length) {
+    errEl.style.display = 'block';
+    errEl.innerHTML = `<b>❌ Проблемы:</b><br>${r.errors.map(e => `• ${e}`).join('<br>')}`;
+  } else {
+    errEl.style.display = 'none';
+    errEl.innerHTML = '';
+  }
+  
+  if (r.metrics.direction) {
+    const dirColor = r.metrics.direction === 'LONG' ? 'var(--acc)' : 'var(--acc2)';
+    let html = `<div style="font-weight:700;color:${dirColor}">${r.metrics.direction} ${d.ticker} — ${d.signalDate}</div>`;
+    html += `<div>RSI(2): <b>${d.rsi2.toFixed(1)}</b> &nbsp;|&nbsp; IBS: <b>${r.metrics.ibs.toFixed(2)}</b> &nbsp;|&nbsp; Range: <b>${r.metrics.rangePct.toFixed(1)}%</b></div>`;
+    html += `<div>SMA200 тренд: <b>${r.metrics.smaTrend === 'up' ? '↑ растёт' : (r.metrics.smaTrend === 'down' ? '↓ падает' : '— flat')}</b></div>`;
+    html += `<div>Stop (${r.metrics.direction === 'LONG' ? 'Low' : 'High'} T-1): <b style="color:var(--acc2)">$${r.stop.toFixed(2)}</b></div>`;
+    if (r.entry != null) {
+      html += `<div>Entry (Open D+1): <b style="color:var(--acc)">$${r.entry.toFixed(2)}</b></div>`;
+      if (r.status === 'GAP_CANCEL') {
+        html += `<div style="color:#ff9900">⚠ Gap отмена: ${r.gapPct.toFixed(2)}% — вход не выполняется</div>`;
+      }
+      if (r.riskPerShare && r.shares) {
+        html += `<div>Risk/share: <b>$${r.riskPerShare.toFixed(2)}</b> &nbsp;|&nbsp; Акций: <b>${r.shares}</b> &nbsp;|&nbsp; Размер: <b>$${(r.shares * r.entry).toFixed(0)}</b></div>`;
+        html += `<div>Target 1: <b>$${r.target1.toFixed(2)}</b> (+1R) &nbsp;|&nbsp; Target 2: <b>$${r.target2.toFixed(2)}</b> (+2R)</div>`;
+      }
+    } else {
+      html += `<div style="color:var(--t2)">Entry будет вычислен когда заполнишь Open D+1</div>`;
+    }
+    prEl.style.display = 'block';
+    prEl.innerHTML = html;
+  } else {
+    prEl.style.display = 'none';
+    prEl.innerHTML = '';
+  }
+}
+
+function saveIbs() {
+  const d = _readIbsForm();
+  const r = calculateIbsCandidate(d);
+  
+  const errEl = document.getElementById('ibsErrors');
+  
+  if (!r.valid) {
+    errEl.style.display = 'block';
+    errEl.innerHTML = `<b>❌ Кандидат не прошёл проверку:</b><br>${r.errors.map(e => `• ${e}`).join('<br>')}`;
+    return;
+  }
+  
+  if (!cache.strategies) cache.strategies = {};
+  if (!cache.strategies.ibs_swing) cache.strategies.ibs_swing = {};
+  if (!cache.strategies.ibs_swing.candidates) cache.strategies.ibs_swing.candidates = [];
+  
+  // Проверка на дубль
+  const existId = `${d.ticker}_${d.signalDate}`;
+  const exists = cache.strategies.ibs_swing.candidates.find(c => c.id === existId);
+  if (exists) {
+    errEl.style.display = 'block';
+    errEl.innerHTML = `❌ Кандидат ${d.ticker} на ${d.signalDate} уже существует`;
+    return;
+  }
+  
+  const candidate = {
+    id: existId,
+    ticker: d.ticker,
+    signalDate: d.signalDate,
+    direction: r.metrics.direction,
+    rsi2: d.rsi2,
+    sma200: d.sma200,
+    sma200_20: d.sma200_20,
+    close1: d.close1,
+    low1: d.low1,
+    high1: d.high1,
+    open0: !isNaN(d.open0) ? d.open0 : null,
+    atrPct: d.atrPct,
+    risk: d.risk,
+    metrics: r.metrics,
+    stop: r.stop,
+    entry: r.entry,
+    riskPerShare: r.riskPerShare,
+    shares: r.shares,
+    target1: r.target1,
+    target2: r.target2,
+    gapPct: r.gapPct,
+    status: r.status,
+    created: new Date().toISOString()
+  };
+  
+  cache.strategies.ibs_swing.candidates.push(candidate);
+  
+  closeIbsForm();
+  renderIbs();
+  scheduleSave();
+  toast(`✓ IBS ${d.ticker} (${r.metrics.direction}) добавлен · Stop $${r.stop.toFixed(2)}`);
+}
+
+function deleteIbs(id) {
+  if (!confirm('Удалить этого IBS кандидата?')) return;
+  if (!cache.strategies?.ibs_swing?.candidates) return;
+  cache.strategies.ibs_swing.candidates = cache.strategies.ibs_swing.candidates.filter(c => c.id !== id);
+  renderIbs();
+  scheduleSave();
+  toast('IBS кандидат удалён');
+}
+
+// ───── IBS trade: открытие сделки ─────
+
+let currentIbsTradeId = null;
+
+function openIbsTradeForm(candidateId) {
+  const c = cache.strategies?.ibs_swing?.candidates?.find(x => x.id === candidateId);
+  if (!c) return;
+  currentIbsTradeId = candidateId;
+  
+  const dirColor = c.direction === 'LONG' ? 'var(--acc)' : 'var(--acc2)';
+  document.getElementById('ibsTradeInfo').innerHTML = `
+    <div><b style="color:${dirColor}">${c.direction}</b> &nbsp;|&nbsp; <b>${c.ticker}</b> &nbsp;|&nbsp; Сигнал: ${c.signalDate}</div>
+    <div>RSI(2): <b>${c.rsi2.toFixed(1)}</b> &nbsp;|&nbsp; IBS: <b>${c.metrics.ibs.toFixed(2)}</b> &nbsp;|&nbsp; Range: <b>${c.metrics.rangePct.toFixed(1)}%</b></div>
+    <div>Close T-1: <b>$${c.close1.toFixed(2)}</b> &nbsp;|&nbsp; Low T-1: <b>$${c.low1.toFixed(2)}</b> &nbsp;|&nbsp; High T-1: <b>$${c.high1.toFixed(2)}</b></div>
+    <div>Stop (${c.direction === 'LONG' ? 'Low' : 'High'} T-1): <b style="color:var(--acc2)">$${c.stop.toFixed(2)}</b></div>
+  `;
+  
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('ibsTradeDate').value = today;
+  // Если уже введён open0 — подставим
+  document.getElementById('ibsTradeEntry').value = c.entry != null ? c.entry.toFixed(2) : '';
+  document.getElementById('ibsTradeRisk').value = c.risk || 100;
+  document.getElementById('ibsTradeComm').value = '';
+  document.getElementById('ibsTradePreview').style.display = 'none';
+  document.getElementById('ibsTradeErrors').style.display = 'none';
+  
+  document.getElementById('ibsTradeModal').style.display = 'flex';
+}
+
+function closeIbsTradeForm() {
+  document.getElementById('ibsTradeModal').style.display = 'none';
+  currentIbsTradeId = null;
+}
+
+function _ibsTradeCalc() {
+  const c = cache.strategies?.ibs_swing?.candidates?.find(x => x.id === currentIbsTradeId);
+  if (!c) return null;
+  
+  const entry = parseNum(document.getElementById('ibsTradeEntry').value);
+  const risk = parseNum(document.getElementById('ibsTradeRisk').value) || 100;
+  const date = document.getElementById('ibsTradeDate').value;
+  const comm = parseNum(document.getElementById('ibsTradeComm').value) || 0;
+  
+  if (isNaN(entry) || entry <= 0) return { error: '❌ Введи фактический Open D+1' };
+  if (!date) return { error: '❌ Укажи дату входа' };
+  
+  // Gap-проверка
+  const gapPct = ((entry - c.close1) / c.close1) * 100;
+  if (c.direction === 'LONG' && entry >= c.close1 * 1.02) {
+    return { error: `❌ Gap отмена: Open ${entry.toFixed(2)} ≥ Close × 1.02 (${(c.close1 * 1.02).toFixed(2)})<br>Gap +${gapPct.toFixed(2)}% — вход не выполняется` };
+  }
+  if (c.direction === 'SHORT' && entry <= c.close1 * 0.98) {
+    return { error: `❌ Gap отмена: Open ${entry.toFixed(2)} ≤ Close × 0.98 (${(c.close1 * 0.98).toFixed(2)})<br>Gap ${gapPct.toFixed(2)}% — вход не выполняется` };
+  }
+  
+  const stop = c.stop;
+  const riskPerShare = c.direction === 'LONG' ? entry - stop : stop - entry;
+  if (riskPerShare <= 0) return { error: '❌ RiskPerShare ≤ 0: проверь Entry/Stop' };
+  
+  const shares = Math.floor(risk / riskPerShare);
+  if (shares < 1) return { error: `❌ Слишком мало акций (${shares}): увеличь риск` };
+  
+  const target1 = c.direction === 'LONG' ? entry + riskPerShare : entry - riskPerShare;
+  const target2 = c.direction === 'LONG' ? entry + 2 * riskPerShare : entry - 2 * riskPerShare;
+  
+  return { c, entry, stop, riskPerShare, shares, target1, target2, date, comm, risk, gapPct };
+}
+
+function calcIbsTrade() {
+  const r = _ibsTradeCalc();
+  const errEl = document.getElementById('ibsTradeErrors');
+  const prEl = document.getElementById('ibsTradePreview');
+  
+  if (!r) return;
+  if (r.error) {
+    errEl.style.display = 'block';
+    errEl.innerHTML = r.error;
+    prEl.style.display = 'none';
+    return;
+  }
+  
+  errEl.style.display = 'none';
+  const dirColor = r.c.direction === 'LONG' ? 'var(--acc)' : 'var(--acc2)';
+  prEl.style.display = 'block';
+  prEl.innerHTML = `
+    <div style="font-weight:700;color:${dirColor}">Позиция</div>
+    <div>Entry (Open D+1): <b>$${r.entry.toFixed(2)}</b> &nbsp;|&nbsp; Gap: <b>${r.gapPct >= 0 ? '+' : ''}${r.gapPct.toFixed(2)}%</b></div>
+    <div>Stop: <b style="color:var(--acc2)">$${r.stop.toFixed(2)}</b> &nbsp;|&nbsp; Risk/share: <b>$${r.riskPerShare.toFixed(2)}</b></div>
+    <div>Акций: <b>${r.shares}</b> &nbsp;|&nbsp; Размер: <b>$${(r.shares * r.entry).toFixed(0)}</b> &nbsp;|&nbsp; Риск: <b>$${(r.shares * r.riskPerShare).toFixed(2)}</b></div>
+    <div>Target 1: <b>$${r.target1.toFixed(2)}</b> (+1R) &nbsp;|&nbsp; Target 2: <b>$${r.target2.toFixed(2)}</b> (+2R)</div>
+  `;
+}
+
+function saveIbsTrade() {
+  const r = _ibsTradeCalc();
+  const errEl = document.getElementById('ibsTradeErrors');
+  
+  if (!r) return;
+  if (r.error) {
+    errEl.style.display = 'block';
+    errEl.innerHTML = r.error;
+    return;
+  }
+  
+  const trade = {
+    id: Date.now().toString(),
+    createdAt: Date.now(),
+    ticker: r.c.ticker,
+    type: r.c.direction,
+    entryDate: r.date,
+    entry: r.entry,
+    shares: r.shares,
+    stop: r.stop.toFixed(2),
+    target1: r.target1.toFixed(2),
+    target2: r.target2.toFixed(2),
+    status: 'OPEN',
+    strategy: 'ibs_swing',
+    commission: r.comm,
+    notes: `IBS RSI(2)=${r.c.rsi2.toFixed(1)} | IBS=${r.c.metrics.ibs.toFixed(2)} | Range=${r.c.metrics.rangePct.toFixed(1)}% | Сигнал: ${r.c.signalDate} | Stop=${r.c.direction === 'LONG' ? 'Low' : 'High'} T-1`,
+    atrPct: r.c.atrPct ? r.c.atrPct.toFixed(2) : null
+  };
+  
+  if (!cache.trades) cache.trades = [];
+  cache.trades.push(trade);
+  
+  r.c.status = 'ENTERED';
+  r.c.tradeId = trade.id;
+  r.c.entry = r.entry;
+  r.c.shares = r.shares;
+  
+  closeIbsTradeForm();
+  renderIbs();
+  if (typeof renderTrades === 'function') renderTrades();
+  if (typeof renderDash === 'function') renderDash();
+  scheduleSave();
+  toast(`✅ IBS сделка ${r.c.ticker} ${r.c.direction} открыта · ${r.shares} акций · Entry $${r.entry.toFixed(2)}`);
+}
+
+// ═══════════════════════════════════════════════════════════
+// СТАРАЯ функция renderRsiScan_OLD — удалена (replaced by renderIbs)
+// ═══════════════════════════════════════════════════════════
+
+function renderRsiScan_OLD_LEGACY() {
   const t0 = today();
   document.getElementById('scanDateLabel').textContent = 'T0: ' + new Date().toLocaleDateString('en-US',{weekday:'short',day:'2-digit',month:'short'});
 
@@ -8483,6 +8955,111 @@ init();
     <div class="modal-f">
       <button class="btn btn-g" onclick="closeRSPCD1Form()">Отмена</button>
       <button class="btn btn-p" onclick="saveRSPCD1()" style="background:#f39c12;border-color:#f39c12">💾 Добавить D+1</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- IBS RSI MODAL -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="ibsModal" class="modal">
+  <div class="modal-c" style="max-width:780px">
+    <div class="modal-h">
+      <div style="font-size:18px;font-weight:700">📊 Добавить IBS RSI кандидата</div>
+      <div class="cls" onclick="closeIbsForm()">×</div>
+    </div>
+    <div class="modal-b">
+      <div class="fgrid" style="grid-template-columns:1fr 1fr;margin-bottom:16px">
+        <div class="fg">
+          <label>Ticker *</label>
+          <input id="ibsTicker" placeholder="AAPL" style="text-transform:uppercase">
+        </div>
+        <div class="fg">
+          <label>Дата сигнала (T-1) *</label>
+          <input id="ibsDate" type="date">
+        </div>
+      </div>
+
+      <div style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--text);margin:20px 0 12px">RSI и тренд</div>
+      <div class="fgrid" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="fg"><label>RSI(2) *</label><input id="ibsRsi2" type="text" inputmode="decimal" placeholder="<10 LONG, >90 SHORT"></div>
+        <div class="fg"><label>SMA200 *</label><input id="ibsSma200" type="text" inputmode="decimal"></div>
+        <div class="fg">
+          <label>SMA200_{−20} *</label>
+          <input id="ibsSma200_20" type="text" inputmode="decimal">
+          <div style="font-family:var(--mono);font-size:9px;color:var(--t2);margin-top:4px">Значение SMA200 двадцать дней назад (для проверки наклона)</div>
+        </div>
+      </div>
+
+      <div style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--text);margin:20px 0 12px">Свеча T-1 (день сигнала)</div>
+      <div class="fgrid" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="fg"><label>Close T-1 *</label><input id="ibsClose1" type="text" inputmode="decimal"></div>
+        <div class="fg"><label>Low T-1 *</label><input id="ibsLow1" type="text" inputmode="decimal"></div>
+        <div class="fg"><label>High T-1 *</label><input id="ibsHigh1" type="text" inputmode="decimal"></div>
+      </div>
+
+      <div style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--text);margin:20px 0 12px">D+1 (день входа) и риск</div>
+      <div class="fgrid" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="fg">
+          <label>Open D+1 (фактический вход)</label>
+          <input id="ibsOpen0" type="text" inputmode="decimal" placeholder="Заполнить утром в день входа">
+          <div style="font-family:var(--mono);font-size:9px;color:var(--t2);margin-top:4px">Можно оставить пустым и заполнить позже</div>
+        </div>
+        <div class="fg"><label>ATR% (для Range фильтра)</label><input id="ibsAtrPct" type="text" inputmode="decimal" placeholder="Например: 2.5"></div>
+        <div class="fg"><label>Риск $</label><input id="ibsRisk" type="text" inputmode="numeric" placeholder="100"></div>
+      </div>
+
+      <div style="font-family:var(--mono);font-size:10px;color:var(--t2);margin-top:16px;padding:10px;background:var(--bg3);border-radius:6px">
+        <b>Auto-check:</b> RSI/SMA/IBS/Range — все 5 условий стратегии.<br>
+        <b>Stop:</b> LONG = Low_T-1, SHORT = High_T-1. <b>Risk/share = |Entry − Stop|.</b>
+      </div>
+      
+      <div id="ibsErrors" style="display:none;margin-top:16px;padding:12px;background:#ff000010;border:1px solid #ff000040;border-radius:6px;font-family:var(--mono);font-size:10px;line-height:1.8;color:#ff4444"></div>
+      <div id="ibsPreview" style="display:none;margin-top:16px;padding:14px;background:var(--bg3);border-radius:8px;border:1px solid var(--line);font-family:var(--mono);font-size:11px;line-height:2"></div>
+    </div>
+    <div class="modal-f">
+      <button class="btn btn-g" onclick="closeIbsForm()">Отмена</button>
+      <button class="btn btn-g" onclick="previewIbs()" style="border-color:var(--acc3);color:var(--acc3)">🧮 Рассчитать</button>
+      <button class="btn btn-p" onclick="saveIbs()">💾 Добавить кандидата</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- IBS TRADE MODAL (открыть сделку из кандидата) -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="ibsTradeModal" class="modal">
+  <div class="modal-c" style="max-width:560px">
+    <div class="modal-h">
+      <div style="font-size:18px;font-weight:700">📊 Открыть IBS сделку</div>
+      <div class="cls" onclick="closeIbsTradeForm()">×</div>
+    </div>
+    <div class="modal-b">
+      <div id="ibsTradeInfo" style="padding:14px;background:var(--bg3);border-radius:8px;border:1px solid var(--line);margin-bottom:20px;font-family:var(--mono);font-size:11px;line-height:2"></div>
+
+      <div class="fgrid" style="grid-template-columns:1fr 1fr;margin-bottom:16px">
+        <div class="fg">
+          <label>Дата входа *</label>
+          <input id="ibsTradeDate" type="date">
+        </div>
+        <div class="fg">
+          <label>Open D+1 (фактический вход) *</label>
+          <input id="ibsTradeEntry" type="text" inputmode="decimal" placeholder="Цена открытия">
+        </div>
+      </div>
+
+      <div class="fgrid" style="grid-template-columns:1fr 1fr">
+        <div class="fg"><label>Риск $</label><input id="ibsTradeRisk" type="text" inputmode="numeric" placeholder="100"></div>
+        <div class="fg"><label>Комиссия $</label><input id="ibsTradeComm" type="text" inputmode="decimal" placeholder="0"></div>
+      </div>
+
+      <div id="ibsTradePreview" style="display:none;margin-top:16px;padding:14px;background:var(--bg3);border-radius:8px;border:1px solid var(--line);font-family:var(--mono);font-size:11px;line-height:2"></div>
+      <div id="ibsTradeErrors" style="display:none;margin-top:12px;padding:12px;background:#ff000010;border:1px solid #ff000040;border-radius:6px;font-family:var(--mono);font-size:10px;line-height:1.8;color:#ff4444"></div>
+    </div>
+    <div class="modal-f">
+      <button class="btn btn-g" onclick="closeIbsTradeForm()">Отмена</button>
+      <button class="btn btn-g" onclick="calcIbsTrade()" style="border-color:var(--acc3);color:var(--acc3)">🧮 Рассчитать</button>
+      <button class="btn btn-p" onclick="saveIbsTrade()">✅ Открыть сделку</button>
     </div>
   </div>
 </div>
