@@ -9780,40 +9780,6 @@
       "trades": [],
       "candidates": [
         {
-          "id": "RMBS_2026-04-27",
-          "ticker": "RMBS",
-          "d0Date": "2026-04-27",
-          "direction": "SHORT",
-          "d_1": {
-            "C": 158.4
-          },
-          "d0": {
-            "O": 156.49,
-            "H": 157.04,
-            "L": 141.02,
-            "C": 141.31,
-            "V": 5.6
-          },
-          "atr": 5.84,
-          "relVol": 2.87,
-          "metrics": {
-            "impulse": -0.10789141414141416,
-            "clv": 0.01810237203495583,
-            "body": 0.9475655430711626,
-            "mid": 149.03,
-            "range": 16.019999999999982,
-            "direction": "SHORT"
-          },
-          "entry": 140.436,
-          "d1": null,
-          "pattern": null,
-          "stop": null,
-          "target1": null,
-          "target2": null,
-          "status": "WAITING_D1",
-          "created": "2026-04-28T06:12:46.939Z"
-        },
-        {
           "id": "FLR_2026-04-27",
           "ticker": "FLR",
           "d0Date": "2026-04-27",
