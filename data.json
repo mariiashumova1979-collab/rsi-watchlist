@@ -9651,6 +9651,83 @@
       "trades": [],
       "candidates": [
         {
+          "id": "TSCO_2026-04-20",
+          "ticker": "TSCO",
+          "d0Date": "2026-04-20",
+          "direction": "SHORT",
+          "d_1": {
+            "C": 44.81
+          },
+          "d0": {
+            "O": 42.6,
+            "H": 42.9,
+            "L": 38.92,
+            "C": 39.57,
+            "V": 13.84
+          },
+          "atr": 2.33,
+          "relVol": 3.89,
+          "metrics": {
+            "impulse": -0.1169381834411962,
+            "clv": 0.16331658291457263,
+            "body": 0.7613065326633175,
+            "mid": 40.91,
+            "range": 3.979999999999997,
+            "direction": "SHORT"
+          },
+          "d1": {
+            "date": "2026-04-22",
+            "O": 39.7,
+            "H": 40.14,
+            "L": 38.3,
+            "C": 38.96
+          },
+          "pattern": "Weak Pullback",
+          "entry": 38.687000000000005,
+          "stop": 40.606,
+          "status": "ENTERED",
+          "created": "2026-04-25T07:22:52.339Z",
+          "target1": 36.76800000000001,
+          "target2": 34.84900000000001,
+          "shares": 521,
+          "tradeId": "1777187887672"
+        },
+        {
+          "id": "EW_2026-04-24",
+          "ticker": "EW",
+          "d0Date": "2026-04-24",
+          "direction": "LONG",
+          "d_1": {
+            "C": 79.72
+          },
+          "d0": {
+            "O": 82.5,
+            "H": 84.74,
+            "L": 82.12,
+            "C": 84.15,
+            "V": 11.82
+          },
+          "atr": 2.82,
+          "relVol": 2.13,
+          "metrics": {
+            "impulse": 0.05556949322629211,
+            "clv": 0.7748091603053469,
+            "body": 0.6297709923664168,
+            "mid": 83.43,
+            "range": 2.6199999999999903,
+            "direction": "LONG"
+          },
+          "entry": 85.02199999999999,
+          "d1": null,
+          "pattern": null,
+          "stop": null,
+          "target1": null,
+          "target2": null,
+          "status": "ENTERED",
+          "created": "2026-04-26T06:50:54.148Z",
+          "tradeId": "1777301343580"
+        },
+        {
           "id": "RMBS_2026-04-27",
           "ticker": "RMBS",
           "d0Date": "2026-04-27",
@@ -9719,41 +9796,6 @@
           "status": "ENTERED",
           "created": "2026-04-28T08:04:04.934Z",
           "tradeId": "1777383847458"
-        },
-        {
-          "id": "ZBH_2026-04-28",
-          "ticker": "ZBH",
-          "d0Date": "2026-04-28",
-          "direction": "SHORT",
-          "d_1": {
-            "C": 91.26
-          },
-          "d0": {
-            "O": 87.6,
-            "H": 88.64,
-            "L": 81.35,
-            "C": 82.8,
-            "V": 9.82
-          },
-          "atr": 3.56,
-          "relVol": 4.97,
-          "metrics": {
-            "impulse": -0.09270216962524663,
-            "clv": 0.19890260631001394,
-            "body": 0.6584362139917685,
-            "mid": 84.995,
-            "range": 7.290000000000006,
-            "relVol": 4.97,
-            "direction": "SHORT"
-          },
-          "entry": 80.994,
-          "d1": null,
-          "pattern": null,
-          "stop": null,
-          "target1": null,
-          "target2": null,
-          "status": "WAITING_D1",
-          "created": "2026-04-29T06:18:47.537Z"
         }
       ]
     },
@@ -10210,15 +10252,6 @@
         "exit": 35.36,
         "pnlPct": 9.95,
         "reason": "TIME"
-      }
-    },
-    {
-      "timestamp": "2026-04-29T06:16:22.482Z",
-      "strategy": "impulse",
-      "event": "strategy_switch",
-      "data": {
-        "from": "impulse",
-        "to": "impulse"
       }
     }
   ],
