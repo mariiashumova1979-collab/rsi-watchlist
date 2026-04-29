@@ -9963,7 +9963,8 @@
           "EMR_rsi2": 3.12,
           "EMR_close1": 138.42,
           "EMR_low1": 138.08,
-          "EMR_high1": 140.79
+          "EMR_high1": 140.79,
+          "EMR_sma200": 137.77
         }
       },
       "config": {}
@@ -15963,7 +15964,8 @@
       "EMR_rsi2": 3.12,
       "EMR_close1": 138.42,
       "EMR_low1": 138.08,
-      "EMR_high1": 140.79
+      "EMR_high1": 140.79,
+      "EMR_sma200": 137.77
     }
   },
   "quarterly": {},
