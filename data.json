@@ -6599,22 +6599,27 @@
         },
         {
           "id": "1777470139056",
-          "createdAt": 1777470139056,
+          "createdAt": 1777579932903,
           "ticker": "ZBH",
           "type": "SHORT",
           "entryDate": "2026-04-29",
           "entry": 81.96,
           "shares": 13,
-          "stop": "89.35",
+          "stop": "86.88",
           "target1": "74.57",
           "target2": "67.18",
-          "status": "OPEN",
-          "strategy": "impulse",
-          "commission": 0,
-          "notes": "D0: 2026-04-28 | Паттерн D+1: не подтверждён | ATR: 3.56 | Impulse: -9.3% | Anchor (High D0): 88.64",
+          "rsi2": "",
           "atrPct": "4.34",
-          "atrAbs": 3.56,
-          "impulseAnchor": 88.64
+          "trend": "",
+          "status": "CLOSED",
+          "exitPrice": 82.718,
+          "exitReason": "STOP",
+          "commission": 5,
+          "notes": "D0: 2026-04-28 | Паттерн D+1: не подтверждён | ATR: 3.56 | Impulse: -9.3% | Anchor (High D0): 88.64",
+          "strategy": "impulse",
+          "pnlNet": -14.85,
+          "pnlPct": -1.39,
+          "result": "LOSS"
         },
         {
           "id": "1777470182779",
@@ -6672,6 +6677,25 @@
           "atrPct": "9.98",
           "atrAbs": 2.97,
           "impulseAnchor": 27.6
+        },
+        {
+          "id": "1777551111777",
+          "createdAt": 1777551111777,
+          "ticker": "ODFL",
+          "type": "SHORT",
+          "entryDate": "2026-04-30",
+          "entry": 208.42,
+          "shares": 3,
+          "stop": "234.58",
+          "target1": "182.26",
+          "target2": "156.11",
+          "status": "OPEN",
+          "strategy": "impulse",
+          "commission": 0,
+          "notes": "D0: 2026-04-29 | Паттерн D+1: не подтверждён | ATR: 3.93 | Impulse: -5.6% | Anchor (High D0): 233.79",
+          "atrPct": "1.89",
+          "atrAbs": 3.93,
+          "impulseAnchor": 233.79
         }
       ],
       "scans": {
@@ -11312,6 +11336,20 @@
         "from": "impulse",
         "to": "impulse"
       }
+    },
+    {
+      "timestamp": "2026-04-30T20:12:12.903Z",
+      "strategy": "impulse",
+      "event": "trade_close",
+      "data": {
+        "id": "1777470139056",
+        "ticker": "ZBH",
+        "type": "SHORT",
+        "entry": 81.96,
+        "exit": 82.718,
+        "pnlPct": -1.39,
+        "reason": "STOP"
+      }
     }
   ],
   "settings": {
@@ -12999,22 +13037,27 @@
     },
     {
       "id": "1777470139056",
-      "createdAt": 1777470139056,
+      "createdAt": 1777579932903,
       "ticker": "ZBH",
       "type": "SHORT",
       "entryDate": "2026-04-29",
       "entry": 81.96,
       "shares": 13,
-      "stop": "89.35",
+      "stop": "86.88",
       "target1": "74.57",
       "target2": "67.18",
-      "status": "OPEN",
-      "strategy": "impulse",
-      "commission": 0,
-      "notes": "D0: 2026-04-28 | Паттерн D+1: не подтверждён | ATR: 3.56 | Impulse: -9.3% | Anchor (High D0): 88.64",
+      "rsi2": "",
       "atrPct": "4.34",
-      "atrAbs": 3.56,
-      "impulseAnchor": 88.64
+      "trend": "",
+      "status": "CLOSED",
+      "exitPrice": 82.718,
+      "exitReason": "STOP",
+      "commission": 5,
+      "notes": "D0: 2026-04-28 | Паттерн D+1: не подтверждён | ATR: 3.56 | Impulse: -9.3% | Anchor (High D0): 88.64",
+      "strategy": "impulse",
+      "pnlNet": -14.85,
+      "pnlPct": -1.39,
+      "result": "LOSS"
     },
     {
       "id": "1777470182779",
