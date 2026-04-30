@@ -10585,6 +10585,41 @@
           "target2": null,
           "status": "WAITING_D1",
           "created": "2026-04-30T06:16:36.697Z"
+        },
+        {
+          "id": "ETSY_2026-04-29",
+          "ticker": "ETSY",
+          "d0Date": "2026-04-29",
+          "direction": "LONG",
+          "d_1": {
+            "C": 63.21
+          },
+          "d0": {
+            "O": 67,
+            "H": 70.88,
+            "L": 66.37,
+            "C": 69.6,
+            "V": 8.9
+          },
+          "atr": 4.29,
+          "relVol": 2.93,
+          "metrics": {
+            "impulse": 0.10109159943046976,
+            "clv": 0.7161862527716178,
+            "body": 0.5764966740576496,
+            "mid": 68.625,
+            "range": 4.509999999999991,
+            "relVol": 2.93,
+            "direction": "LONG"
+          },
+          "entry": 71.309,
+          "d1": null,
+          "pattern": null,
+          "stop": null,
+          "target1": null,
+          "target2": null,
+          "status": "WAITING_D1",
+          "created": "2026-04-30T06:32:43.513Z"
         }
       ]
     },
