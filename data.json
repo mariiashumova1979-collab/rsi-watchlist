@@ -10550,6 +10550,41 @@
           "status": "ENTERED",
           "created": "2026-04-29T08:59:29.515Z",
           "tradeId": "1777470275434"
+        },
+        {
+          "id": "ODFL_2026-04-29",
+          "ticker": "ODFL",
+          "d0Date": "2026-04-29",
+          "direction": "SHORT",
+          "d_1": {
+            "C": 221.77
+          },
+          "d0": {
+            "O": 224.77,
+            "H": 233.79,
+            "L": 206.97,
+            "C": 209.35,
+            "V": 5.03
+          },
+          "atr": 3.93,
+          "relVol": 2.86,
+          "metrics": {
+            "impulse": -0.05600396807503276,
+            "clv": 0.08873974645786711,
+            "body": 0.5749440715883676,
+            "mid": 220.38,
+            "range": 26.819999999999993,
+            "relVol": 2.86,
+            "direction": "SHORT"
+          },
+          "entry": 206.577,
+          "d1": null,
+          "pattern": null,
+          "stop": null,
+          "target1": null,
+          "target2": null,
+          "status": "WAITING_D1",
+          "created": "2026-04-30T06:16:36.697Z"
         }
       ]
     },
