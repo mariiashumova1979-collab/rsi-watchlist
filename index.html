@@ -1495,6 +1495,61 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
       </div>
     </div>
 
+    <!-- SETUP ANALYSIS (Impulse/RSPC/IBS data — for retrospective pattern analysis) -->
+    <div id="te_setup_section" style="display:none">
+      <hr style="margin:14px 0">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--acc4);letter-spacing:1.5px;text-transform:uppercase">📐 SETUP ANALYSIS · данные для анализа паттерна</div>
+        <button type="button" class="btn btn-g btn-s" onclick="toggleSetupExpand()" id="te_setup_toggle" style="font-size:9px">Развернуть</button>
+      </div>
+      <div id="te_setup_summary" style="font-family:var(--mono);font-size:10px;padding:10px 12px;background:var(--bg3);border-radius:8px;border:1px solid var(--line);line-height:1.7;color:var(--t2)"></div>
+      
+      <div id="te_setup_expand" style="display:none;margin-top:12px;padding:12px;background:var(--bg3);border-radius:8px;border:1px solid var(--line)">
+        
+        <!-- D-1 -->
+        <div style="font-family:var(--mono);font-size:10px;font-weight:700;margin-bottom:8px;color:var(--text)">Day D-1 (предыдущий)</div>
+        <div class="fgrid" style="grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:12px">
+          <div class="fg"><label style="font-size:9px">Open</label><input id="te_s_d_1_O" type="text" inputmode="decimal" oninput="recalcSetupMetrics()"></div>
+          <div class="fg"><label style="font-size:9px">High</label><input id="te_s_d_1_H" type="text" inputmode="decimal" oninput="recalcSetupMetrics()"></div>
+          <div class="fg"><label style="font-size:9px">Low</label><input id="te_s_d_1_L" type="text" inputmode="decimal" oninput="recalcSetupMetrics()"></div>
+          <div class="fg"><label style="font-size:9px">Close</label><input id="te_s_d_1_C" type="text" inputmode="decimal" oninput="recalcSetupMetrics()"></div>
+          <div class="fg"><label style="font-size:9px">Volume</label><input id="te_s_d_1_V" type="text" inputmode="numeric" oninput="recalcSetupMetrics()"></div>
+        </div>
+
+        <!-- D0 -->
+        <div style="font-family:var(--mono);font-size:10px;font-weight:700;margin-bottom:8px;color:var(--text)">Day D0 (импульс / сигнал)</div>
+        <div class="fgrid" style="grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:12px">
+          <div class="fg"><label style="font-size:9px">Open</label><input id="te_s_d0_O" type="text" inputmode="decimal" oninput="recalcSetupMetrics()"></div>
+          <div class="fg"><label style="font-size:9px">High</label><input id="te_s_d0_H" type="text" inputmode="decimal" oninput="recalcSetupMetrics()"></div>
+          <div class="fg"><label style="font-size:9px">Low</label><input id="te_s_d0_L" type="text" inputmode="decimal" oninput="recalcSetupMetrics()"></div>
+          <div class="fg"><label style="font-size:9px">Close</label><input id="te_s_d0_C" type="text" inputmode="decimal" oninput="recalcSetupMetrics()"></div>
+          <div class="fg"><label style="font-size:9px">Volume</label><input id="te_s_d0_V" type="text" inputmode="numeric" oninput="recalcSetupMetrics()"></div>
+        </div>
+
+        <!-- D+1 -->
+        <div style="font-family:var(--mono);font-size:10px;font-weight:700;margin-bottom:8px;color:var(--text)">Day D+1 (паттерн)</div>
+        <div class="fgrid" style="grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px">
+          <div class="fg"><label style="font-size:9px">Open</label><input id="te_s_d1_O" type="text" inputmode="decimal" oninput="recalcSetupMetrics()"></div>
+          <div class="fg"><label style="font-size:9px">High</label><input id="te_s_d1_H" type="text" inputmode="decimal" oninput="recalcSetupMetrics()"></div>
+          <div class="fg"><label style="font-size:9px">Low</label><input id="te_s_d1_L" type="text" inputmode="decimal" oninput="recalcSetupMetrics()"></div>
+          <div class="fg"><label style="font-size:9px">Close</label><input id="te_s_d1_C" type="text" inputmode="decimal" oninput="recalcSetupMetrics()"></div>
+        </div>
+
+        <!-- Контекст -->
+        <div style="font-family:var(--mono);font-size:10px;font-weight:700;margin-bottom:8px;color:var(--text)">Контекст</div>
+        <div class="fgrid" style="grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px">
+          <div class="fg"><label style="font-size:9px">ATR (абс)</label><input id="te_s_atr" type="text" inputmode="decimal" oninput="recalcSetupMetrics()"></div>
+          <div class="fg"><label style="font-size:9px">RelVol / VolRatio</label><input id="te_s_relvol" type="text" inputmode="decimal" oninput="recalcSetupMetrics()"></div>
+          <div class="fg"><label style="font-size:9px">SPY change %</label><input id="te_s_spy" type="text" inputmode="decimal" oninput="recalcSetupMetrics()"></div>
+          <div class="fg"><label style="font-size:9px">RSI(2)</label><input id="te_s_rsi" type="text" inputmode="decimal" oninput="recalcSetupMetrics()"></div>
+        </div>
+
+        <!-- Auto computed metrics -->
+        <div style="font-family:var(--mono);font-size:10px;font-weight:700;margin-bottom:8px;color:var(--acc4)">Авторасчёт</div>
+        <div id="te_s_metrics" style="font-family:var(--mono);font-size:10px;padding:10px 12px;background:var(--bg2);border-radius:6px;line-height:2;color:var(--t2)">—</div>
+      </div>
+    </div>
+
     <div class="fg" style="margin-top:10px"><label>Заметки</label><textarea id="te_nt" placeholder="Описание настройки, наблюдения..."></textarea></div>
 
     <div class="ar">
@@ -3922,7 +3977,205 @@ function openTrade(id=null) {
 
   toggleExitFields();
   tradeAutoCalc();
+  loadSetupIntoForm(id);
   openMo('moTrade');
+}
+
+// ─── Setup analysis (in trade modal) ───
+
+function loadSetupIntoForm(tradeId) {
+  const section = document.getElementById('te_setup_section');
+  const summary = document.getElementById('te_setup_summary');
+  const expand = document.getElementById('te_setup_expand');
+  
+  // Hide section for new trade (without id)
+  if (!tradeId) {
+    if (section) section.style.display = 'none';
+    return;
+  }
+  
+  if (section) section.style.display = 'block';
+  if (expand) expand.style.display = 'none';
+  document.getElementById('te_setup_toggle').textContent = 'Развернуть';
+  
+  const t = cache.trades.find(x => x.id === tradeId);
+  if (!t) return;
+  
+  const s = t.setup || {};
+  
+  // Заполняем поля D-1
+  setVal('te_s_d_1_O', s.d_1?.O);
+  setVal('te_s_d_1_H', s.d_1?.H);
+  setVal('te_s_d_1_L', s.d_1?.L);
+  setVal('te_s_d_1_C', s.d_1?.C);
+  setVal('te_s_d_1_V', s.d_1?.V);
+  
+  // D0
+  setVal('te_s_d0_O', s.d0?.O);
+  setVal('te_s_d0_H', s.d0?.H);
+  setVal('te_s_d0_L', s.d0?.L);
+  setVal('te_s_d0_C', s.d0?.C);
+  setVal('te_s_d0_V', s.d0?.V);
+  
+  // D+1
+  setVal('te_s_d1_O', s.d1?.O);
+  setVal('te_s_d1_H', s.d1?.H);
+  setVal('te_s_d1_L', s.d1?.L);
+  setVal('te_s_d1_C', s.d1?.C);
+  
+  // Контекст
+  setVal('te_s_atr', s.atr);
+  setVal('te_s_relvol', s.relVol != null ? s.relVol : (s.metrics?.volRatio));
+  setVal('te_s_spy', s.spyChg);
+  setVal('te_s_rsi', s.metrics?.rsi2 != null ? s.metrics.rsi2 : (t.rsi2 || ''));
+  
+  // Считаем метрики и обновляем summary
+  recalcSetupMetrics();
+}
+
+function setVal(id, v) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.value = (v == null || v === '') ? '' : v;
+}
+
+function toggleSetupExpand() {
+  const expand = document.getElementById('te_setup_expand');
+  const btn = document.getElementById('te_setup_toggle');
+  const isHidden = expand.style.display === 'none';
+  expand.style.display = isHidden ? 'block' : 'none';
+  btn.textContent = isHidden ? 'Свернуть' : 'Развернуть';
+}
+
+function recalcSetupMetrics() {
+  const d_1 = {
+    O: parseNum(document.getElementById('te_s_d_1_O').value),
+    H: parseNum(document.getElementById('te_s_d_1_H').value),
+    L: parseNum(document.getElementById('te_s_d_1_L').value),
+    C: parseNum(document.getElementById('te_s_d_1_C').value),
+    V: parseNum(document.getElementById('te_s_d_1_V').value)
+  };
+  const d0 = {
+    O: parseNum(document.getElementById('te_s_d0_O').value),
+    H: parseNum(document.getElementById('te_s_d0_H').value),
+    L: parseNum(document.getElementById('te_s_d0_L').value),
+    C: parseNum(document.getElementById('te_s_d0_C').value),
+    V: parseNum(document.getElementById('te_s_d0_V').value)
+  };
+  const d1 = {
+    O: parseNum(document.getElementById('te_s_d1_O').value),
+    H: parseNum(document.getElementById('te_s_d1_H').value),
+    L: parseNum(document.getElementById('te_s_d1_L').value),
+    C: parseNum(document.getElementById('te_s_d1_C').value)
+  };
+  const atr = parseNum(document.getElementById('te_s_atr').value);
+  const relVol = parseNum(document.getElementById('te_s_relvol').value);
+  
+  const lines = [];
+  
+  // D0 метрики
+  if (!isNaN(d0.O) && !isNaN(d0.H) && !isNaN(d0.L) && !isNaN(d0.C)) {
+    const range0 = d0.H - d0.L;
+    const mid0 = (d0.H + d0.L) / 2;
+    const clv = range0 > 0 ? (d0.C - d0.L) / range0 : 0;
+    const body = range0 > 0 ? Math.abs(d0.C - d0.O) / range0 : 0;
+    let rangeATR = null;
+    if (!isNaN(atr) && atr > 0) rangeATR = range0 / atr;
+    
+    let impulse = null;
+    if (!isNaN(d_1.C) && d_1.C > 0) impulse = ((d0.C - d_1.C) / d_1.C) * 100;
+    
+    lines.push(`<b style="color:var(--text)">D0:</b> Range=${range0.toFixed(2)} · Mid=${mid0.toFixed(2)} · CLV=<b>${clv.toFixed(2)}</b> · Body=<b>${body.toFixed(2)}</b>${rangeATR != null ? ` · Range/ATR=<b>${rangeATR.toFixed(2)}</b>` : ''}${impulse != null ? ` · Impulse=<b>${impulse >= 0 ? '+' : ''}${impulse.toFixed(2)}%</b>` : ''}${!isNaN(relVol) ? ` · RelVol=<b>${relVol.toFixed(2)}×</b>` : ''}`);
+    
+    // D+1 паттерны
+    if (!isNaN(d1.H) && !isNaN(d1.L) && !isNaN(d1.C) && range0 > 0) {
+      const range1 = d1.H - d1.L;
+      
+      const isInsideDay = d1.H <= d0.H && d1.L >= d0.L;
+      
+      // Weak Pullback — direction-aware (по CLV D0 определим направление)
+      const isLong = clv > 0.5;
+      let isWeakPullback = false;
+      let isCompression = false;
+      
+      if (isLong) {
+        isWeakPullback = d1.L > mid0 && ((d0.H - d1.L) / range0) < 0.5 && d1.C > mid0;
+        isCompression = (range1 / range0) < 0.5 && Math.abs(d1.C - d0.C) < 0.3 * range0 && d1.C > mid0;
+      } else {
+        isWeakPullback = d1.H < mid0 && ((d1.H - d0.L) / range0) < 0.5 && d1.C < mid0;
+        isCompression = (range1 / range0) < 0.5 && Math.abs(d1.C - d0.C) < 0.3 * range0 && d1.C < mid0;
+      }
+      
+      const matched = [];
+      if (isInsideDay) matched.push('Inside Day');
+      if (isWeakPullback) matched.push('Weak Pullback');
+      if (isCompression) matched.push('Compression');
+      
+      const patternStr = matched.length ? `<span style="color:var(--acc)"><b>${matched.join(' + ')}</b></span>` : '<span style="color:var(--acc2)"><b>не подтверждён</b></span>';
+      
+      lines.push(`<b style="color:var(--text)">D+1:</b> Range=${range1.toFixed(2)} · Range1/Range0=<b>${(range1/range0).toFixed(2)}</b> · |Close1−Close0|=<b>${Math.abs(d1.C - d0.C).toFixed(2)}</b> · Паттерн: ${patternStr}`);
+      
+      // Детали проверки
+      const check = [];
+      check.push(`Inside Day: ${isInsideDay ? '✓' : '×'} (H1 ${d1.H.toFixed(2)}≤${d0.H.toFixed(2)} & L1 ${d1.L.toFixed(2)}≥${d0.L.toFixed(2)})`);
+      if (isLong) {
+        check.push(`Weak Pullback (LONG): ${isWeakPullback ? '✓' : '×'} (L1>${mid0.toFixed(2)}, retracement<50%, C1>${mid0.toFixed(2)})`);
+        check.push(`Compression: ${isCompression ? '✓' : '×'} (Range1/Range0=${(range1/range0).toFixed(2)}<0.5, C1>${mid0.toFixed(2)})`);
+      } else {
+        check.push(`Weak Pullback (SHORT): ${isWeakPullback ? '✓' : '×'} (H1<${mid0.toFixed(2)}, retracement<50%, C1<${mid0.toFixed(2)})`);
+        check.push(`Compression: ${isCompression ? '✓' : '×'} (Range1/Range0=${(range1/range0).toFixed(2)}<0.5, C1<${mid0.toFixed(2)})`);
+      }
+      lines.push(`<span style="color:var(--t2);font-size:9px">${check.join(' · ')}</span>`);
+    } else {
+      lines.push(`<span style="color:var(--t2)">D+1 не введён</span>`);
+    }
+    
+    // IBS (для RSI стратегии)
+    if (!isNaN(d_1.H) && !isNaN(d_1.L) && !isNaN(d_1.C)) {
+      const range_1 = d_1.H - d_1.L;
+      const ibs = range_1 > 0 ? (d_1.C - d_1.L) / range_1 : 0;
+      lines.push(`<b style="color:var(--text)">IBS (D-1):</b> ${ibs.toFixed(2)} · Range D-1=${range_1.toFixed(2)}`);
+    }
+  } else {
+    lines.push('<span style="color:var(--t2)">Заполни OHLC D0 для расчёта метрик</span>');
+  }
+  
+  document.getElementById('te_s_metrics').innerHTML = lines.join('<br>');
+  
+  // Обновляем краткую сводку
+  updateSetupSummary();
+}
+
+function updateSetupSummary() {
+  const summary = document.getElementById('te_setup_summary');
+  if (!summary) return;
+  
+  const id = document.getElementById('te_id').value;
+  const t = id ? cache.trades.find(x => x.id === id) : null;
+  
+  const parts = [];
+  const s = t?.setup;
+  
+  if (s) {
+    if (s.d0) parts.push(`D0: ${s.d0Date || s.earningsDate || '—'}`);
+    if (s.metrics) {
+      const m = s.metrics;
+      const subParts = [];
+      if (m.clv != null) subParts.push(`CLV ${m.clv.toFixed(2)}`);
+      if (m.body != null) subParts.push(`Body ${m.body.toFixed(2)}`);
+      if (m.rangeATR != null) subParts.push(`R/ATR ${m.rangeATR.toFixed(2)}`);
+      if (m.volRatio != null) subParts.push(`VolR ${m.volRatio.toFixed(1)}×`);
+      if (m.impulse != null) subParts.push(`${m.impulse >= 0 ? '+' : ''}${(m.impulse * 100).toFixed(1)}%`);
+      if (subParts.length) parts.push(subParts.join(' · '));
+    }
+    if (s.pattern) parts.push(`Паттерн D+1: <b>${s.pattern}</b>`);
+    if (s.atr) parts.push(`ATR ${s.atr.toFixed(2)}`);
+    if (s.spyChg != null) parts.push(`SPY ${s.spyChg >= 0 ? '+' : ''}${s.spyChg.toFixed(2)}%`);
+  }
+  
+  summary.innerHTML = parts.length 
+    ? parts.join(' · ') 
+    : '<span style="color:var(--t3)">Нет данных. Разверни форму чтобы добавить OHLC и проанализировать паттерн.</span>';
 }
 
 async function saveTrade() {
@@ -3930,7 +4183,11 @@ async function saveTrade() {
   if(!ticker) { toast('Введите тикер!',true); return; }
   const id = document.getElementById('te_id').value;
   const map = {tk:'ticker',tp:'type',dt:'entryDate',en:'entry',sh:'shares',st:'stop',t1:'target1',t2:'target2',rsi2:'rsi2',atr:'atrPct',trend:'trend',sta:'status',ex:'exitPrice',er:'exitReason',comm:'commission',nt:'notes'};
-  const t = { id: id||Date.now().toString(), createdAt: Date.now() };
+  
+  // При редактировании — наследуем существующие поля (setup, atrAbs, impulseAnchor, и т.д.)
+  const existing = id ? cache.trades.find(x => x.id === id) : null;
+  const t = existing ? { ...existing } : { id: id||Date.now().toString(), createdAt: Date.now() };
+  
   Object.entries(map).forEach(([elId,key]) => { const el=document.getElementById('te_'+elId); if(el) t[key]=el.value; });
   t.ticker = ticker;
   t.entry      = parseFloat(t.entry)      || 0;
@@ -4037,11 +4294,104 @@ async function saveTrade() {
     logEvent(t.strategy || 'ibs_swing', 'trade_open', { id: t.id, ticker: t.ticker, type: t.type, entry: t.entry });
   }
   
+  // ─── Read setup data from form (если секция была развёрнута и юзер ввёл данные) ───
+  const setup = collectSetupFromForm(t.setup);
+  if (setup) t.setup = setup;
+  
   scheduleSave(); const ok = true;
   if(ok) { 
     syncCandidateStatusFromTrade(t);
     closeMo('moTrade'); renderTrades(); renderDash(); toast(id?'Сделка обновлена ✓':'Сделка добавлена ✓'); 
   }
+}
+
+// Собираем setup-данные из формы. Возвращает объект если есть хоть одно значение, иначе null.
+function collectSetupFromForm(existingSetup) {
+  const has = (id) => {
+    const el = document.getElementById(id);
+    return el && el.value !== '' && el.value != null;
+  };
+  
+  const num = (id) => {
+    const el = document.getElementById(id);
+    return el ? parseNum(el.value) : NaN;
+  };
+  
+  const buildOHLCV = (prefix, withV = true) => {
+    const fields = withV ? ['O','H','L','C','V'] : ['O','H','L','C'];
+    const obj = {};
+    let any = false;
+    for (const f of fields) {
+      const id = prefix + f;
+      if (has(id)) {
+        const v = num(id);
+        if (!isNaN(v)) { obj[f] = v; any = true; }
+      }
+    }
+    return any ? obj : null;
+  };
+  
+  const d_1 = buildOHLCV('te_s_d_1_');
+  const d0 = buildOHLCV('te_s_d0_');
+  const d1 = buildOHLCV('te_s_d1_', false);
+  const atr = num('te_s_atr');
+  const relVol = num('te_s_relvol');
+  const spy = num('te_s_spy');
+  const rsi = num('te_s_rsi');
+  
+  // Если ни одно поле не заполнено — оставляем существующий setup как есть
+  const anyFilled = d_1 || d0 || d1 || !isNaN(atr) || !isNaN(relVol) || !isNaN(spy) || !isNaN(rsi);
+  if (!anyFilled) return existingSetup || null;
+  
+  // Считаем метрики
+  let metrics = (existingSetup?.metrics) ? { ...existingSetup.metrics } : {};
+  let pattern = existingSetup?.pattern || null;
+  
+  if (d0 && d0.H != null && d0.L != null && d0.C != null && d0.O != null) {
+    const range = d0.H - d0.L;
+    const mid = (d0.H + d0.L) / 2;
+    metrics.range = range;
+    metrics.mid = mid;
+    if (range > 0) {
+      metrics.clv = (d0.C - d0.L) / range;
+      metrics.body = Math.abs(d0.C - d0.O) / range;
+    }
+    if (!isNaN(atr) && atr > 0) metrics.rangeATR = range / atr;
+    if (d_1 && d_1.C != null && d_1.C > 0) metrics.impulse = (d0.C - d_1.C) / d_1.C;
+  }
+  if (!isNaN(relVol)) metrics.volRatio = relVol;
+  if (!isNaN(rsi)) metrics.rsi2 = rsi;
+  
+  // D+1 паттерн (если возможно посчитать)
+  if (d0 && d1 && d0.H != null && d0.L != null && metrics.mid != null && metrics.range > 0) {
+    const isInsideDay = d1.H <= d0.H && d1.L >= d0.L;
+    const isLong = metrics.clv != null ? metrics.clv > 0.5 : true;
+    let isWeakPullback = false, isCompression = false;
+    if (isLong) {
+      isWeakPullback = d1.L > metrics.mid && ((d0.H - d1.L) / metrics.range) < 0.5 && d1.C > metrics.mid;
+      isCompression = ((d1.H - d1.L) / metrics.range) < 0.5 && Math.abs(d1.C - d0.C) < 0.3 * metrics.range && d1.C > metrics.mid;
+    } else {
+      isWeakPullback = d1.H < metrics.mid && ((d1.H - d0.L) / metrics.range) < 0.5 && d1.C < metrics.mid;
+      isCompression = ((d1.H - d1.L) / metrics.range) < 0.5 && Math.abs(d1.C - d0.C) < 0.3 * metrics.range && d1.C < metrics.mid;
+    }
+    const matched = [];
+    if (isInsideDay) matched.push('Inside Day');
+    if (isWeakPullback) matched.push('Weak Pullback');
+    if (isCompression) matched.push('Compression');
+    pattern = matched.length ? matched.join(' + ') : 'не подтверждён';
+  }
+  
+  return {
+    ...(existingSetup || {}),
+    d_1: d_1 || existingSetup?.d_1 || null,
+    d0: d0 || existingSetup?.d0 || null,
+    d1: d1 || existingSetup?.d1 || null,
+    atr: !isNaN(atr) ? atr : (existingSetup?.atr ?? null),
+    relVol: !isNaN(relVol) ? relVol : (existingSetup?.relVol ?? null),
+    spyChg: !isNaN(spy) ? spy : (existingSetup?.spyChg ?? null),
+    pattern: pattern,
+    metrics: Object.keys(metrics).length ? metrics : (existingSetup?.metrics || null)
+  };
 }
 
 // Синхронизация статуса кандидата с состоянием сделки
@@ -5759,7 +6109,25 @@ function saveIbsTrade() {
     strategy: 'ibs_swing',
     commission: r.comm,
     notes: `IBS RSI(2)=${r.c.rsi2.toFixed(1)} | IBS=${r.c.metrics.ibs.toFixed(2)} | Range=${r.c.metrics.rangePct.toFixed(1)}% | Сигнал: ${r.c.signalDate} | Stop=${r.c.direction === 'LONG' ? 'Low' : 'High'} T-1`,
-    atrPct: r.c.atrPct ? r.c.atrPct.toFixed(2) : null
+    atrPct: r.c.atrPct ? r.c.atrPct.toFixed(2) : null,
+    // ─── Полный снапшот сетапа ───
+    setup: {
+      signalDate: r.c.signalDate,
+      rsi2: r.c.rsi2,
+      sma200: r.c.sma200,
+      sma200_20: r.c.sma200_20,
+      close1: r.c.close1,
+      low1: r.c.low1,
+      high1: r.c.high1,
+      open0: r.c.open0,
+      atrPct: r.c.atrPct,
+      gapPct: r.gapPct,
+      metrics: r.c.metrics ? {
+        ibs: r.c.metrics.ibs,
+        rangePct: r.c.metrics.rangePct,
+        smaTrend: r.c.metrics.smaTrend
+      } : null
+    }
   };
   
   if (!cache.trades) cache.trades = [];
@@ -7404,7 +7772,23 @@ function savePEADTrade() {
     strategy: 'pead',
     commission: commission,
     notes: `Earnings: ${e.earningsDate} | SUE: ${(e.metrics.sue*100).toFixed(1)}% | EAR: ${e.metrics.ear.toFixed(1)}% | VolSpike: ${e.metrics.volSpike.toFixed(1)}×`,
-    atrPct: ((atr / entry) * 100).toFixed(2)
+    atrPct: ((atr / entry) * 100).toFixed(2),
+    // ─── Полный снапшот сетапа ───
+    setup: {
+      earningsDate: e.earningsDate,
+      t1: e.t1,
+      t0: e.t0,
+      epsConsensus: e.epsConsensus,
+      epsActual: e.epsActual,
+      atr: atr,
+      metrics: e.metrics ? {
+        sue: e.metrics.sue,
+        ear: e.metrics.ear,
+        volSpike: e.metrics.volSpike,
+        rangePct: e.metrics.rangePct,
+        atrPct: e.metrics.atrPct
+      } : null
+    }
   };
 
   if (!cache.trades) cache.trades = [];
@@ -8059,7 +8443,29 @@ function saveImpulseTrade() {
     notes: notes,
     atrPct: ((c.atr / entry) * 100).toFixed(2),
     atrAbs: c.atr,
-    impulseAnchor: anchor
+    impulseAnchor: anchor,
+    // ─── Полный снапшот сетапа (для последующего анализа) ───
+    setup: {
+      d0Date: c.d0Date,
+      d_1: c.d_1 || null,
+      d0: c.d0,
+      d1: c.d1 || null,
+      atr: c.atr,
+      relVol: c.relVol != null ? c.relVol : null,
+      avgVol: c.avgVol != null ? c.avgVol : null,
+      ext10D: c.ext10D != null ? c.ext10D : null,
+      spyChg: c.spyChg != null ? c.spyChg : null,
+      pattern: c.pattern || null,
+      metrics: c.metrics ? {
+        impulse: c.metrics.impulse,
+        clv: c.metrics.clv,
+        body: c.metrics.body,
+        rangeATR: c.metrics.rangeATR != null ? c.metrics.rangeATR : null,
+        volRatio: c.metrics.volRatio != null ? c.metrics.volRatio : null,
+        mid: c.metrics.mid,
+        range: c.metrics.range
+      } : null
+    }
   };
 
   if (!cache.trades) cache.trades = [];
