@@ -10866,6 +10866,41 @@
           "target2": null,
           "status": "WAITING_D1",
           "created": "2026-05-01T06:25:43.660Z"
+        },
+        {
+          "id": "ENTG_2026-04-30",
+          "ticker": "ENTG",
+          "d0Date": "2026-04-30",
+          "direction": "SHORT",
+          "d_1": {
+            "C": 149.37
+          },
+          "d0": {
+            "O": 150,
+            "H": 150,
+            "L": 138.67,
+            "C": 141.38,
+            "V": 6.5
+          },
+          "atr": 5.02,
+          "relVol": 2.13,
+          "metrics": {
+            "impulse": -0.0534913302537324,
+            "clv": 0.2391879964695503,
+            "body": 0.7608120035304496,
+            "mid": 144.33499999999998,
+            "range": 11.330000000000013,
+            "relVol": 2.13,
+            "direction": "SHORT"
+          },
+          "entry": 138.16799999999998,
+          "d1": null,
+          "pattern": null,
+          "stop": null,
+          "target1": null,
+          "target2": null,
+          "status": "WAITING_D1",
+          "created": "2026-05-01T06:28:00.870Z"
         }
       ]
     },
