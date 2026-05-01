@@ -10829,8 +10829,9 @@
           "stop": null,
           "target1": null,
           "target2": null,
-          "status": "WAITING_D1",
-          "created": "2026-05-01T06:22:44.394Z"
+          "status": "ENTERED",
+          "created": "2026-05-01T06:22:44.394Z",
+          "tradeId": "1777643161200"
         },
         {
           "id": "APG_2026-04-30",
@@ -13371,6 +13372,25 @@
       "atrPct": "3.88",
       "atrAbs": 2.35,
       "impulseAnchor": 57.39
+    },
+    {
+      "id": "1777643161200",
+      "createdAt": 1777643161200,
+      "ticker": "AMRZ",
+      "type": "SHORT",
+      "entryDate": "2026-05-01",
+      "entry": 53.17,
+      "shares": 33,
+      "stop": "56.16",
+      "target1": "50.18",
+      "target2": "47.20",
+      "status": "OPEN",
+      "strategy": "impulse",
+      "commission": 0,
+      "notes": "D0: 2026-04-30 | Паттерн D+1: не подтверждён | ATR: 3.28 | Impulse: -5.3% | Anchor (High D0): 55.50",
+      "atrPct": "6.17",
+      "atrAbs": 3.28,
+      "impulseAnchor": 55.5
     }
   ],
   "rsiScans": {
