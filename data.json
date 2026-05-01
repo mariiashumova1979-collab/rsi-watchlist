@@ -10866,8 +10866,9 @@
           "stop": null,
           "target1": null,
           "target2": null,
-          "status": "WAITING_D1",
-          "created": "2026-05-01T06:25:43.660Z"
+          "status": "ENTERED",
+          "created": "2026-05-01T06:25:43.660Z",
+          "tradeId": "1777643202289"
         },
         {
           "id": "ENTG_2026-04-30",
@@ -13411,6 +13412,25 @@
       "atrPct": "7.11",
       "atrAbs": 5.57,
       "impulseAnchor": 85.88
+    },
+    {
+      "id": "1777643202289",
+      "createdAt": 1777643202289,
+      "ticker": "APG",
+      "type": "SHORT",
+      "entryDate": "2026-05-01",
+      "entry": 45.84,
+      "shares": 20,
+      "stop": "50.67",
+      "target1": "41.01",
+      "target2": "36.18",
+      "status": "OPEN",
+      "strategy": "impulse",
+      "commission": 0,
+      "notes": "D0: 2026-04-30 | Паттерн D+1: не подтверждён | ATR: 3.39 | Impulse: -6.0% | Anchor (High D0): 49.99",
+      "atrPct": "7.40",
+      "atrAbs": 3.39,
+      "impulseAnchor": 49.99
     }
   ],
   "rsiScans": {
