@@ -10796,6 +10796,41 @@
           "target2": null,
           "status": "WAITING_D1",
           "created": "2026-05-01T06:18:19.387Z"
+        },
+        {
+          "id": "AMRZ_2026-04-30",
+          "ticker": "AMRZ",
+          "d0Date": "2026-04-30",
+          "direction": "SHORT",
+          "d_1": {
+            "C": 56.77
+          },
+          "d0": {
+            "O": 55.5,
+            "H": 55.5,
+            "L": 53.5,
+            "C": 53.78,
+            "V": 6.36
+          },
+          "atr": 3.28,
+          "relVol": 2.28,
+          "metrics": {
+            "impulse": -0.05266866302624629,
+            "clv": 0.14000000000000057,
+            "body": 0.8599999999999994,
+            "mid": 54.5,
+            "range": 2,
+            "relVol": 2.28,
+            "direction": "SHORT"
+          },
+          "entry": 53.172,
+          "d1": null,
+          "pattern": null,
+          "stop": null,
+          "target1": null,
+          "target2": null,
+          "status": "WAITING_D1",
+          "created": "2026-05-01T06:22:44.394Z"
         }
       ]
     },
