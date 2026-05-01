@@ -10794,8 +10794,9 @@
           "stop": null,
           "target1": null,
           "target2": null,
-          "status": "WAITING_D1",
-          "created": "2026-05-01T06:18:19.387Z"
+          "status": "ENTERED",
+          "created": "2026-05-01T06:18:19.387Z",
+          "tradeId": "1777643184946"
         },
         {
           "id": "AMRZ_2026-04-30",
@@ -13391,6 +13392,25 @@
       "atrPct": "6.17",
       "atrAbs": 3.28,
       "impulseAnchor": 55.5
+    },
+    {
+      "id": "1777643184946",
+      "createdAt": 1777643184946,
+      "ticker": "BLDR",
+      "type": "SHORT",
+      "entryDate": "2026-05-01",
+      "entry": 78.31,
+      "shares": 11,
+      "stop": "86.99",
+      "target1": "69.63",
+      "target2": "60.94",
+      "status": "OPEN",
+      "strategy": "impulse",
+      "commission": 0,
+      "notes": "D0: 2026-04-30 | Паттерн D+1: не подтверждён | ATR: 5.57 | Impulse: -5.1% | Anchor (High D0): 85.88",
+      "atrPct": "7.11",
+      "atrAbs": 5.57,
+      "impulseAnchor": 85.88
     }
   ],
   "rsiScans": {
