@@ -10831,6 +10831,41 @@
           "target2": null,
           "status": "WAITING_D1",
           "created": "2026-05-01T06:22:44.394Z"
+        },
+        {
+          "id": "APG_2026-04-30",
+          "ticker": "APG",
+          "d0Date": "2026-04-30",
+          "direction": "SHORT",
+          "d_1": {
+            "C": 48.66
+          },
+          "d0": {
+            "O": 48.19,
+            "H": 49.99,
+            "L": 45.55,
+            "C": 45.72,
+            "V": 7.05
+          },
+          "atr": 3.39,
+          "relVol": 2.2,
+          "metrics": {
+            "impulse": -0.06041923551171389,
+            "clv": 0.03828828828828863,
+            "body": 0.5563063063063054,
+            "mid": 47.769999999999996,
+            "range": 4.440000000000005,
+            "relVol": 2.2,
+            "direction": "SHORT"
+          },
+          "entry": 45.211,
+          "d1": null,
+          "pattern": null,
+          "stop": null,
+          "target1": null,
+          "target2": null,
+          "status": "WAITING_D1",
+          "created": "2026-05-01T06:25:43.660Z"
         }
       ]
     },
