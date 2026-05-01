@@ -10761,6 +10761,41 @@
           "status": "ENTERED",
           "created": "2026-04-30T06:16:36.697Z",
           "tradeId": "1777551111777"
+        },
+        {
+          "id": "BLDR_2026-04-30",
+          "ticker": "BLDR",
+          "d0Date": "2026-04-30",
+          "direction": "SHORT",
+          "d_1": {
+            "C": 83.38
+          },
+          "d0": {
+            "O": 83.49,
+            "H": 85.88,
+            "L": 77.86,
+            "C": 79.09,
+            "V": 5.93
+          },
+          "atr": 5.57,
+          "relVol": 2.66,
+          "metrics": {
+            "impulse": -0.051451187335092255,
+            "clv": 0.1533665835411477,
+            "body": 0.54862842892768,
+            "mid": 81.87,
+            "range": 8.019999999999996,
+            "relVol": 2.66,
+            "direction": "SHORT"
+          },
+          "entry": 77.303,
+          "d1": null,
+          "pattern": null,
+          "stop": null,
+          "target1": null,
+          "target2": null,
+          "status": "WAITING_D1",
+          "created": "2026-05-01T06:18:19.387Z"
         }
       ]
     },
