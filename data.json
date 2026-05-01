@@ -10902,8 +10902,9 @@
           "stop": null,
           "target1": null,
           "target2": null,
-          "status": "WAITING_D1",
-          "created": "2026-05-01T06:28:00.870Z"
+          "status": "ENTERED",
+          "created": "2026-05-01T06:28:00.870Z",
+          "tradeId": "1777643235266"
         },
         {
           "id": "ETSY_2026-04-30",
@@ -13431,6 +13432,25 @@
       "atrPct": "7.40",
       "atrAbs": 3.39,
       "impulseAnchor": 49.99
+    },
+    {
+      "id": "1777643235266",
+      "createdAt": 1777643235266,
+      "ticker": "ENTG",
+      "type": "SHORT",
+      "entryDate": "2026-05-01",
+      "entry": 141.31,
+      "shares": 10,
+      "stop": "151.00",
+      "target1": "131.62",
+      "target2": "121.92",
+      "status": "OPEN",
+      "strategy": "impulse",
+      "commission": 0,
+      "notes": "D0: 2026-04-30 | Паттерн D+1: не подтверждён | ATR: 5.02 | Impulse: -5.3% | Anchor (High D0): 150.00",
+      "atrPct": "3.55",
+      "atrAbs": 5.02,
+      "impulseAnchor": 150
     }
   ],
   "rsiScans": {
