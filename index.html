@@ -611,6 +611,14 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
     <select id="fType" onchange="renderTrades()"><option value="">Все типы</option><option>LONG</option><option>SHORT</option></select>
     <select id="fStatus" onchange="renderTrades()"><option value="">Все статусы</option><option value="OPEN">Открытые</option><option value="PARTIAL">Частичн. выход</option><option value="CLOSED">Закрытые</option></select>
     <select id="fResult" onchange="renderTrades()"><option value="">Результат</option><option value="WIN">Выигрыш</option><option value="LOSS">Убыток</option></select>
+    <select id="fStrategy" onchange="renderTrades()">
+      <option value="">Все стратегии</option>
+      <option value="ibs_swing">📊 IBS</option>
+      <option value="event_continuation">⚡ Event</option>
+      <option value="pead">📈 PEAD</option>
+      <option value="impulse">🚀 Impulse</option>
+      <option value="rspc">🎯 RSPC</option>
+    </select>
     <input id="fTicker" placeholder="Тикер..." oninput="renderTrades()" style="max-width:120px">
   </div>
   <div class="tw">
@@ -819,7 +827,12 @@ hr{border:none;border-top:1px solid var(--line);margin:18px 0}
       <div style="font-family:var(--mono);font-size:9px;color:var(--t2);margin:12px 0;padding:10px 14px;background:var(--bg3);border-radius:8px;border:1px solid var(--line);line-height:1.7">
         <b>D0 LONG:</b> Move +5% to +12%, CLV > 0.70, Body > 0.50, RelVol ≥ 1.5<br>
         <b>D0 SHORT:</b> Move −5% to −12%, CLV < 0.30, Body > 0.50, RelVol ≥ 1.5<br>
-        <b>D+1:</b> Inside Day OR Weak Pullback OR Compression<br>
+        <b>D+1 (один из паттернов — кто не отдал движение D0):</b><br>
+        &nbsp;&nbsp;<b>1. Inside Day:</b> High_D+1 ≤ High_D0 AND Low_D+1 ≥ Low_D0 (день внутри предыдущего)<br>
+        &nbsp;&nbsp;<b>2. Weak Pullback (LONG):</b> Low_D+1 > Mid_D0 AND (H_D0 − L_D+1)/Range_D0 < 0.5 AND Close_D+1 > Mid_D0<br>
+        &nbsp;&nbsp;<b>2. Weak Pullback (SHORT):</b> High_D+1 < Mid_D0 AND (H_D+1 − L_D0)/Range_D0 < 0.5 AND Close_D+1 < Mid_D0<br>
+        &nbsp;&nbsp;<b>3. Compression:</b> Range_D+1/Range_D0 < 0.5 AND |Close_D+1 − Close_D0| < 0.3×Range_D0 AND Close на нужной стороне Mid_D0<br>
+        &nbsp;&nbsp;<i>Mid_D0 = (High_D0 + Low_D0) / 2 · Range_D0 = High_D0 − Low_D0</i><br>
         <b>Entry D+2 (LONG):</b> High_D0 + 0.1×ATR, Stop = Low_D0 − 0.2×ATR<br>
         <b>Entry D+2 (SHORT):</b> Low_D0 − 0.1×ATR, Stop = High_D0 + 0.2×ATR
       </div>
@@ -2839,7 +2852,7 @@ function applyData(data) {
     cache.analytics = data.analytics;
   }
   
-  // Migrate legacy trades[] → strategies.ibs_swing.trades[]
+  // Migrate legacy trades[] → отмечаем strategy для старых сделок
   if (Array.isArray(data.trades) && data.trades.length > 0) {
     if (!cache.strategies.ibs_swing) {
       cache.strategies.ibs_swing = { trades: [], scans: {}, config: {} };
@@ -2848,11 +2861,7 @@ function applyData(data) {
     data.trades.forEach(t => {
       if (!t.strategy) t.strategy = 'ibs_swing';
     });
-    // If new structure is empty, migrate from legacy
-    if (cache.strategies.ibs_swing.trades.length === 0) {
-      cache.strategies.ibs_swing.trades = data.trades;
-    }
-    // Keep legacy for backward compatibility
+    // cache.trades — единый источник всех сделок (по всем стратегиям)
     cache.trades = data.trades;
   }
   
@@ -4028,18 +4037,73 @@ async function saveTrade() {
     logEvent(t.strategy || 'ibs_swing', 'trade_open', { id: t.id, ticker: t.ticker, type: t.type, entry: t.entry });
   }
   
-  // Sync to new structure
-  if (cache.strategies.ibs_swing) {
-    cache.strategies.ibs_swing.trades = cache.trades;
+  scheduleSave(); const ok = true;
+  if(ok) { 
+    syncCandidateStatusFromTrade(t);
+    closeMo('moTrade'); renderTrades(); renderDash(); toast(id?'Сделка обновлена ✓':'Сделка добавлена ✓'); 
+  }
+}
+
+// Синхронизация статуса кандидата с состоянием сделки
+// Если сделка закрыта — кандидат → 'CLOSED', иначе → 'ENTERED'
+function syncCandidateStatusFromTrade(trade) {
+  if (!trade || !trade.id) return;
+  const newStatus = trade.status === 'CLOSED' ? 'CLOSED' : 'ENTERED';
+  
+  const collections = [
+    cache.strategies?.impulse?.candidates,
+    cache.strategies?.rspc?.candidates,
+    cache.strategies?.ibs_swing?.candidates,
+    cache.strategies?.event_continuation?.events,
+    cache.strategies?.pead?.earnings
+  ];
+  
+  let changed = false;
+  for (const list of collections) {
+    if (!Array.isArray(list)) continue;
+    for (const c of list) {
+      if (c.tradeId === trade.id && c.status !== newStatus) {
+        c.status = newStatus;
+        changed = true;
+      }
+    }
   }
   
-  scheduleSave(); const ok = true;
-  if(ok) { closeMo('moTrade'); renderTrades(); renderDash(); toast(id?'Сделка обновлена ✓':'Сделка добавлена ✓'); }
+  if (changed) {
+    if (typeof renderImpulse === 'function') renderImpulse();
+    if (typeof renderRSPC === 'function') renderRSPC();
+    if (typeof renderIbs === 'function') renderIbs();
+    if (typeof renderEvents === 'function') renderEvents();
+    if (typeof renderPEAD === 'function') renderPEAD();
+  }
+}
+
+// Вызывается при удалении сделки — кандидат вернётся в активный статус
+function unbindCandidateFromDeletedTrade(tradeId) {
+  const collections = [
+    { list: cache.strategies?.impulse?.candidates, render: 'renderImpulse', defaultStatus: 'READY_ENTRY' },
+    { list: cache.strategies?.rspc?.candidates, render: 'renderRSPC', defaultStatus: 'READY_ENTRY' },
+    { list: cache.strategies?.ibs_swing?.candidates, render: 'renderIbs', defaultStatus: 'READY_ENTRY' },
+    { list: cache.strategies?.event_continuation?.events, render: 'renderEvents', defaultStatus: 'READY_ENTRY' },
+    { list: cache.strategies?.pead?.earnings, render: 'renderPEAD', defaultStatus: 'READY_ENTRY' }
+  ];
+  
+  for (const { list, render, defaultStatus } of collections) {
+    if (!Array.isArray(list)) continue;
+    for (const c of list) {
+      if (c.tradeId === tradeId) {
+        c.status = defaultStatus;
+        delete c.tradeId;
+        if (typeof window[render] === 'function') window[render]();
+      }
+    }
+  }
 }
 
 async function delTrade(id) {
   confirmDialog('Удалить сделку?', async () => {
     cache.trades = cache.trades.filter(t=>t.id!==id);
+    unbindCandidateFromDeletedTrade(id);
     scheduleSave();
     renderTrades(); renderDash(); toast('Удалено');
   });
@@ -4122,8 +4186,9 @@ function renderTrades() {
   const tf = document.getElementById('fType')?.value||'';
   const sf = document.getElementById('fStatus')?.value||'';
   const rf = document.getElementById('fResult')?.value||'';
+  const stratF = document.getElementById('fStrategy')?.value||'';
   const tk = (document.getElementById('fTicker')?.value||'').toUpperCase();
-  const fl = tr.filter(t=>(!tf||t.type===tf)&&(!sf||t.status===sf)&&(!rf||t.result===rf)&&(!tk||t.ticker.includes(tk)));
+  const fl = tr.filter(t=>(!tf||t.type===tf)&&(!sf||t.status===sf)&&(!rf||t.result===rf)&&(!stratF||(t.strategy||'ibs_swing')===stratF)&&(!tk||t.ticker.includes(tk)));
   const tb = document.getElementById('tradesTb');
   if(!fl.length){ tb.innerHTML='<tr><td colspan="12" style="text-align:center;color:var(--t2);padding:36px">No trades</td></tr>'; return; }
   tb.innerHTML = fl.map(t => {
