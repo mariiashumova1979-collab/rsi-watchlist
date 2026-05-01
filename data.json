@@ -10936,6 +10936,41 @@
           "target2": null,
           "status": "WAITING_D1",
           "created": "2026-05-01T06:36:25.462Z"
+        },
+        {
+          "id": "BMY_2026-04-30",
+          "ticker": "BMY",
+          "d0Date": "2026-04-30",
+          "direction": "LONG",
+          "d_1": {
+            "C": 57.59
+          },
+          "d0": {
+            "O": 57.69,
+            "H": 60.78,
+            "L": 57.39,
+            "C": 60.59,
+            "V": 24.88
+          },
+          "atr": 2.35,
+          "relVol": 2.97,
+          "metrics": {
+            "impulse": 0.052092377148810556,
+            "clv": 0.9439528023598827,
+            "body": 0.8554572271386446,
+            "mid": 59.085,
+            "range": 3.3900000000000006,
+            "relVol": 2.97,
+            "direction": "LONG"
+          },
+          "entry": 61.015,
+          "d1": null,
+          "pattern": null,
+          "stop": null,
+          "target1": null,
+          "target2": null,
+          "status": "WAITING_D1",
+          "created": "2026-05-01T06:42:08.546Z"
         }
       ]
     },
