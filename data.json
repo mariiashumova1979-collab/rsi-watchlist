@@ -10938,8 +10938,9 @@
           "stop": null,
           "target1": null,
           "target2": null,
-          "status": "WAITING_D1",
-          "created": "2026-05-01T06:36:25.462Z"
+          "status": "ENTERED",
+          "created": "2026-05-01T06:36:25.462Z",
+          "tradeId": "1777643251763"
         },
         {
           "id": "BMY_2026-04-30",
@@ -13451,6 +13452,25 @@
       "atrPct": "3.55",
       "atrAbs": 5.02,
       "impulseAnchor": 150
+    },
+    {
+      "id": "1777643251763",
+      "createdAt": 1777643251763,
+      "ticker": "ETSY",
+      "type": "SHORT",
+      "entryDate": "2026-05-01",
+      "entry": 64.99,
+      "shares": 29,
+      "stop": "68.37",
+      "target1": "61.61",
+      "target2": "58.24",
+      "status": "OPEN",
+      "strategy": "impulse",
+      "commission": 0,
+      "notes": "D0: 2026-04-30 | Паттерн D+1: не подтверждён | ATR: 4.98 | Impulse: -7.6% | Anchor (High D0): 67.37",
+      "atrPct": "7.66",
+      "atrAbs": 4.98,
+      "impulseAnchor": 67.37
     }
   ],
   "rsiScans": {
