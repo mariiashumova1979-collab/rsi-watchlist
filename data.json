@@ -13623,7 +13623,7 @@
       "entryDate": "2026-05-01",
       "entry": 64.99,
       "shares": 29,
-      "stop": "68.37",
+      "stop": "68.89",
       "target1": "61.61",
       "target2": "58.24",
       "status": "OPEN",
@@ -13632,7 +13632,44 @@
       "notes": "D0: 2026-04-30 | Паттерн D+1: не подтверждён | ATR: 4.98 | Impulse: -7.6% | Anchor (High D0): 67.37",
       "atrPct": "7.66",
       "atrAbs": 4.98,
-      "impulseAnchor": 67.37
+      "impulseAnchor": 67.37,
+      "rsi2": "",
+      "trend": "",
+      "exitPrice": 0,
+      "exitReason": "",
+      "setup": {
+        "d_1": {
+          "O": 67,
+          "H": 70.88,
+          "L": 66.37,
+          "C": 69.6,
+          "V": 8.9
+        },
+        "d0": {
+          "O": 67.37,
+          "H": 67.37,
+          "L": 63.63,
+          "C": 64.34,
+          "V": 5.91
+        },
+        "d1": {
+          "O": 64.8,
+          "H": 65.05,
+          "L": 63.14,
+          "C": 63.17
+        },
+        "atr": null,
+        "relVol": null,
+        "spyChg": null,
+        "pattern": "Weak Pullback",
+        "metrics": {
+          "range": 3.740000000000002,
+          "mid": 65.5,
+          "clv": 0.1898395721925135,
+          "body": 0.8101604278074865,
+          "impulse": -0.07557471264367803
+        }
+      }
     }
   ],
   "rsiScans": {
