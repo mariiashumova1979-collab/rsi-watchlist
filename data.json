@@ -11206,6 +11206,41 @@
           "target2": null,
           "status": "WAITING_D1",
           "created": "2026-05-03T21:26:41.813Z"
+        },
+        {
+          "id": "ELF_2026-05-01",
+          "ticker": "ELF",
+          "d0Date": "2026-05-01",
+          "direction": "SHORT",
+          "d_1": {
+            "C": 63.97
+          },
+          "d0": {
+            "O": 63.1,
+            "H": 64,
+            "L": 59.74,
+            "C": 60.49,
+            "V": 4.07
+          },
+          "atr": 5.66,
+          "relVol": 1.86,
+          "metrics": {
+            "impulse": -0.054400500234484866,
+            "clv": 0.17605633802816908,
+            "body": 0.6126760563380284,
+            "mid": 61.870000000000005,
+            "range": 4.259999999999998,
+            "relVol": 1.86,
+            "direction": "SHORT"
+          },
+          "entry": 59.174,
+          "d1": null,
+          "pattern": null,
+          "stop": null,
+          "target1": null,
+          "target2": null,
+          "status": "WAITING_D1",
+          "created": "2026-05-03T21:29:58.592Z"
         }
       ]
     },
