@@ -11101,6 +11101,41 @@
           "status": "ENTERED",
           "created": "2026-05-01T06:42:08.546Z",
           "tradeId": "1777643081823"
+        },
+        {
+          "id": "CNK_2026-05-01",
+          "ticker": "CNK",
+          "d0Date": "2026-05-01",
+          "direction": "SHORT",
+          "d_1": {
+            "C": 29.52
+          },
+          "d0": {
+            "O": 29.11,
+            "H": 29.82,
+            "L": 27.39,
+            "C": 27.62,
+            "V": 4.79
+          },
+          "atr": 3.83,
+          "relVol": 2.28,
+          "metrics": {
+            "impulse": -0.06436314363143626,
+            "clv": 0.09465020576131705,
+            "body": 0.6131687242798348,
+            "mid": 28.605,
+            "range": 2.4299999999999997,
+            "relVol": 2.28,
+            "direction": "SHORT"
+          },
+          "entry": 27.007,
+          "d1": null,
+          "pattern": null,
+          "stop": null,
+          "target1": null,
+          "target2": null,
+          "status": "WAITING_D1",
+          "created": "2026-05-03T21:17:52.055Z"
         }
       ]
     },
@@ -11719,6 +11754,15 @@
         "exit": 41.39,
         "pnlPct": -2.21,
         "reason": ""
+      }
+    },
+    {
+      "timestamp": "2026-05-03T21:06:27.721Z",
+      "strategy": "impulse",
+      "event": "strategy_switch",
+      "data": {
+        "from": "impulse",
+        "to": "impulse"
       }
     }
   ],
