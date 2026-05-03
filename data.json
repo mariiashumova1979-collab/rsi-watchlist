@@ -11136,6 +11136,41 @@
           "target2": null,
           "status": "WAITING_D1",
           "created": "2026-05-03T21:17:52.055Z"
+        },
+        {
+          "id": "CLX_2026-05-01",
+          "ticker": "CLX",
+          "d0Date": "2026-05-01",
+          "direction": "SHORT",
+          "d_1": {
+            "C": 96.44
+          },
+          "d0": {
+            "O": 90.99,
+            "H": 91.15,
+            "L": 86.01,
+            "C": 87.11,
+            "V": 13.26
+          },
+          "atr": 4.03,
+          "relVol": 4.38,
+          "metrics": {
+            "impulse": -0.09674408958938198,
+            "clv": 0.2140077821011662,
+            "body": 0.754863813229571,
+            "mid": 88.58000000000001,
+            "range": 5.140000000000001,
+            "relVol": 4.38,
+            "direction": "SHORT"
+          },
+          "entry": 85.607,
+          "d1": null,
+          "pattern": null,
+          "stop": null,
+          "target1": null,
+          "target2": null,
+          "status": "WAITING_D1",
+          "created": "2026-05-03T21:24:51.799Z"
         }
       ]
     },
