@@ -11171,6 +11171,41 @@
           "target2": null,
           "status": "WAITING_D1",
           "created": "2026-05-03T21:24:51.799Z"
+        },
+        {
+          "id": "SYK_2026-05-01",
+          "ticker": "SYK",
+          "d0Date": "2026-05-01",
+          "direction": "SHORT",
+          "d_1": {
+            "C": 315.13
+          },
+          "d0": {
+            "O": 313.34,
+            "H": 313.34,
+            "L": 294.55,
+            "C": 294.73,
+            "V": 4.52
+          },
+          "atr": 3.14,
+          "relVol": 2.23,
+          "metrics": {
+            "impulse": -0.06473518865230216,
+            "clv": 0.00957956359765871,
+            "body": 0.9904204364023413,
+            "mid": 303.945,
+            "range": 18.789999999999964,
+            "relVol": 2.23,
+            "direction": "SHORT"
+          },
+          "entry": 294.236,
+          "d1": null,
+          "pattern": null,
+          "stop": null,
+          "target1": null,
+          "target2": null,
+          "status": "WAITING_D1",
+          "created": "2026-05-03T21:26:41.813Z"
         }
       ]
     },
